@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@600&display=swap');
+
+:root{
+    /*FONTS*/
+    --primaryfont: Genera Grotesk;
+    --secondaryfont: Archivo, sans-serif;
+    /*COLORS*/
+    --primarycolor: #F6F6F6;
+    --secondarycolor: #E7B95D;
+    --terciarycolor: #252525;
+    --red: #874545;
+    --green: #45874C;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--terciarycolor);
+    font-family: var(--primaryfont);
+}
+
+header {
+    text-align: center;
+}
+
+.logonav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    max-width: 100%;
+}
+
+.navmp{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+ul{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+li{
+    list-style-type: none;
+}
+
+.anchors{
+    font-family: var(--secondaryfont);
+    text-decoration: none;
+    margin-inline: 150px;
+    color: var(--primarycolor);
+    text-wrap: nowrap;
+    letter-spacing: 2px;
+}
+
+
+.featured{
+    position: absolute;
+    height: 500px;
+}
+
+.feature-prop{
+    z-index: -2;
+    position: absolute;
+    top: 0;
+}
+
+.actionfeature{
+    position: inherit;
+    bottom: 0;
+    margin-left: 65px;
+    margin-bottom: 30px;
+    color: var(--primarycolor);
+    font-family: var(--primaryfont);
+}
+
+.description-fp{
+    color: var(--primarycolor);
+    text-wrap: nowrap;
+    letter-spacing: 2px;
+    font-size: 28px;
+    margin-bottom: -8px;
+}
+
+.price-fp{
+    color: var(--primarycolor);
+    font-family: Archivo;
+    font-weight: 800;
+    letter-spacing: 1px;
+    font-size: 16px;
+}
+
+.bookmark-button{
+    position: absolute;
+}
+
+.arrowright-feature{
+    position: absolute;
+    right: 0;
+    transform: scaleX(-1);
+    background-color: var(--red);
+}
+
+.arrowleft-feature{
+    background-color: var(--red);
+}
