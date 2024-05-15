@@ -1,0 +1,67 @@
+---
+
+---
+
+<style is:global>
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@600&display=swap');
+
+
+  :root {
+    --primaryfont: Genera Grotesk;
+    --secondaryfont: Archivo, sans-serif;
+    /*COLORS*/
+    --primarycolor: #F6F6F6;
+    --secondarycolor: #E7B95D;
+    --terciarycolor: #252525;
+    --blur: rgba(0, 0, 0, 0.5);;
+    --red: #874545;
+    --green: #45874C;
+  }
+</style>
+
+<header class="bg-[var(--blur)] backdrop-blur-[5px] text-[var(--primarycolor)] sticky font-semibold">
+
+    
+    <header class="flex w-full sticky">
+        <div class="flex items-center">
+          <!--HAMBURGER MENU -->
+          <button>
+            <img src="icons/menu.svg" alt="ham" class="h-6 w-6">
+          </button>
+          <!--LOGOTYPE-->
+          <a href="/src/main/main.html">
+            <img src="icons/brand/luxerium.svg" alt="logo" class="h-14 w-fit m-auto">
+          </a>
+        </div>
+        <!--User + List w/us-->
+        <nav class="flex items-center space-x-6">
+          <ul class="flex items-center">
+            <li class="bg-transparent p-2 border-solid border-2 border-[var(--secondarycolor)] rounded-lg ">
+              <a href="#" class="text-secondarycolor">LIST WITH US</a>
+            </li>
+            <li>
+              <a href="#">
+                <img src="icons/user.svg" alt="profile" class="h-8 w-8">
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </header>
+
+    
+      <!--SECONDARY NAVBAR-->
+
+  <header class="flex gap-[10vw] w-fit m-auto py-[10px]"> 
+
+    <nav>
+      <ul class="flex lg:gap-[15em] md:gap-[8em] ">
+        <li><a href="#" class="text-[18px] font-[var(--secondaryfont)] transition-all duration-500 ease-in-out hover:text-emerald-600">REAL ESTATE</a></li>
+        <li><a href="#" class="text-[18px] font-[var(--secondaryfont)] transition-all duration-500 ease-in-out hover:text-emerald-600">CARS</a></li>
+        <li><a href="#" class="text-[18px] font-[var(--secondaryfont)] transition-all duration-500 ease-in-out hover:text-emerald-600">AIRCRAFTS</a></li>
+        <li><a href="#" class="text-[18px] font-[var(--secondaryfont)] transition-all duration-500 ease-in-out hover:text-emerald-600">SHIPS</a></li>
+      </ul>
+    </nav>
+
+  </header>
+</header>

@@ -1,0 +1,39 @@
+---
+import Searchbar from  './Searchbar.astro';
+
+
+---
+
+<div class="w-[100vw] h-[50vh] relative max-w-[1920px]">
+  <Searchbar />
+  <img src="https://images.pexels.com/photos/7031408/pexels-photo-7031408.jpeg" alt="" class="w-[100vw] h-[50vh] max-w-[100vw] relative object-cover duration-[2s] ease-in-out object-top hover:object-center brightness-[0.85] contrast-95">
+
+  
+    <div class="absolute bottom-0 ml-[30px] mb-[30px] font-semibold text-[var(--primarycolor)]">
+        <h1 class="font-[var(--primaryfont)] text-[28px] font-bold">MANSION IN LOMAS DE ZAMORA, GBA SUR, AR</h1>
+        <p class="font-[var(--secondaryfont)] text-[16px] my-1">$420.000.000.00</p>
+        <div class="flex">
+            <button class="aspect-square w-[40px] bg-[var(--terciarycolor)]"><img src="/icons/bookmark.svg" alt="bookmark" class="flex w-fit m-auto"></button>
+            <button class="w-[300px] h-[40px] text-center bg-[var(--green)]">CONTACT AGENT</button>
+        </div>
+    </div>
+
+</div>
+
+<style is:global>
+
+    @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@600&display=swap');
+    
+    
+      :root {
+        --primaryfont: Genera Grotesk;
+        --secondaryfont: Archivo, sans-serif;
+        /*COLORS*/
+        --primarycolor: #F6F6F6;
+        --secondarycolor: #E7B95D;
+        --terciarycolor: #252525;
+        --blur: rgba(0, 0, 0, 0.5);;
+        --red: #874545;
+        --green: #45874C;
+      }
+    </style>
