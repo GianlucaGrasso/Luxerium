@@ -1,20 +1,32 @@
 ---
+import FeatureButton from "./subComponents/FeatureButton.astro"
 
 ---
 
 <div class="max-w-[100vw]">
 
-  <h1 class="text-center w-fit m-auto mt-[1em] text-[#F6F6F6] font-bold text-[28px]">BROWSE BY MARKETPLACE</h1>
+  <h1 class="text-center w-fit m-auto mt-[.75em] text-[#F6F6F6] font-bold text-[28px]">BROWSE BY MARKETPLACE</h1>
 
   <div class="absolute my-[1.5em] w-[100vw] flex justify-center px-[2em] gap-[10px]">  
-      <button class="flex-grow aspect-[1/2] h-[15em] max-w[30em] duration-[0.3s] ease-in-out hover:bg-bottom bg-[url('https://archello.s3.eu-central-1.amazonaws.com/images/2023/07/21/mask-architects-eagle-mansion-signature-villa-for-emaar-misr-housing-archello.1689934438.6904.jpg')]  bg-top bg-cover"> <a href="#" class="flex w-fit mx-auto"> REAL ESTATE</a> </button>
-      <button class="flex-grow aspect-[1/2] h-[15em] max-w[30em] duration-[0.3s] ease-in-out hover:bg-bottom bg-[url('https://images.pexels.com/photos/10550012/pexels-photo-10550012.jpeg')] bg-center bg-cover"> <a href="#" class="flex w-fit mx-auto"> CARS </a> </button>
-      <button class="flex-grow aspect-[1/2] h-[15em] max-w[30em] duration-[0.3s] ease-in-out hover:bg-bottom bg-[url('https://images.pexels.com/photos/18356792/pexels-photo-18356792/free-photo-of-vuelo-cielo-volador-avion.jpeg')]  bg-center bg-cover"> <a href="#" class="flex w-fit mx-auto"> AIRCRAFT </a> </button>
-      <button class="flex-grow aspect-[1/2] h-[15em] max-w[30em] duration-[0.3s] ease-in-out hover:bg-bottom bg-[url('https://d2x2jq9y4geyy8.cloudfront.net/default/yacht-amels-60-20220902-editorial-profile-01-631200e0b3022_v_default_extra_big.jpeg')]  bg-center bg-cover"> <a href="#" class="flex w-fit mx-auto"> SHIPS </a> </button>
-  </div>
 
+    <FeatureButton title="REAL ESTATE" image="https://images3.alphacoders.com/134/1347183.png" />
+    <FeatureButton title="VEHICLES" image="https://images.pexels.com/photos/10550012/pexels-photo-10550012.jpeg" />
+    <FeatureButton title="AIRCRAFTS" image="https://images.pexels.com/photos/18356792/pexels-photo-18356792/free-photo-of-vuelo-cielo-volador-avion.jpeg" />
+    <FeatureButton title="SHIPS" image="https://d2x2jq9y4geyy8.cloudfront.net/default/yacht-amels-60-20220902-editorial-profile-01-631200e0b3022_v_default_extra_big.jpeg" />
+
+
+  </div>
+  
 </div>  
 
+<!--
+
+<button class="flex-grow aspect-[1/2] h-[15em] max-w[30em] duration-[0.3s] ease-in-out hover:bg-bottom bg-[url('https://archello.s3.eu-central-1.amazonaws.com/images/2023/07/21/mask-architects-eagle-mansion-signature-villa-for-emaar-misr-housing-archello.1689934438.6904.jpg')]  bg-top bg-cover"> <a href="#" class="flex w-fit mx-auto"> REAL ESTATE</a> </button>
+<button class="flex-grow aspect-[1/2] h-[15em] max-w[30em] duration-[0.3s] ease-in-out hover:bg-bottom bg-[url('https://images.pexels.com/photos/10550012/pexels-photo-10550012.jpeg')] bg-center bg-cover"> <a href="#" class="flex w-fit mx-auto"> CARS </a> </button>
+<button class="flex-grow aspect-[1/2] h-[15em] max-w[30em] duration-[0.3s] ease-in-out hover:bg-bottom bg-[url('https://images.pexels.com/photos/18356792/pexels-photo-18356792/free-photo-of-vuelo-cielo-volador-avion.jpeg')]  bg-center bg-cover"> <a href="#" class="flex w-fit mx-auto"> AIRCRAFT </a> </button>
+<button class="flex-grow aspect-[1/2] h-[15em] max-w[30em] duration-[0.3s] ease-in-out hover:bg-bottom bg-[url('https://d2x2jq9y4geyy8.cloudfront.net/default/yacht-amels-60-20220902-editorial-profile-01-631200e0b3022_v_default_extra_big.jpeg')]  bg-center bg-cover"> <a href="#" class="flex w-fit mx-auto"> SHIPS </a> </button>
+
+-->
 
 <!-----
 <div class="w-[1920px] h-[300px] relative">

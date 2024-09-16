@@ -1,0 +1,24 @@
+---
+const { market = "DEFAULT"} = Astro.props;
+
+---
+
+<li>
+    <a href="#" class="text-white text-[18px] font-secondaryFont transition-all duration-[250ms] ease-in-out hover:text-[#F99929] hover:underline hover:underline-offset-4 hover:text-shadow-glow">
+      {market}
+    </a>
+  </li>
+  
+  <style is:global>
+    /* Glow effect using text-shadow */
+    .hover\:text-shadow-glow:hover {
+      text-shadow: 0 0 4px #F99929, 0 0 1px #F99929;
+    }
+  
+    /* Underline style (can be controlled with the 'underline-offset' utility) */
+    a:hover {
+      text-decoration-color: #F99929;
+      text-underline-offset: 2px; /* Optional: adjust the distance of underline from the text */
+    }
+  </style>
+  

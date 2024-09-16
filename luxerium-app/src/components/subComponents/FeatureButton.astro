@@ -1,0 +1,16 @@
+---
+const { title = "DEFAULT TITLE", image = "https://placehold.co/1920x1080" } = Astro.props;
+---
+
+<button 
+  class="group flex-grow aspect-[1/2] h-[15em] max-w-[30em] duration-[0.3s] ease-in-out hover:bg-bottom bg-top bg-cover relative" 
+  style={`background-image: url('${image}');`}
+>
+  <!-- Red background div around title, expands on hover -->
+  <div class="bg-lightGreyFade w-full h-[3em] absolute bottom-0 flex justify-center items-center group-hover:h-full transition-all duration-300 ease-in-out">
+    <a href="#" class="text-primaryColor font-primaryFont text-xl tracking-wider">
+      {title}
+    </a>
+  </div>
+</button>
+
