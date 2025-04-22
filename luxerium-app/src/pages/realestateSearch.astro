@@ -1,0 +1,34 @@
+---
+import Layout from "../layouts/Layout.astro"
+import Navbar from "../components/Navbar.astro"
+import SecondaryNavbar from "../components/SecondaryNavbar.astro"
+import Map from "../components/Map.astro"
+import Proplist from "../components/Proplist.astro"
+import Filters from "../components/subComponents/navbarElements/Filters.astro"
+---
+
+<Layout title="Real Estate">
+    <Navbar />
+    <SecondaryNavbar />
+    <Filters/>
+
+    <div class="grid grid-cols-2 max-lg:grid-cols-1 gap-0 h-screen fixed">
+        <Map />
+        <Proplist />
+    </div>
+</Layout>
+
+
+
+  
+
+
+<!-- 
+    <Layout title="RealEstate">
+        <Navbar/>
+        <div class="grid grid-cols-2 p-0 m-0 gap-0">
+            <Map/>
+            <Proplist/>
+        </div>
+    </Layout>
+ -->

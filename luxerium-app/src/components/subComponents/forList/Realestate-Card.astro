@@ -1,0 +1,129 @@
+---
+const Price = "$999,999,999";
+const { Title } = Astro.props;
+const Location = {
+  Country: "Argentina",
+  State: "Buenos Aires",
+  City: "Lomas de Zamora",
+  Zipcode: "B1832",
+  Pluscode: "8QC7+22",
+};
+
+// Status data
+const Status = {
+  '0': "NO STATE",
+  '1': "FOR SALE",
+  '2': "FOR RENT",
+  '3': "SOLD",
+  '4': "TEMPO"
+};
+
+// Map status to Tailwind classes
+const StatusClasses = {
+  '0': "text-slate-500 bg-slate-500",
+  '1': "text-forSale bg-forSale",
+  '2': "text-forRent bg-forRent",
+  '3': "text-Sold bg-Sold",
+  '4': "text-forRentTemp bg-forRentTemp"
+};
+
+// Current status
+
+const currentStatus = '3'; // Change this to test different states
+---
+
+<!-- CARD -->
+<a href="" class="h-full rounded-2xl bg-primaryColor select-none text-terciaryColor flex flex-col justify-between">
+  <div>
+    <div class="w-full h-48 rounded-t-2xl">
+      <img
+        src="https://mansionesmiami.com/wp-content/uploads/2020/05/620-Arvida-Pkwy-Coral-Gables-FL-33156-1.jpg"
+        alt=""
+        class="w-full h-full object-cover rounded-t-2xl"
+        draggable="false"
+      />
+    </div>
+    <div class="px-3 pt-3 pb-0">
+      <!-- Price -->
+      <div class="flex items-center justify-between">
+        <span class="font-secondaryFont text-2xl font-semibold">{Price}</span>
+        <!-- Dynamic Status -->
+        <span
+          class={`font-secondaryFont font-semibold bg-opacity-35 h-full text-sm px-3 py-1 w-24 rounded-2xl text-center text-nowrap ${StatusClasses[currentStatus]}`}
+        >
+          {Status[currentStatus]}
+        </span>
+      </div>
+      <!-- Title -->
+      <h3 class="font-primaryFont text-3xl mb-2 mt-1 " id="title">{Title}</h3>
+
+      <!-- Location -->
+      <p class="font-secondaryFont mt-2 text-sm font-light leading-tight text-gray-500 flex">
+        <img src="https://www.svgrepo.com/show/424575/location-direction-gps.svg" alt="Type Icon" class="mr-1 h-4" />
+        {Location.City}, {Location.State}, <br />{Location.Country}. {Location.Zipcode}, {Location.Pluscode}
+      </p>
+
+    </div>
+  </div>
+  <!-- Specs -->
+  <div class="h-max stati mb-0 px-3 flex justify-center">
+    <div class="grid min-lg:grid-cols-3 min-lg:gap-4 sm:grid-cols-3 sm:gap-x-4 gap-y-2 my-2 text-sm text-terciaryColor h-fit">
+      <span class="font-secondaryFont font-light flex items-center text-nowrap">
+        <img src="https://www.svgrepo.com/show/253357/measure-ruler.svg" alt="Size Icon" class="mr-1 h-[1.4rem]" />
+        1800 sqft
+      </span>
+      <span class="font-secondaryFont font-light flex items-center text-nowrap justify-center">
+        <img src="https://www.svgrepo.com/show/273949/annual-year.svg" alt="Built Icon" class="mr-1 h-[1.4rem]" />
+        Built 2020
+      </span>
+      <span class="font-secondaryFont font-light flex items-center text-nowrap">
+        <img src="https://www.svgrepo.com/show/217910/mansion.svg" alt="Type Icon" class="mr-1 h-[1.4rem]" />
+        Mansion
+      </span>
+      <span class="font-secondaryFont font-light flex items-center text-nowrap">
+        <img src="https://www.svgrepo.com/show/12056/bed.svg" alt="Beds Icon" class="mr-1 h-[1.4rem]" />
+        5 Bed
+      </span>
+      <span class="font-secondaryFont font-light flex items-center text-nowrap">
+        <img src="https://www.svgrepo.com/show/25980/bathtub.svg" alt="Baths Icon" class="mr-1 h-[1.4rem]" />
+        1.5 Bath
+      </span>
+      <span class="font-secondaryFont font-light flex items-center text-nowrap">
+        <img src="https://www.svgrepo.com/show/138473/parking.svg" alt="Garage Icon" class="mr-1 h-[1.4rem]" />
+        2 Slots
+      </span>
+    </div>
+  </div>
+
+  <!-- AGENT/CY INFO -->
+  <div class="relative items-center border-t border-r-white p-3 flex justify-between">
+    <div class="flex w-fit bottom-0">
+      <!-- Agent Image -->
+      <img
+        src="https://media.licdn.com/dms/image/D4E03AQF7H3JcLhG_Dw/profile-displayphoto-shrink_200_200/0/1695826075442?e=2147483647&v=beta&t=i-DkXKIKz97U01QD5xk4obzxDGSytcYenEU_Y32yYpk"
+        alt="Agent Image"
+        class="h-12 w-12 rounded-2xl object-cover shadow-xl"
+        draggable="false"
+      />
+
+      <!-- Agent Details -->
+      <div class="ml-3 flex-1">
+        <div class="leading-tight">
+          <h4 class="font-secondaryFont font-semibold text-gray-800 text-sm w-fit object-center py-1">
+            RYAN<br />SERHANT
+          </h4>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Section -->
+    <div class="absolute inset-y-0 right-0 overflow-hidden rounded-br-2xl">
+      <img
+        src="https://media.licdn.com/dms/image/v2/C4D0BAQHAngADammaaw/company-logo_200_200/company-logo_200_200/0/1630507650503/the_serhant_team_logo?e=2147483647&v=beta&t=Gyo7NCOUwI4Z6ySSdQnXaef03XxW_ZDqf_SaBDCqRAU"
+        alt="#"
+        class="h-full w-[9.5rem] object-cover border-l object-center"
+        draggable="false"
+      />
+    </div>
+  </div>
+</a>

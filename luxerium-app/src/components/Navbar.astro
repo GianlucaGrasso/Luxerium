@@ -1,25 +1,25 @@
 ---
-import Logotype from "./subComponents/Logotype.astro";
-import HamburgerMenu from "./subComponents/HamburgerMenu.astro";
-import UserButton from "./subComponents/UserButton.astro";
-import ListWithUs from "./subComponents/ListWithUs.astro";
+import Logotype from "./subComponents/navbarElements/Logotype.astro";
+import HamburgerMenu from "./subComponents/navbarElements/HamburgerMenu.astro";
+import UserButton from "./subComponents/navbarElements/UserButton.astro";
+import ListWithUs from "./subComponents/navbarElements/ListWithUs.astro";
 ---
 
-<header class="backdrop-blur-[5px] text-primaryColor sticky top-0 z-50 font-semibold h-[60px]">
+<header class="backdrop-blur-[5px] bg-terciaryColor text-primaryColor sticky top-0 z-50 font-semibold h-[60px] w-full">
   <div class="flex items-center justify-between w-full h-full px-4">
     <!-- Menú hamburguesa y "List With Us" a la izquierda -->
     <div class="flex items-center space-x-4">
       <HamburgerMenu />
-      <ListWithUs />
     </div>
-
+    
     <!-- Logotipo centrado -->
     <div class="absolute left-1/2 transform -translate-x-1/2">
       <Logotype />
     </div>
-
+    
     <!-- Botón de usuario a la derecha -->
     <div class="flex items-center">
+      <ListWithUs />
       <UserButton />
     </div>
   </div>

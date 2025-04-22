@@ -1,0 +1,130 @@
+---
+import Layout from "../layouts/Layout.astro"
+import RealestateCard from "../components/subComponents/forList/Realestate-Card.astro"
+
+---
+
+<Layout title="Test">
+    <RealestateCard/>
+</Layout>
+
+<div class="bg-primaryColor w-fit m-auto rounded-[20px] overflow-hidden shadow-lg">
+  <!-- Image Section -->
+  <div class="relative h-48">
+    <img
+      src="https://placehold.co/300x200"
+      alt="Property Title"
+      class="w-full h-full object-cover"
+      draggable="false"
+    />
+    <!-- Carousel Navigation -->
+    <div class="absolute inset-0 flex items-center justify-between px-4">
+      <button class="bg-white/80 rounded-full p-2 hover:bg-white transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+      <button class="bg-white/80 rounded-full p-2 hover:bg-white transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+    <!-- Carousel Indicators -->
+    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+      <span class="w-2 h-2 bg-white rounded-full"></span>
+      <span class="w-2 h-2 bg-white/50 rounded-full"></span>
+      <span class="w-2 h-2 bg-orange-500 rounded-full"></span>
+      <span class="w-2 h-2 bg-white/50 rounded-full"></span>
+    </div>
+  </div>
+
+  <div class="p-4">
+    <!-- Price and Status -->
+    <div class="flex justify-between items-center mb-3">
+      <span class="text-xl font-bold">$999,999</span>
+      <span class="px-3 py-1 bg-red-100 text-red-600 rounded-full text-xs font-medium">
+        For Sale
+      </span>
+    </div>
+
+    <!-- Title -->
+    <h3 class="text-lg font-bold mb-3">Beautiful Family Home</h3>
+
+    <!-- Location -->
+    <div class="flex gap-2 mb-4">
+      <svg class="w-5 h-5 mt-1 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 13.43a3.12 3.12 0 1 0 0-6.24 3.12 3.12 0 0 0 0 6.24Z" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M3.62 8.49c1.97-8.66 14.8-8.65 16.76.01 1.15 5.08-2.01 9.38-4.78 12.04a5.193 5.193 0 0 1-7.21 0c-2.76-2.66-5.92-6.97-4.77-12.05Z" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      <div class="flex flex-col text-sm text-gray-600">
+        <span>Los Angeles, CA</span>
+        <span>34.0522° N, 118.2437° W</span>
+      </div>
+    </div>
+
+    <!-- Specs -->
+    <div class="grid grid-cols-3 gap-4 mb-4">
+      <div class="flex items-center gap-1">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 22h20" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2.95 22 3 9.97c0-.61.29-1.19.77-1.57l7-5.45c.72-.56 1.73-.56 2.46 0l7 5.44c.49.38.77.96.77 1.58V22" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10"/>
+        </svg>
+        <span class="text-xs">1800 sqft</span>
+      </div>
+      <div class="flex items-center gap-1">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 2v3M16 2v3M3.5 9.09h17M3 13.01V8.5c0-3 1.5-5 5-5h8c3.5 0 5 2 5 5v8.5c0 3-1.5 5-5 5h-8c-3.5 0-5-2-5-5v-3.99Z" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="text-xs">Built in 2020</span>
+      </div>
+      <div class="flex items-center gap-1">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19.5 7v3c0 .55-.45 1-1 1h-13c-.55 0-1-.45-1-1V7c0-.55.45-1 1-1h13c.55 0 1 .45 1 1ZM19.5 14v3c0 .55-.45 1-1 1h-13c-.55 0-1-.45-1-1v-3c0-.55.45-1 1-1h13c.55 0 1 .45 1 1Z" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="text-xs">4 beds</span>
+      </div>
+      <div class="flex items-center gap-1">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 22h20" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2.95 22 3 9.97c0-.61.29-1.19.77-1.57l7-5.45c.72-.56 1.73-.56 2.46 0l7 5.44c.49.38.77.96.77 1.58V22" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10"/>
+        </svg>
+        <span class="text-xs">1800 sqft</span>
+      </div>
+      <div class="flex items-center gap-1">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 2v3M16 2v3M3.5 9.09h17M3 13.01V8.5c0-3 1.5-5 5-5h8c3.5 0 5 2 5 5v8.5c0 3-1.5 5-5 5h-8c-3.5 0-5-2-5-5v-3.99Z" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="text-xs">Built in 2020</span>
+      </div>
+      <div class="flex items-center gap-1">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19.5 7v3c0 .55-.45 1-1 1h-13c-.55 0-1-.45-1-1V7c0-.55.45-1 1-1h13c.55 0 1 .45 1 1ZM19.5 14v3c0 .55-.45 1-1 1h-13c-.55 0-1-.45-1-1v-3c0-.55.45-1 1-1h13c.55 0 1 .45 1 1Z" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="text-xs">4 beds</span>
+      </div>
+    </div>
+
+    <!-- Agent Info -->
+    <div class="flex items-center justify-between pt-3 border-t">
+      <div class="flex items-center gap-2">
+        <img
+          src="https://placehold.co/40x40"
+          alt="Agent"
+          class="w-10 h-10 rounded-full object-cover"
+          draggable="false"
+        />
+        <div class="flex flex-col">
+          <span class="font-bold text-sm">John Doe</span>
+          <span class="font-bold text-sm">Agency Name</span>
+        </div>
+      </div>
+      <img
+        src="https://placehold.co/80x40"
+        alt="Agent Logo"
+        class="h-10 object-contain"
+        draggable="false"
+      />
+    </div>
+  </div>
+</div>

@@ -1,25 +1,54 @@
 ---
 
 ---
+<!-- SEARCHBAR -->
 
-<div class="absolute z-10 m-5 w-fit flex ">
-    <input type="text" name="" id="" placeholder="COUNTRY / CITY / STATE / ZIP CODE" class="rounded text-center min-w-[30vw] p-2 bg-[var(--primarycolor)] opacity-65 text-[var(--terciarycolor)] outline-none">
+<div class="absolute left-1/2 transform -translate-x-1/2 z-10 my-5">
+  <div class="flex">
+
+    <!-- Boton de tipo de propiedades -->
+
+    <div>
+      <button class="w-[100px] h-[50px] bg-blackBackground">
+        <img src="icons/tags/arrowTag.svg" alt="" class="w-[40px] h-[40px] flex m-auto">
+      </button>
+    </div>
+        
+    
+    <input type="text" name="" id="" placeholder="SEARCH PROPERTIES" class="h-[50px] w-[40px] text-center min-w-[30vw] p-2 bg-primaryColor opacity-65 text-terciaryColor outline-none">
+    
+    <!-- Boton de busqueda -->
+    <div>
+      <button class="w-[75px] h-[50px] bg-blackBackground">
+        <img src="icons/tags/searchTag.svg" alt="" class="w-[40px] h-[40px] flex m-auto">
+      </button>
+    </div>
+  </div>
 </div>
 
-<style is:global>
+<!-- COUNTRY / CITY / STATE / ZIP CODE -->
 
-    @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@600&display=swap');
+
+<!--
+---
+
+---
+
+
+<div class="absolute z-10 my-5 w-fit flex ">
+    <div>
+      <button class=" w-[100px] h-[50px] bg-blackBackground">
+        <img src="icons/tags/arrowTag.svg" alt="" class="w-[40px] h-[40px] flex m-auto">
+      </button>
+    </div>
+    <input type="text" name="" id="" placeholder="SEARCH PROPERTIES" class=" h-[50px]  w-[40px] text-center min-w-[30vw] p-2 bg-primaryColor opacity-65 text-terciaryColor outline-none">
     
+    <div>
+      <button class=" w-[75px] h-[50px] bg-blackBackground">
+        <img src="icons/tags/searchTag.svg" alt="" class="w-[40px] h-[40px] flex m-auto">
+      </button>
+    </div>    
     
-      :root {
-        --primaryfont: Genera Grotesk;
-        --secondaryfont: Archivo, sans-serif;
-        /*COLORS*/
-        --primarycolor: #F6F6F6;
-        --secondarycolor: #E7B95D;
-        --terciarycolor: #252525;
-        --blur: rgba(0, 0, 0, 0.5);;
-        --red: #874545;
-        --green: #45874C;
-      }
-    </style>
+</div>
+
+-->
