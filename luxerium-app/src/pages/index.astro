@@ -4,15 +4,21 @@ import Navbar from '../components/Navbar.astro';
 import SecondaryNavbar from '../components/SecondaryNavbar.astro';
 import Feature from '../components/Feature.astro';
 import Markets from  '../components/Markets.astro';
+import Test2 from './test2.astro';
 ---
 
 <Layout title="Luxerium">
     <Navbar />
     <SecondaryNavbar/>
     <Feature />
-    <Markets />
-    
-    
+    <div class="flex flex-col">
+        <div class="w-full">
+            <Markets />
+        </div>
+        <div class="w-full">
+            <Test2 />
+        </div>
+    </div>
 </Layout>
 
     

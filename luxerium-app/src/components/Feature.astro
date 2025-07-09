@@ -1,5 +1,16 @@
 ---
 import Searchbar from './Searchbar.astro';
+
+var currency = {
+  0: 'USD $',
+  1: 'EUR €',
+  2: 'GBP €',
+  3: 'ARS $',
+  4: 'JPY ¥',
+  5: 'CNY ¥',
+  6: 'AUD $',
+} ; // Define the currency variable
+
 ---
 
 <div class="relative w-full h-[50vh]">
@@ -28,10 +39,10 @@ import Searchbar from './Searchbar.astro';
       <span class="lg:inline hidden">, AR</span>
     </h1>
     <p class="mb-[.5em] text-lg font-secondaryFont">
-      $420,000,000.00
+     <span class="text-secondaryColor font-extrabold">{currency[4]}</span> 420,000,000
     </p>
     <div class="flex space-x-4">
-      <button class="transition ease-in-out duration-300 hover:backdrop-blur w-72 h-10 text-center bg-transparent border-secondaryColor border rounded-br-3xl rounded-tr-md">
+      <button class="transition-all duration-300 backdrop-blur-sm hover:bg-secondaryColor w-72 h-10 text-center border-secondaryColor border rounded-br-3xl rounded-tr-md">
         CONTACT AGENT
       </button>
     </div>

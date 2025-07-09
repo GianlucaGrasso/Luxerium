@@ -1,0 +1,138 @@
+---
+import Layout from "../layouts/Layout.astro";
+import BrowseBy from "../components/subComponents/BrowseBy.astro";
+
+// REAL ESTATE FILTER
+
+const realEstateTypes = { 
+    1: "HOUSES",
+    2: "APARTMENTS",
+    3: "BUILDINGS",
+    4: "LANDS",
+}
+
+const houseTypes = {
+    1: "MANSIONS",
+    2: "TOWNHOUSES",
+    3: "VILLAS",
+    4: "COTTAGES",
+    5: "RANCHS",
+    6: "CABINS",
+}
+const apartmentTypes = { 
+    1: "STUDIOS",
+    2: "PENTHOUSES",
+    3: "LOFTS",
+    4: "CONDOS",
+}
+
+const buildingTypes = { 
+    1: "OFFICES",
+    2: "WAREHOUSES",
+    3: "HOTELS",
+}
+
+const landTypes = { 
+    1: "RESIDENTIAL",
+    2: "COMMERCIAL",
+    3: "AGRICULTURAL",
+    4: "INDUSTRIAL",
+}
+
+// VEHICLES FILTER
+
+const vehicleTypes = { 
+   1: "CARS",
+   2: "MOTORCYCLES",
+   3: "TRUCKS",
+   4: "OFFROAD",
+}
+
+const carTypes = {
+    1: "SPORTS CARS",
+    2: "SUVS",
+    3: "SEDANS",
+    4: "HATCHBACKS",
+    5: "COUPES",
+    6: "CONVERTIBLES",
+    7: "PICKUPS",
+    8: "VANS",
+    9: "SUPERCARS",
+}
+
+const motorcycleTypes = { 
+    1: "STANDARD",
+    2: "SPORT BIKES",
+    3: "CRUISERS",
+    4: "TOURING BIKES",
+    5: "CHOPPER",
+    6: "SCOOTER",
+}
+
+const truckTypes = { 
+    1: "SEMI TRUCKS",
+    2: "LIVESTOCK TRUCKS",
+    3: "SMALL TRUCKS",
+    4: "BOX TRUCKS",
+}
+
+const offroadTypes = { 
+    1: "UTILITY ATVS",
+    2: "SNOWMOBILES",
+    3: "OFF-ROAD BIKES",
+    4: "TASK VEHICLES",
+}
+
+// AIRCRAFTS FILTER
+
+const aircraftTypes = { 
+   1: "PRIVATE JETS",
+   2: "COMMERCIAL AIRCRAFTS",
+   3: "HELICOPTERS",
+   4: "GLIDERS",
+   5: "SEAPLANES",
+   6: "EVTOLS",
+}
+
+// SHIPS FILTER
+
+const shipTypes = { 
+   1: "YACHTS",
+   2: "CATAMARANS",
+   3: "SAILBOATS",
+   4: "BOATS",
+   5: "CRUISERS",
+   6: "JETSKIS"
+
+
+}
+
+---
+<div class="max-w-[100vw]">
+  <h1 class="text-center w-fit m-auto text-primaryColor font-secondaryFont text-[18px]">BROWSE BY {}</h1>
+  
+  <div class="my-[1.5em] w-full flex px-[2em] gap-[10px] flex-wrap flex-none">  
+    <BrowseBy title={realEstateTypes[1]} size="sm" image="https://images.unsplash.com/photo-1721902474248-3d6d2f2b595e?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+    <BrowseBy title={realEstateTypes[2]} size="md" image="https://images.unsplash.com/photo-1629644494884-7580538c3d43?q=80&w=889&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dhttps://images.pexels.com/photos/10550012/pexels-photo-10550012.jpeg" />
+    <BrowseBy title={realEstateTypes[3]} size="lg" image="https://images.unsplash.com/photo-1682380116425-f103d66c5cf1?q=80&w=880&auto=format&full=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+    <BrowseBy title={realEstateTypes[4]} size="md" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />      
+    <BrowseBy title="" size="lg" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />      
+    <BrowseBy title="" size="sm" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />      
+    <BrowseBy title="" size="md" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />      
+    <BrowseBy title="" size="" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />      
+    <BrowseBy title="" size="" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />      
+    <BrowseBy title="" size="" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />      
+    <BrowseBy title="" size="" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />      
+    <BrowseBy title="" size="" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />      
+    <BrowseBy title="" size="" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />      
+    <BrowseBy title="" size="" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />      
+    <BrowseBy title="" size="" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />      
+    <BrowseBy title="" size="" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />      
+    <BrowseBy title="" size="" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />      
+    <BrowseBy title="" size="" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />      
+    <BrowseBy title="" size="" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />      
+    <BrowseBy title="" size="" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />      
+    <BrowseBy title="" size="" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />      
+    
+  </div>
+</div>

@@ -12,6 +12,7 @@ export default {
 				secondaryFont: ['Archivo', 'sans-serif'],
 				// Add more custom font families as needed
 			  },
+			  
 			  colors: {
 				'primaryColor': '#F6F6F6',
 				'secondaryColor': '#F99929',

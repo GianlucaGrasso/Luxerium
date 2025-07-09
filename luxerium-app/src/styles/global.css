@@ -1,0 +1,8 @@
+@font-face {
+    font-family: "Genera Grotesk";
+    src: url("/fonts/genera-grotesk.ttf") format("ttf");
+  }
+  @font-face {
+    font-family: "Archivo";
+    src: url("/fonts/archivo.ttf") format("ttf");
+  }

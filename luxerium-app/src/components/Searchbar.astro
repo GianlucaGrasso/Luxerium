@@ -3,24 +3,25 @@
 <!-- SEARCHBAR -->
 
 <div class="absolute left-1/2 transform -translate-x-1/2 z-10 my-5 w-[95%] sm:w-auto">
-  <div class="flex items-center bg-transparent rounded-lg backdrop-blur-sm">
+  <div class="flex items-center rounded-lg bg-white/20 backdrop-blur-sm">
     <!-- Boton de tipo de propiedades -->
     <div>
-      <button class="w-[75px] sm:w-[100px] h-[50px] border-2 border-r-0 border-secondaryColor rounded-tl-md rounded-bl-md hover:bg-secondaryColor hover:text-white transition-all duration-300 flex items-center justify-center">
+      <button class="w-[75px] sm:w-[100px] h-[50px] border border-r-0 border-secondaryColor rounded-tl-md rounded-bl-md hover:bg-secondaryColor hover:text-white transition-all duration-300 flex items-center justify-center">
         <img src="icons/tags/arrowTag.svg" alt="Property Type" class="w-[30px] h-[30px]">
       </button>
     </div>
 
     <!-- Input de búsqueda -->
     <input 
-      type="text" 
-      placeholder="Buscar propiedades..." 
-      class="h-[50px] w-full text-center outline-none min-w-[250px] sm:min-w-[30vw] px-4 bg-transparent border-secondaryColor border-2 text-gray-700 focus:ring-2 focus:ring-primaryColor"
+      type="text"
+      maxlength="40" 
+      placeholder="COUNTRY / CITY / STATE / ZIP CODE" 
+      class="h-[50px] w-full text-center outline-none min-w-[250px] sm:min-w-[30vw] px-4 bg-transparent border-secondaryColor border-t border-b border-x text-primaryColor focus:ring-2 focus:ring-primaryColor placeholder:text-primaryColor font-secondaryFont text-[16px] transition-all duration-300 uppercase"
     >
 
     <!-- Boton de búsqueda -->
     <div>
-      <button class="w-[75px] h-[50px] border-2 border-secondaryColor rounded-tr-md rounded-br-md border-l-0 hover:bg-secondaryColor hover:text-white transition-all duration-300 flex items-center justify-center">
+      <button class="w-[75px] h-[50px] border border-secondaryColor rounded-tr-md rounded-br-md border-l-0 hover:bg-secondaryColor hover:text-white transition-all duration-300 flex items-center justify-center">
         <img src="/icons/tags/searchTag.svg" alt="Search" class="w-[30px] h-[30px]">
       </button>
     </div>

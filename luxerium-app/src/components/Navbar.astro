@@ -19,8 +19,13 @@ import ListWithUs from "./subComponents/navbarElements/ListWithUs.astro";
     
     <!-- Botón de usuario a la derecha -->
     <div class="flex items-center">
-      <ListWithUs />
-      <UserButton />
+      <div class="pr-6 md:inline hidden">
+        <ListWithUs/>
+      </div>
+
+      <div class="sm:inline hidden">
+        <UserButton />
+      </div>
     </div>
   </div>
 </header>
