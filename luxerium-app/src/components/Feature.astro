@@ -1,5 +1,5 @@
 ---
-import Searchbar from './Searchbar.astro';
+import Searchbar from './core/Searchbar.astro';
 
 var currency = {
   0: 'USD $',
@@ -11,6 +11,7 @@ var currency = {
   6: 'AUD $',
 } ; // Define the currency variable
 
+
 ---
 
 <div class="relative w-full h-[50vh]">
@@ -20,10 +21,10 @@ var currency = {
   <a href="https://www.google.com/">
     <div class="relative w-full h-full">
       <img 
-        src="https://images.pexels.com/photos/7031408/pexels-photo-7031408.jpeg" 
+        src="Featured.webp" 
         alt="Mansion in Lomas de Zamora" 
         class="w-full h-full object-cover hover:object-top" 
-        loading="lazy"
+        loading="eager"
       />
       
       <!-- Gradient overlay -->

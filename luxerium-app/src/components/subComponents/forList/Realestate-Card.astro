@@ -1,10 +1,13 @@
 ---
+
 const Price = "$999,999,999";
+const Extra = " $12,500 " + " per month";
 const { Title } = Astro.props;
 const Location = {
   Country: "Argentina",
   State: "Buenos Aires",
   City: "Lomas de Zamora",
+  Address: "249 Avenida Hipólito Yrigoyen",
   Zipcode: "B1832",
   Pluscode: "8QC7+22",
 };
@@ -29,11 +32,14 @@ const StatusClasses = {
 
 // Current status
 
-const currentStatus = '3'; // Change this to test different states
+const {currentStatus = '0'} = Astro.props; // Change this to test different states
+
+const {Agency = "null"} = Astro.props;
 ---
 
 <!-- CARD -->
-<a href="" class="h-full rounded-2xl bg-primaryColor select-none text-terciaryColor flex flex-col justify-between">
+
+<a href="" class="h-full rounded-2xl bg-primaryColor select-none text-terciaryColor flex flex-col justify-between duration-[0.15s] ease-in-out hover:outline hover:outline-2 hover:outline-secondaryColor">
   <div>
     <div class="w-full h-48 rounded-t-2xl">
       <img
@@ -49,81 +55,133 @@ const currentStatus = '3'; // Change this to test different states
         <span class="font-secondaryFont text-2xl font-semibold">{Price}</span>
         <!-- Dynamic Status -->
         <span
-          class={`font-secondaryFont font-semibold bg-opacity-35 h-full text-sm px-3 py-1 w-24 rounded-2xl text-center text-nowrap ${StatusClasses[currentStatus]}`}
+        class={`font-secondaryFont font-semibold bg-opacity-35 h-full text-sm px-3 py-1 w-24 rounded-2xl text-center text-nowrap ${StatusClasses[currentStatus]}`}
         >
-          {Status[currentStatus]}
-        </span>
-      </div>
-      <!-- Title -->
-      <h3 class="font-primaryFont text-3xl mb-2 mt-1 " id="title">{Title}</h3>
+        {Status[currentStatus]}
+      </span>
+    </div>
+    <!-- Title -->
+    
+    <span class="font-secondaryFont text-md font-semibold flex text-terciaryColor/75">{Extra}</span>
+      <h3 class="font-primaryFont text-3xl mb-2 mt-1 hidden " id="title">{Title}</h3>
 
       <!-- Location -->
       <p class="font-secondaryFont mt-2 text-sm font-light leading-tight text-gray-500 flex">
-        <img src="https://www.svgrepo.com/show/424575/location-direction-gps.svg" alt="Type Icon" class="mr-1 h-4" />
-        {Location.City}, {Location.State}, <br />{Location.Country}. {Location.Zipcode}, {Location.Pluscode}
+        <img src="https://www.svgrepo.com/show/424575/location-direction-gps.svg" alt="Type Icon" class="mr-1 h-4 hidden" />
+        {Location.Address}, {Location.City}, {Location.State}, {Location.Country}.
       </p>
 
     </div>
   </div>
-  <!-- Specs -->
+  <div>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-1 sm:gap-3 w-full px-4 py-4">
+  
+      <span class="flex justify-center flex-col sm:flex-row">
+        <img src="https://cdn-icons-png.flaticon.com/512/1946/1946488.png" width="20px" height="20px" alt="a" class=" h-5 w-5">
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">Mansion</p>
+      </span>
+      <span class="flex justify-center flex-col sm:flex-row">
+        <img src="https://cdn-icons-png.flaticon.com/512/93/93640.png" alt="a" width="20px" height="20px" class=" h-5 w-5">
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">1800 sqft</p>
+      </span>
+      <span class="flex justify-center flex-col sm:flex-row">
+        <img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" width="20px" height="20px" alt="a" class=" h-5 w-5">
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">10 years</p>
+      </span>
+
+      <span class="flex justify-center flex-col sm:flex-row">
+        <img src="https://cdn-icons-png.flaticon.com/512/952/952772.png" width="20px" height="20px" alt="a" class=" h-5 w-5">
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">5 beds</p>
+      </span>
+      <span class="flex justify-center flex-col sm:flex-row">
+        <img src="https://cdn-icons-png.flaticon.com/512/169/169301.png" width="20px" height="20px" alt="a" class=" h-5 w-5">
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">2.5 baths</p>
+      </span>
+      <span class="flex justify-center flex-col sm:flex-row">
+        <img src="https://cdn-icons-png.flaticon.com/512/243/243232.png" width="20px" height="20px" alt="a" class=" h-5 w-5">
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">2 slots</p>
+      </span>
+
+    </div>
+
+    <!--
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 w-full px-4 pb-4 pt-2">
+    </div>
+    -->
+    
+  </div>
+
+  <!-- Specs 
   <div class="h-max stati mb-0 px-3 flex justify-center">
-    <div class="grid min-lg:grid-cols-3 min-lg:gap-4 sm:grid-cols-3 sm:gap-x-4 gap-y-2 my-2 text-sm text-terciaryColor h-fit">
-      <span class="font-secondaryFont font-light flex items-center text-nowrap">
-        <img src="https://www.svgrepo.com/show/253357/measure-ruler.svg" alt="Size Icon" class="mr-1 h-[1.4rem]" />
+    <div class="w-fit m-auto  grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2 text-sm text-terciaryColor">
+      <span class="font-secondaryFont font-light flex items-center text-nowrap justify-start">
+        <img src="https://www.svgrepo.com/show/253357/measure-ruler.svg" alt="Size Icon" class="mr-1 h-[1.2rem]" />
         1800 sqft
       </span>
-      <span class="font-secondaryFont font-light flex items-center text-nowrap justify-center">
-        <img src="https://www.svgrepo.com/show/273949/annual-year.svg" alt="Built Icon" class="mr-1 h-[1.4rem]" />
+      <span class="font-secondaryFont font-light flex items-center text-nowrap">
+        <img src="https://www.svgrepo.com/show/273949/annual-year.svg" alt="Built Icon" class="mr-1 h-[1.2rem]" />
         Built 2020
       </span>
-      <span class="font-secondaryFont font-light flex items-center text-nowrap">
-        <img src="https://www.svgrepo.com/show/217910/mansion.svg" alt="Type Icon" class="mr-1 h-[1.4rem]" />
+      <span class="font-secondaryFont font-light flex items-center text-nowrap justify-end">
+        <img src="https://www.svgrepo.com/show/217910/mansion.svg" alt="Type Icon" class="mr-1 h-[1.2rem]" />
         Mansion
       </span>
       <span class="font-secondaryFont font-light flex items-center text-nowrap">
-        <img src="https://www.svgrepo.com/show/12056/bed.svg" alt="Beds Icon" class="mr-1 h-[1.4rem]" />
+        <img src="https://www.svgrepo.com/show/12056/bed.svg" alt="Beds Icon" class="mr-1 h-[1.2rem]" />
         5 Bed
       </span>
       <span class="font-secondaryFont font-light flex items-center text-nowrap">
-        <img src="https://www.svgrepo.com/show/25980/bathtub.svg" alt="Baths Icon" class="mr-1 h-[1.4rem]" />
+        <img src="https://www.svgrepo.com/show/25980/bathtub.svg" alt="Baths Icon" class="mr-1 h-[1.2rem]" />
         1.5 Bath
       </span>
-      <span class="font-secondaryFont font-light flex items-center text-nowrap">
-        <img src="https://www.svgrepo.com/show/138473/parking.svg" alt="Garage Icon" class="mr-1 h-[1.4rem]" />
+      <span class="font-secondaryFont font-light flex items-center text-nowrap justify-end">
+        <img src="https://www.svgrepo.com/show/138473/parking.svg" alt="Garage Icon" class="mr-1 h-[1.2em]" />
         2 Slots
       </span>
     </div>
   </div>
+  -->
 
   <!-- AGENT/CY INFO -->
-  <div class="relative items-center border-t border-r-white p-3 flex justify-between">
+<div class="static bottom-0">
+
+  <div class="p-1 m-0 border-t">
+   <p class="text-xs text-center relative font-secondaryFont uppercase text-terciaryColor">{Agency}</p>
+  </div>
+  <div class="relative items-center border-t border-r-white p-3 grid grid-cols-2 justify-end">
     <div class="flex w-fit bottom-0">
       <!-- Agent Image -->
       <img
-        src="https://media.licdn.com/dms/image/D4E03AQF7H3JcLhG_Dw/profile-displayphoto-shrink_200_200/0/1695826075442?e=2147483647&v=beta&t=i-DkXKIKz97U01QD5xk4obzxDGSytcYenEU_Y32yYpk"
-        alt="Agent Image"
-        class="h-12 w-12 rounded-2xl object-cover shadow-xl"
-        draggable="false"
+      src="https://placehold.co/100x100"
+      alt="Agent Image"
+      class="h-12 w-12 aspect-square rounded-xl object-cover"
+      draggable="false"
       />
-
+      <!--
+        src="https://media.licdn.com/dms/image/D4E03AQF7H3JcLhG_Dw/profile-displayphoto-shrink_200_200/0/1695826075442?e=2147483647&v=beta&t=i-DkXKIKz97U01QD5xk4obzxDGSytcYenEU_Y32yYpk"
+       -->
+      
       <!-- Agent Details -->
-      <div class="ml-3 flex-1">
-        <div class="leading-tight">
-          <h4 class="font-secondaryFont font-semibold text-gray-800 text-sm w-fit object-center py-1">
-            RYAN<br />SERHANT
-          </h4>
+      <div class="flex flex-col ml-2 w-full overflow-hidden">
+          <p class="font-secondaryFont font-medium text-terciaryColor text-xs text-left my-2 truncate uppercase">
+            JOHN A.  <br> DOE
+          </p>
         </div>
-      </div>
     </div>
 
     <!-- Image Section -->
-    <div class="absolute inset-y-0 right-0 overflow-hidden rounded-br-2xl">
+    <div class="absolute inset-y-0 right-0 overflow-hidden rounded-br-2xl w-[35%] sm:w-[50%] md:w-[50%]">
       <img
-        src="https://media.licdn.com/dms/image/v2/C4D0BAQHAngADammaaw/company-logo_200_200/company-logo_200_200/0/1630507650503/the_serhant_team_logo?e=2147483647&v=beta&t=Gyo7NCOUwI4Z6ySSdQnXaef03XxW_ZDqf_SaBDCqRAU"
-        alt="#"
-        class="h-full w-[9.5rem] object-cover border-l object-center"
-        draggable="false"
+      src="https://placehold.co/1920x1080"
+      alt="#"
+      class="h-full object-cover w-full border-l"
+      draggable="false"
       />
+      <!--
+        src="https://media.licdn.com/dms/image/v2/C4D0BAQHAngADammaaw/company-logo_200_200/company-logo_200_200/0/1630507650503/the_serhant_team_logo?e=2147483647&v=beta&t=Gyo7NCOUwI4Z6ySSdQnXaef03XxW_ZDqf_SaBDCqRAU"
+       -->
     </div>
   </div>
+
+</div>
 </a>

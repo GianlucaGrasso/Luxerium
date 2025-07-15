@@ -1,48 +1,92 @@
 ---
-import FeatureButton from "./subComponents/FeatureButton.astro"
+import BrowseBy from "./subComponents/BrowseBy.astro"
+import { MarketFilters } from "../../public/marketFilters"
+import react from "@astrojs/react"
+
+const getNestedTypes = (obj: Record<string, any>, maxDepth: number = 3, currentDepth: number = 1): any[] => {
+  let results: any[] = [];
+  
+  if (currentDepth > maxDepth) return results;
+
+  for (const key in obj) {
+    if (obj[key]?.types) {
+      const types: any[] = Object.values(obj[key].types);
+
+      if (currentDepth >= 2) {  // Solo incluir desde el segundo nivel
+        results.push(...types);
+      }
+
+      // Buscar en niveles más profundos
+      results = results.concat(getNestedTypes(obj[key].types as Record<string, any>, maxDepth, currentDepth + 1));
+    }
+  }
+
+  return results;
+};
+
+const allTypes = getNestedTypes(MarketFilters, 3);
 
 
 ---
 
-<div class="max-w-[100vw]">
+<div class="max-w-[100vw] flex flex-col">
   <h1 class="text-center w-fit m-auto mt-[.75em] text-primaryColor font-secondaryFont text-[18px] pt-3">BROWSE BY MARKETPLACE</h1>
   
-  <div class="my-[1.5em] w-full flex justify-center px-[2em] gap-[10px] flex-wrap flex-none">  
-    <FeatureButton title="REAL ESTATE" image="https://images.unsplash.com/photo-1721902474248-3d6d2f2b595e?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
-    <FeatureButton title="VEHICLES" image="https://images.unsplash.com/photo-1629644494884-7580538c3d43?q=80&w=889&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dhttps://images.pexels.com/photos/10550012/pexels-photo-10550012.jpeg" />
-    <FeatureButton title="AIRCRAFTS" image="https://images.unsplash.com/photo-1682380116425-f103d66c5cf1?q=80&w=880&auto=format&full=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
-    <FeatureButton title="SHIPS" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />
+  <div class="my-[1.5em] w-full grid grid-cols-1 md:grid-cols-4 lg:grid-cols-8 justify-center px-[2em] gap-[10px]">
+
+    {
+      Object.values(MarketFilters).map((filter) => {
+        return (
+          <BrowseBy 
+            title={filter.title.toUpperCase()} 
+            size="md" 
+            image={filter.image} 
+          />
+        )
+      })
+    }
+
+    <!--
+    <BrowseBy size="md"  title="REAL ESTATE" image="https://images.unsplash.com/photo-1721902474248-3d6d2f2b595e?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+    <BrowseBy size="md" title="VEHICLES" image="https://images.unsplash.com/photo-1629644494884-7580538c3d43?q=80&w=889&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dhttps://images.pexels.com/photos/10550012/pexels-photo-10550012.jpeg" />
+    <BrowseBy size="md" title="AIRCRAFTS" image="https://images.unsplash.com/photo-1682380116425-f103d66c5cf1?q=80&w=880&auto=format&full=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+    <BrowseBy size="md" title="SHIPS" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />
+    -->
   </div>
 </div>
 
-<!--
+<div class="max-w-[100vw] flex flex-col">
+  <h1 class="text-center w-fit m-auto text-primaryColor font-secondaryFont text-[18px]">BROWSE BY TYPE</h1>
+  
+  <div class="my-[1.5em] w-full grid px-[2em] gap-[10px] grid-cols-1 md:grid-cols-3 lg:grid-cols-4">  
+    {
+      Object.values({ ...MarketFilters.realEstate.types, ...MarketFilters.vehicles.types, ...MarketFilters.aircrafts.types, ...MarketFilters.ships.types}).map((filter) => {
+        return (
+          <BrowseBy 
+            title={filter.title.toUpperCase()} 
+            size="sm" 
+            image={filter.image} 
+          />
+        )
+      })
+    }
 
-<button class="flex-grow aspect-[1/2] h-[15em] max-w[30em] duration-[0.3s] ease-in-out hover:bg-bottom bg-[url('https://archello.s3.eu-central-1.amazonaws.com/images/2023/07/21/mask-architects-eagle-mansion-signature-villa-for-emaar-misr-housing-archello.1689934438.6904.jpg')]  bg-top bg-cover"> <a href="#" class="flex w-fit mx-auto"> REAL ESTATE</a> </button>
-<button class="flex-grow aspect-[1/2] h-[15em] max-w[30em] duration-[0.3s] ease-in-out hover:bg-bottom bg-[url('https://images.pexels.com/photos/10550012/pexels-photo-10550012.jpeg')] bg-center bg-cover"> <a href="#" class="flex w-fit mx-auto"> CARS </a> </button>
-<button class="flex-grow aspect-[1/2] h-[15em] max-w[30em] duration-[0.3s] ease-in-out hover:bg-bottom bg-[url('https://images.pexels.com/photos/18356792/pexels-photo-18356792/free-photo-of-vuelo-cielo-volador-avion.jpeg')]  bg-center bg-cover"> <a href="#" class="flex w-fit mx-auto"> AIRCRAFT </a> </button>
-<button class="flex-grow aspect-[1/2] h-[15em] max-w[30em] duration-[0.3s] ease-in-out hover:bg-bottom bg-[url('https://d2x2jq9y4geyy8.cloudfront.net/default/yacht-amels-60-20220902-editorial-profile-01-631200e0b3022_v_default_extra_big.jpeg')]  bg-center bg-cover"> <a href="#" class="flex w-fit mx-auto"> SHIPS </a> </button>
+    {
+      allTypes.map((type) => {
+        return (
+          <BrowseBy 
+            title={type.title.toUpperCase()} 
+            size="sm" 
+            image={type.image} 
+          />
+        )
+      })
+    }
 
--->
+    <!--
+    <BrowseBy title="" size="sm" image="https://images.unsplash.com/photo-1721902474248-3d6d2f2b595e?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+    <BrowseBy title="" size="md" image="https://images.unsplash.com/photo-1629644494884-7580538c3d43?q=80&w=889&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dhttps://images.pexels.com/photos/10550012/pexels-photo-10550012.jpeg" />
+    <BrowseBy title="" size="sm" image="https://images.unsplash.com/photo-1682380116425-f103d66c5cf1?q=80&w=880&auto=format&full=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+    -->
+  </div
 
-<!-----
-<div class="w-[1920px] h-[300px] relative">
-  <div class="w-[480px] h-[300px] left-[1440px] top-0 absolute justify-center items-center inline-flex">
-    <div class="w-[480px] h-[300px] relative flex-col justify-start items-start flex">
-      <div class="w-[480px] h-[70px] bg-neutral-950 bg-opacity-70"></div>
-      <div class="text-neutral-100 text-[28px] font-black font-['Genera Grotesk']">YATCHS</div>
-    </div>
-  </div>
-  <div class="w-[480px] h-[300px] left-[960px] top-0 absolute flex-col justify-start items-start inline-flex">
-    <div class="w-[480px] h-[70px] bg-neutral-950 bg-opacity-70"></div>
-    <div class="text-neutral-100 text-[28px] font-black font-['Genera Grotesk']">AIRCRAFT</div>
-  </div>
-  <div class="w-[480px] h-[300px] left-[480px] top-0 absolute flex-col justify-start items-start inline-flex">
-    <div class="w-[480px] h-[70px] bg-neutral-950 bg-opacity-70"></div>
-    <div class="text-neutral-100 text-[28px] font-black font-['Genera Grotesk']">CARS</div>
-  </div>
-  <div class="w-[480px] h-[300px] left-0 top-0 absolute flex-col justify-start items-start inline-flex">
-    <div class="w-[480px] h-[70px] bg-neutral-950 bg-opacity-70"></div>
-    <div class="text-neutral-100 text-[28px] font-black font-['Genera Grotesk']">REAL ESTATE</div>
-  </div>
-</div>
---- -->

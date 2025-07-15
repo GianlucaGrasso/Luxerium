@@ -1,26 +1,24 @@
 ---
 const { title = "DEFAULT TITLE", image = "https://placehold.co/1920x1080" } = Astro.props;
 
-const { size = "" } = Astro.props; 
+const { size = "sm" } = Astro.props as { size?: "sm" | "md" | "lg" }; 
 
 var basisSizes = {
-  sm: 'w-[15%] max-w-auto',
-  md: 'w-[35%] max-w-auto ',
-  lg: 'w-[40%] max-w-auto',
+  sm: 'col-span-1',
+  md: 'col-span-2',
+  lg: 'col-span-3',
 };
 
 ---
 
 <button 
-  class={`group flex-grow aspect-[1/1] ${basisSizes[size]} h-[15em] max-w-[30em] duration-[0.3s] ease-in-out hover:bg-bottom bg-top bg-cover relative hover:outline hover:outline-secondaryColor hover:shadow hover:shadow-secondaryColor`} 
+  class={`group flex-grow ${basisSizes[size]} h-[15em] w-full duration-[0.3s] ease-in-out bg-top bg-cover relative hover:bg-bottom hover:outline hover:outline-2 hover:outline-secondaryColor hover:shadow-inner hover:shadow-secondaryColor`} 
   style={`background-image: url('${image}');`}
 >
-  <!-- Red background div around title, expands on hover -->
-  <div class="bg-lightGreyFade w-full h-[3em] absolute bottom-0 flex justify-center items-center group-hover:h-full transition-all duration-300 ease-in-out backdrop-blur-sm ">
-    <a href="#" class="text-primaryColor font-primaryFont text-xl tracking-wider">
+  <div class="bg-lightGreyFade w-full h-[3em] absolute bottom-0 flex justify-center items-center group-hover:h-full transition-all duration-300 ease-in-out backdrop-blur-sm">
+    <a href="#" class="text-primaryColor font-primaryFont text-[1.26rem] tracking-[0.2em] transition-all duration-300 ease-in-out hover:text-secondaryColor ">
 
       {title}
     </a>
   </div>
 </button>
-
