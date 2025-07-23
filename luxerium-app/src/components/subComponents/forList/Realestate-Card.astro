@@ -1,45 +1,91 @@
 ---
 
-const Price = "$999,999,999";
-const Extra = " $12,500 " + " per month";
-const { Title } = Astro.props;
-const Location = {
-  Country: "Argentina",
-  State: "Buenos Aires",
-  City: "Lomas de Zamora",
-  Address: "249 Avenida Hipólito Yrigoyen",
-  Zipcode: "B1832",
-  Pluscode: "8QC7+22",
-};
 
-// Status data
+export interface Props {
+  id: number;
+  slug: string;
+  price: string;
+  extra?: string;
+  location: {
+    country: string;
+    state: string;
+    city: string;
+    address: string;
+    zipcode: string;
+    pluscode?: string;
+  };
+  status: 0 | 1 | 2 | 3 | 4;
+  features: {
+    type: string;
+    area: string;
+    year: number;
+    bedrooms: number;
+    bathrooms: number;
+    slots: number;
+  };
+  description?: string;
+  tags?: string[];
+  amenities?: string[];
+  agency: string;
+  agentName: [string, string];
+  media: string[];
+}
+
+const {
+  id,
+  slug,
+  price,
+  extra,
+  location,
+  status,
+  features,
+  description,
+  tags,
+  amenities,
+  agency,
+  agentName,
+  media
+} = Astro.props;
+
+
+/*
+import { getCollection } from "astro:content";
+
+const Props = await getCollection('Props');
+console.log(Props);
+*/
+
+
 const Status = {
-  '0': "NO STATE",
-  '1': "FOR SALE",
-  '2': "FOR RENT",
-  '3': "SOLD",
-  '4': "TEMPO"
-};
+  0: "NO STATE",
+  1: "FOR SALE",
+  2: "FOR RENT",
+  3: "SOLD",
+  4: "TEMPO"
+} as const;
 
-// Map status to Tailwind classes
 const StatusClasses = {
-  '0': "text-slate-500 bg-slate-500",
-  '1': "text-forSale bg-forSale",
-  '2': "text-forRent bg-forRent",
-  '3': "text-Sold bg-Sold",
-  '4': "text-forRentTemp bg-forRentTemp"
-};
+  0: "text-slate-500 bg-slate-500",
+  1: "text-forSale bg-forSale",
+  2: "text-forRent bg-forRent",
+  3: "text-Sold bg-Sold",
+  4: "text-forRentTemp bg-forRentTemp"
+} as const;
 
-// Current status
 
-const {currentStatus = '0'} = Astro.props; // Change this to test different states
 
-const {Agency = "null"} = Astro.props;
 ---
 
 <!-- CARD -->
 
-<a href="" class="h-full rounded-2xl bg-primaryColor select-none text-terciaryColor flex flex-col justify-between duration-[0.15s] ease-in-out hover:outline hover:outline-2 hover:outline-secondaryColor">
+<a href={`/propiedad/${slug}`} 
+class="h-full rounded-2xl bg-primaryColor select-none text-terciaryColor flex flex-col justify-between duration-[0.15s] ease-in-out hover:outline hover:outline-2 hover:outline-secondaryColor"
+data-type={features.type}
+data-beds={features.bedrooms}
+data-price={price.replace(/[^0-9]/g, '')}
+data-location={`${location.country} ${location.city} ${location.state} ${location.zipcode}`.toLowerCase()}
+
+>
   <div>
     <div class="w-full h-48 rounded-t-2xl">
       <img
@@ -51,102 +97,72 @@ const {Agency = "null"} = Astro.props;
     </div>
     <div class="px-3 pt-3 pb-0">
       <!-- Price -->
-      <div class="flex items-center justify-between">
-        <span class="font-secondaryFont text-2xl font-semibold">{Price}</span>
+      <div class="flex flex-row items-center justify-between">
+        <div class="flex flex-col">
+          <span class="font-secondaryFont text-2xl ">{price}</span>
+          <span class="font-secondaryFont text-md text-terciaryColor/75">{extra}</span>
+        </div>
+
         <!-- Dynamic Status -->
         <span
-        class={`font-secondaryFont font-semibold bg-opacity-35 h-full text-sm px-3 py-1 w-24 rounded-2xl text-center text-nowrap ${StatusClasses[currentStatus]}`}
-        >
-        {Status[currentStatus]}
+        class:list={[
+          "font-secondaryFont font-semibold bg-opacity-35 h-full text-sm px-3 py-1 w-24 rounded-2xl text-center text-nowrap mb-2",
+          StatusClasses[status]        // <-- usa directamente "status"
+        ]}
+      >
+        {Status[status]}
+      </span>
       </span>
     </div>
-    <!-- Title -->
-    
-    <span class="font-secondaryFont text-md font-semibold flex text-terciaryColor/75">{Extra}</span>
-      <h3 class="font-primaryFont text-3xl mb-2 mt-1 hidden " id="title">{Title}</h3>
 
       <!-- Location -->
       <p class="font-secondaryFont mt-2 text-sm font-light leading-tight text-terciaryColor/75 flex">
         <img src="https://www.svgrepo.com/show/424575/location-direction-gps.svg" alt="Type Icon" class="mr-1 h-4 hidden" />
-        {Location.Address}, {Location.City}, {Location.State}, {Location.Country}.
+        {location.address}, {location.city}, {location.state}, {location.country}.
       </p>
 
     </div>
   </div>
   <div>
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-1 sm:gap-3 w-full px-4 py-4">
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-1 sm:gap-2 w-full px-3 py-3">
   
-      <span class="flex justify-center flex-col sm:flex-row">
-        <img src="https://cdn-icons-png.flaticon.com/512/1946/1946488.png" width="20px" height="20px" alt="a" class=" h-5 w-5">
-        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">Mansion</p>
+      <span class="flex justify-center flex-col">
+        <img src="https://cdn-icons-png.flaticon.com/512/1946/1946488.png" width="20px" height="20px" alt="a" class=" m-auto h-4 w-4 mb-1">
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{features.type}</p>
       </span>
-      <span class="flex justify-center flex-col sm:flex-row">
-        <img src="https://cdn-icons-png.flaticon.com/512/93/93640.png" alt="a" width="20px" height="20px" class=" h-5 w-5">
-        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">1800 sqft</p>
+      <span class="flex justify-center flex-col">
+        <img src="https://cdn-icons-png.flaticon.com/512/93/93640.png" alt="a" width="20px" height="20px" class=" m-auto h-4 w-4 mb-1">
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{features.area}</p>
       </span>
-      <span class="flex justify-center flex-col sm:flex-row">
-        <img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" width="20px" height="20px" alt="a" class=" h-5 w-5">
-        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">10 years</p>
+      <span class="flex justify-center flex-col">
+        <img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" width="20px" height="20px" alt="a" class=" m-auto h-4 w-4 mb-1">
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{features.year}</p>
       </span>
 
-      <span class="flex justify-center flex-col sm:flex-row">
-        <img src="https://cdn-icons-png.flaticon.com/512/952/952772.png" width="20px" height="20px" alt="a" class=" h-5 w-5">
-        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">5 beds</p>
+      <span class="flex justify-center flex-col">
+        <img src="https://cdn-icons-png.flaticon.com/512/952/952772.png" width="20px" height="20px" alt="a" class=" m-auto h-4 w-4 mb-1">
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{features.bedrooms}</p>
       </span>
-      <span class="flex justify-center flex-col sm:flex-row">
-        <img src="https://cdn-icons-png.flaticon.com/512/169/169301.png" width="20px" height="20px" alt="a" class=" h-5 w-5">
-        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">2.5 baths</p>
+      <span class="flex justify-center flex-col">
+        <img src="https://cdn-icons-png.flaticon.com/512/169/169301.png" width="20px" height="20px" alt="a" class=" m-auto h-4 w-4 mb-1">
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{features.bathrooms}</p>
       </span>
-      <span class="flex justify-center flex-col sm:flex-row">
-        <img src="https://cdn-icons-png.flaticon.com/512/243/243232.png" width="20px" height="20px" alt="a" class=" h-5 w-5">
-        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">2 slots</p>
+      <span class="flex justify-center flex-col">
+        <img src="https://cdn-icons-png.flaticon.com/512/243/243232.png" width="20px" height="20px" alt="a" class=" m-auto h-4 w-4 mb-1">
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{features.slots}</p>
       </span>
 
     </div>
 
-    <!--
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 w-full px-4 pb-4 pt-2">
-    </div>
-    -->
     
   </div>
 
-  <!-- Specs 
-  <div class="h-max stati mb-0 px-3 flex justify-center">
-    <div class="w-fit m-auto  grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2 text-sm text-terciaryColor">
-      <span class="font-secondaryFont font-light flex items-center text-nowrap justify-start">
-        <img src="https://www.svgrepo.com/show/253357/measure-ruler.svg" alt="Size Icon" class="mr-1 h-[1.2rem]" />
-        1800 sqft
-      </span>
-      <span class="font-secondaryFont font-light flex items-center text-nowrap">
-        <img src="https://www.svgrepo.com/show/273949/annual-year.svg" alt="Built Icon" class="mr-1 h-[1.2rem]" />
-        Built 2020
-      </span>
-      <span class="font-secondaryFont font-light flex items-center text-nowrap justify-end">
-        <img src="https://www.svgrepo.com/show/217910/mansion.svg" alt="Type Icon" class="mr-1 h-[1.2rem]" />
-        Mansion
-      </span>
-      <span class="font-secondaryFont font-light flex items-center text-nowrap">
-        <img src="https://www.svgrepo.com/show/12056/bed.svg" alt="Beds Icon" class="mr-1 h-[1.2rem]" />
-        5 Bed
-      </span>
-      <span class="font-secondaryFont font-light flex items-center text-nowrap">
-        <img src="https://www.svgrepo.com/show/25980/bathtub.svg" alt="Baths Icon" class="mr-1 h-[1.2rem]" />
-        1.5 Bath
-      </span>
-      <span class="font-secondaryFont font-light flex items-center text-nowrap justify-end">
-        <img src="https://www.svgrepo.com/show/138473/parking.svg" alt="Garage Icon" class="mr-1 h-[1.2em]" />
-        2 Slots
-      </span>
-    </div>
-  </div>
-  -->
 
   <!-- AGENT/CY INFO -->
 <div class="static bottom-0">
 
   <div class="p-1 m-0 border-t">
-   <p class="text-xs text-center relative font-secondaryFont uppercase text-terciaryColor">{Agency}</p>
+   <p class="text-xs text-center relative font-secondaryFont uppercase text-terciaryColor">{agency}</p>
   </div>
   <div class="relative items-center border-t border-r-white p-3 grid grid-cols-2 justify-end">
     <div class="flex w-fit bottom-0">
@@ -157,14 +173,11 @@ const {Agency = "null"} = Astro.props;
       class="h-12 w-12 aspect-square rounded-xl object-cover"
       draggable="false"
       />
-      <!--
-        src="https://media.licdn.com/dms/image/D4E03AQF7H3JcLhG_Dw/profile-displayphoto-shrink_200_200/0/1695826075442?e=2147483647&v=beta&t=i-DkXKIKz97U01QD5xk4obzxDGSytcYenEU_Y32yYpk"
-       -->
       
       <!-- Agent Details -->
       <div class="flex flex-col ml-2 w-full overflow-hidden">
           <p class="font-secondaryFont font-medium text-terciaryColor text-xs text-left my-2 truncate uppercase">
-            JOHN A.  <br> DOE
+            {agentName[0]} <br> {agentName[1]}
           </p>
         </div>
     </div>
@@ -177,11 +190,9 @@ const {Agency = "null"} = Astro.props;
       class="h-full object-cover w-full border-l"
       draggable="false"
       />
-      <!--
-        src="https://media.licdn.com/dms/image/v2/C4D0BAQHAngADammaaw/company-logo_200_200/company-logo_200_200/0/1630507650503/the_serhant_team_logo?e=2147483647&v=beta&t=Gyo7NCOUwI4Z6ySSdQnXaef03XxW_ZDqf_SaBDCqRAU"
-       -->
+
     </div>
   </div>
 
-</div>
+  </div>
 </a>

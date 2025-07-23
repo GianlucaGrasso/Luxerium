@@ -1,27 +1,29 @@
 ---
 import BrowseBy from "./subComponents/BrowseBy.astro"
-import { MarketFilters } from "../../public/marketFilters"
+import { MarketFilters } from "../content/marketFilters"
 import react from "@astrojs/react"
 
-const getNestedTypes = (obj: Record<string, any>, maxDepth: number = 3, currentDepth: number = 1): any[] => {
-  let results: any[] = [];
-  
-  if (currentDepth > maxDepth) return results;
+const getNestedTypes = (
+  obj: Record<string, any>,
+  maxDepth: number = 3,
+  currentDepth: number = 1
+): any[] => {
+  if (currentDepth > maxDepth) return [];
 
-  for (const key in obj) {
-    if (obj[key]?.types) {
-      const types: any[] = Object.values(obj[key].types);
+  return Object.values(obj).flatMap(value => {
+    if (!value?.types) return [];
 
-      if (currentDepth >= 2) {  // Solo incluir desde el segundo nivel
-        results.push(...types);
-      }
+    const typesArray = Object.values(value.types);
+    const currentResults = currentDepth >= 2 ? typesArray : [];
+    
+    const nestedResults = getNestedTypes(
+      value.types,
+      maxDepth,
+      currentDepth + 1
+    );
 
-      // Buscar en niveles más profundos
-      results = results.concat(getNestedTypes(obj[key].types as Record<string, any>, maxDepth, currentDepth + 1));
-    }
-  }
-
-  return results;
+    return [...currentResults, ...nestedResults];
+  });
 };
 
 const allTypes = getNestedTypes(MarketFilters, 3);

@@ -1,18 +1,72 @@
 ---
-import RealestateCard from "./subComponents/forList/Realestate-Card.astro"
+import RealestateCard from "./subComponents/forList/Realestate-Card.astro";
+import listings from "../content/propertyListings";
 ---
 
-<!-- CARD GRID -->
 <div class="h-full overflow-y-auto no-scrollbar p-3">
-    <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2 pb-40">
-        <RealestateCard currentStatus=1 Agency="SERHANT. REALTORS" />
-        <RealestateCard currentStatus=3 />
-        <RealestateCard currentStatus=4 />
-        <RealestateCard Title="" />
-        <RealestateCard Title="" />
-        <RealestateCard Title="" />
-        <RealestateCard Title="" />
-        <RealestateCard Title="" />
-        <RealestateCard Title="" />
-    </div>
+  <!-- BARRA DE BÚSQUEDA -->
+  <form id="searchForm" class="flex sticky m-auto mb-2 w-full">
+    <input
+      id="searchInput"
+      type="text"
+      maxlength="40"
+      placeholder="COUNTRY / CITY / STATE / ZIP"
+      class="h-[50px] w-full text-center rounded-xl outline-none min-w-[250px] sm:min-w-[30vw] px-4 bg-transparent border-primaryColor border-t border-b border-x text-primaryColor focus:ring-2 focus:ring-primaryColor placeholder:text-primaryColor font-secondaryFont text-[16px] transition-all duration-300 uppercase"
+    />
+  </form>
+
+  <div id="propertyGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-2 pb-40 static">
+    {listings.map(listing => (
+      <RealestateCard
+        {...listing}
+        data-type={listing.features.type}
+        data-beds={listing.features.bedrooms}
+        data-price={listing.price.replace(/[^0-9]/g, '')}
+        data-location={`${listing.location.country} ${listing.location.city} ${listing.location.state} ${listing.location.zipcode}`.toLowerCase()}
+      />
+    ))}
+  </div>
 </div>
+
+<script>
+  const searchInput = document.getElementById("searchInput") as HTMLInputElement;
+  const propertyGrid = document.getElementById("propertyGrid") as HTMLDivElement;
+  const allCards = Array.from(propertyGrid.children) as HTMLElement[];
+
+  function parsePrice(price: string): number {
+    return parseInt(price.replace(/[^0-9]/g, ""));
+  }
+
+  function applyFilters() {
+    const params = new URLSearchParams(window.location.search);
+    const search = searchInput.value.toLowerCase();
+    const type = params.get("type")?.toLowerCase() || "";
+    const beds = parseInt(params.get("beds") || "0");
+    const maxPrice = parseInt(params.get("maxPrice") || "999999999");
+
+    allCards.forEach(card => {
+      const cardType = card.getAttribute("data-type")?.toLowerCase() || "";
+      const cardBeds = parseInt(card.getAttribute("data-beds") || "0");
+      const cardPrice = parseInt(card.getAttribute("data-price") || "0");
+      const cardLocation = card.getAttribute("data-location")?.toLowerCase() || "";
+
+      const matchText = !search || cardLocation.includes(search);
+      const matchType = !type || cardType === type;
+      const matchBeds = !beds || cardBeds >= beds;
+      const matchPrice = !maxPrice || cardPrice <= maxPrice;
+
+      card.style.display = matchText && matchType && matchBeds && matchPrice ? "block" : "none";
+    });
+  }
+
+  // Escuchar input de búsqueda
+  searchInput.addEventListener("input", () => {
+    applyFilters();
+  });
+
+  // Escuchar cambios desde Filters
+  window.addEventListener("filterUpdated", applyFilters);
+
+  // Inicial
+  applyFilters();
+</script>

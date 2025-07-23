@@ -1,0 +1,489 @@
+directorio:
+  src/pages/realEstateSearch.astro
+
+  src/content/realEstate/[slug].astro (vacio)
+  src/content/config.ts (vacio)
+  src/content/propertyListings.ts 
+
+  src/components/Proplist.astro 
+  src/components/subComponents/Realestate-Card.astro
+
+Fin del directorio.
+
+src/pages/realEstateSearch.astro:
+
+---
+import Layout from "../layouts/Layout.astro"
+import Navbar from "../components/core/Navbar.astro"
+import SecondaryNavbar from "../components/core/SecondaryNavbar.astro"
+import Map from "../components/Map.astro"
+import Proplist from "../components/Proplist.astro"
+import Filters from "../components/subComponents/navbarElements/Filters.astro"
+
+
+
+---
+
+<Layout title="Real Estate">
+    <Navbar />
+    <SecondaryNavbar />
+    <Filters/>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-0 h-screen static">
+        <Map />
+        <Proplist />
+    </div>
+</Layout>
+
+fin.
+
+src/content/propertyListings.ts:
+
+export default [
+    {
+      "id": 1,
+      "price": "$1,200,000",
+      "extra": "$12,500 per month",
+      "location": {
+        "country": "Argentina",
+        "state": "Buenos Aires",
+        "city": "Lomas de Zamora",
+        "address": "249 Avenida Hipólito Yrigoyen",
+        "zipcode": "B1832",
+        "pluscode": "8QC7+22"
+      },
+      "status": 2,
+      "features": {
+        "type": "Apartment",
+        "area": "150 m²",
+        "year": 2020 + " BUILT",
+        "bedrooms": 3 + " BEDS",
+        "bathrooms": 2.5 + " BATHS",
+        "slots": 2 + " SLOTS",
+      },
+      "description": "Modern apartment in the heart of Lomas de Zamora, featuring spacious living areas and a balcony with city views.",
+      "tags": ["modern", "city view", "balcony"],
+      "amenities": ["gym", "pool", "parking"],
+      "agency": "Luxerium Realty",
+      "agentName": ["Lucia" , "Fernandez"],
+      "media": [
+        "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
+        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
+      ]
+    },
+    {
+      "id": 2,
+      "price": "$1,200,000",
+      "extra": "$12,500 per month",
+      "location": {
+        "country": "Argentina",
+        "state": "Cordoba",
+        "city": "Villa General Belgrano",
+        "address": "Calle San Martin n° 1234",
+        "zipcode": "5194",
+        "pluscode": "8QF5+34"
+      },
+      "status": 2,
+      "features": {
+        "type": "Apartment",
+        "area": "150 m²",
+        "year": 2020 + " BUILT",
+        "bedrooms": 3 + " BEDS",
+        "bathrooms": 2.5 + " BATHS",
+        "slots": 2 + " SLOTS",
+      },
+      "description": "Modern apartment in the heart of Lomas de Zamora, featuring spacious living areas and a balcony with city views.",
+      "tags": ["modern", "city view", "balcony"],
+      "amenities": ["gym", "pool", "parking"],
+      "agency": "Luxerium Realty",
+      "agentName": ["Lucia" , "Fernandez"],
+      "media": [
+        "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
+        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
+      ]
+    },
+    {
+      "id": 1,
+      "price": "$1,200,000",
+      "extra": "$12,500 per month",
+      "location": {
+        "country": "Argentina",
+        "state": "Buenos Aires",
+        "city": "Lomas de Zamora",
+        "address": "Avenida Hipólito Yrigoyen n° 249",
+        "zipcode": "B1832",
+        "pluscode": "8QC7+22"
+      },
+      "status": 2,
+      "features": {
+        "type": "Apartment",
+        "area": "150 m²",
+        "year": 2020 + " BUILT",
+        "bedrooms": 3 + " BEDS",
+        "bathrooms": 2.5 + " BATHS",
+        "slots": 2 + " SLOTS",
+      },
+      "description": "Modern apartment in the heart of Lomas de Zamora, featuring spacious living areas and a balcony with city views.",
+      "tags": ["modern", "city view", "balcony"],
+      "amenities": ["gym", "pool", "parking"],
+      "agency": "Luxerium Realty",
+      "agentName": ["Lucia" , "Fernandez"],
+      "media": [
+        "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
+        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
+      ]
+    },
+    {
+      "id": 1,
+      "price": "$1,200,000",
+      "extra": "$12,500 per month",
+      "location": {
+        "country": "Argentina",
+        "state": "Buenos Aires",
+        "city": "Lomas de Zamora",
+        "address": "249 Avenida Hipólito Yrigoyen",
+        "zipcode": "B1832",
+        "pluscode": "8QC7+22"
+      },
+      "status": 2,
+      "features": {
+        "type": "Apartment",
+        "area": "150 m²",
+        "year": 2020 + " BUILT",
+        "bedrooms": 3 + " BEDS",
+        "bathrooms": 2.5 + " BATHS",
+        "slots": 2 + " SLOTS",
+      },
+      "description": "Modern apartment in the heart of Lomas de Zamora, featuring spacious living areas and a balcony with city views.",
+      "tags": ["modern", "city view", "balcony"],
+      "amenities": ["gym", "pool", "parking"],
+      "agency": "Luxerium Realty",
+      "agentName": ["Lucia" , "Fernandez"],
+      "media": [
+        "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
+        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
+      ]
+    },
+    {
+      "id": 1,
+      "price": "$1,200,000",
+      "extra": "$12,500 per month",
+      "location": {
+        "country": "Argentina",
+        "state": "Buenos Aires",
+        "city": "Lomas de Zamora",
+        "address": "249 Avenida Hipólito Yrigoyen",
+        "zipcode": "B1832",
+        "pluscode": "8QC7+22"
+      },
+      "status": 2,
+      "features": {
+        "type": "Apartment",
+        "area": "150 m²",
+        "year": 2020 + " BUILT",
+        "bedrooms": 3 + " BEDS",
+        "bathrooms": 2.5 + " BATHS",
+        "slots": 2 + " SLOTS",
+      },
+      "description": "Modern apartment in the heart of Lomas de Zamora, featuring spacious living areas and a balcony with city views.",
+      "tags": ["modern", "city view", "balcony"],
+      "amenities": ["gym", "pool", "parking"],
+      "agency": "Luxerium Realty",
+      "agentName": ["Lucia" , "Fernandez"],
+      "media": [
+        "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
+        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
+      ]
+    },
+    {
+      "id": 1,
+      "price": "$1,200,000",
+      "extra": "$12,500 per month",
+      "location": {
+        "country": "Argentina",
+        "state": "Buenos Aires",
+        "city": "Lomas de Zamora",
+        "address": "249 Avenida Hipólito Yrigoyen",
+        "zipcode": "B1832",
+        "pluscode": "8QC7+22"
+      },
+      "status": 2,
+      "features": {
+        "type": "Apartment",
+        "area": "150 m²",
+        "year": 2020 + " BUILT",
+        "bedrooms": 3 + " BEDS",
+        "bathrooms": 2.5 + " BATHS",
+        "slots": 2 + " SLOTS",
+      },
+      "description": "Modern apartment in the heart of Lomas de Zamora, featuring spacious living areas and a balcony with city views.",
+      "tags": ["modern", "city view", "balcony"],
+      "amenities": ["gym", "pool", "parking"],
+      "agency": "Luxerium Realty",
+      "agentName": ["Lucia" , "Fernandez"],
+      "media": [
+        "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
+        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
+      ]
+    },
+    {
+      "id": 1,
+      "price": "$1,200,000",
+      "extra": "$12,500 per month",
+      "location": {
+        "country": "Argentina",
+        "state": "Buenos Aires",
+        "city": "Lomas de Zamora",
+        "address": "249 Avenida Hipólito Yrigoyen",
+        "zipcode": "B1832",
+        "pluscode": "8QC7+22"
+      },
+      "status": 2,
+      "features": {
+        "type": "Apartment",
+        "area": "150 m²",
+        "year": 2020 + " BUILT",
+        "bedrooms": 3 + " BEDS",
+        "bathrooms": 2.5 + " BATHS",
+        "slots": 2 + " SLOTS",
+      },
+      "description": "Modern apartment in the heart of Lomas de Zamora, featuring spacious living areas and a balcony with city views.",
+      "tags": ["modern", "city view", "balcony"],
+      "amenities": ["gym", "pool", "parking"],
+      "agency": "Luxerium Realty",
+      "agentName": ["Lucia" , "Fernandez"],
+      "media": [
+        "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
+        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
+      ]
+    },
+]
+
+
+src/components/Proplist.astro:
+
+---
+import RealestateCard from "./subComponents/forList/Realestate-Card.astro";
+import listings from "../content/propertyListings";
+
+
+---
+
+<div class="h-full overflow-y-auto no-scrollbar p-3">
+
+
+  <!-- SEARCHBAR -->
+  <form action="/realestateSearch" method="get" class="flex sticky m-auto mb-2 w-full">
+    <div class="flex w-full items-center rounded-xl bg-terciaryColor backdrop-blur-[.25em] inset-0">
+      <input
+        name="search"
+        type="text"
+        maxlength="40"
+        placeholder=" COUNTRY / CITY / STATE / ZIP "
+        class="h-[50px] w-full text-center rounded-xl outline-none min-w-[250px] sm:min-w-[30vw] px-4 bg-transparent border-primaryColor border-t border-b border-x text-primaryColor focus:ring-2 focus:ring-primaryColor placeholder:text-primaryColor font-secondaryFont text-[16px] transition-all duration-300 uppercase"
+      />
+    </div>
+  </form>
+
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-2 pb-40 static">
+
+    {listings.map(listing => (
+      <RealestateCard {...listing} />
+    ))}
+    
+  </div>
+</div>
+
+src/components/subComponents/Realestate-Card.astro:
+
+---
+
+
+export interface Props {
+  id: number;
+  price: string;
+  extra?: string;
+  location: {
+    country: string;
+    state: string;
+    city: string;
+    address: string;
+    zipcode: string;
+    pluscode?: string;
+  };
+  status: 0 | 1 | 2 | 3 | 4;
+  features: {
+    type: string;
+    area: string;
+    year: number;
+    bedrooms: number;
+    bathrooms: number;
+    slots: number;
+  };
+  description?: string;
+  tags?: string[];
+  amenities?: string[];
+  agency: string;
+  agentName: [string, string];
+  media: string[];
+}
+
+const {
+  id,
+  price,
+  extra,
+  location,
+  status,
+  features,
+  description,
+  tags,
+  amenities,
+  agency,
+  agentName,
+  media
+} = Astro.props;
+
+
+/*
+import { getCollection } from "astro:content";
+
+const Props = await getCollection('Props');
+console.log(Props);
+*/
+
+
+const Status = {
+  0: "NO STATE",
+  1: "FOR SALE",
+  2: "FOR RENT",
+  3: "SOLD",
+  4: "TEMPO"
+} as const;
+
+const StatusClasses = {
+  0: "text-slate-500 bg-slate-500",
+  1: "text-forSale bg-forSale",
+  2: "text-forRent bg-forRent",
+  3: "text-Sold bg-Sold",
+  4: "text-forRentTemp bg-forRentTemp"
+} as const;
+
+
+
+---
+
+<!-- CARD -->
+
+<a href="#" class="h-full rounded-2xl bg-primaryColor select-none text-terciaryColor flex flex-col justify-between duration-[0.15s] ease-in-out hover:outline hover:outline-2 hover:outline-secondaryColor">
+  <div>
+    <div class="w-full h-48 rounded-t-2xl">
+      <img
+        src="https://mansionesmiami.com/wp-content/uploads/2020/05/620-Arvida-Pkwy-Coral-Gables-FL-33156-1.jpg"
+        alt=""
+        class="w-full h-full object-cover rounded-t-2xl"
+        draggable="false"
+      />
+    </div>
+    <div class="px-3 pt-3 pb-0">
+      <!-- Price -->
+      <div class="flex flex-row items-center justify-between">
+        <div class="flex flex-col">
+          <span class="font-secondaryFont text-2xl ">{price}</span>
+          <span class="font-secondaryFont text-md text-terciaryColor/75">{extra}</span>
+        </div>
+
+        <!-- Dynamic Status -->
+        <span
+        class:list={[
+          "font-secondaryFont font-semibold bg-opacity-35 h-full text-sm px-3 py-1 w-24 rounded-2xl text-center text-nowrap mb-2",
+          StatusClasses[status]        // <-- usa directamente "status"
+        ]}
+      >
+        {Status[status]}
+      </span>
+      </span>
+    </div>
+
+      <!-- Location -->
+      <p class="font-secondaryFont mt-2 text-sm font-light leading-tight text-terciaryColor/75 flex">
+        <img src="https://www.svgrepo.com/show/424575/location-direction-gps.svg" alt="Type Icon" class="mr-1 h-4 hidden" />
+        {location.address}, {location.city}, {location.state}, {location.country}.
+      </p>
+
+    </div>
+  </div>
+  <div>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-1 sm:gap-2 w-full px-3 py-3">
+  
+      <span class="flex justify-center flex-col">
+        <img src="https://cdn-icons-png.flaticon.com/512/1946/1946488.png" width="20px" height="20px" alt="a" class=" m-auto h-4 w-4 mb-1">
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{features.type}</p>
+      </span>
+      <span class="flex justify-center flex-col">
+        <img src="https://cdn-icons-png.flaticon.com/512/93/93640.png" alt="a" width="20px" height="20px" class=" m-auto h-4 w-4 mb-1">
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{features.area}</p>
+      </span>
+      <span class="flex justify-center flex-col">
+        <img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" width="20px" height="20px" alt="a" class=" m-auto h-4 w-4 mb-1">
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{features.year}</p>
+      </span>
+
+      <span class="flex justify-center flex-col">
+        <img src="https://cdn-icons-png.flaticon.com/512/952/952772.png" width="20px" height="20px" alt="a" class=" m-auto h-4 w-4 mb-1">
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{features.bedrooms}</p>
+      </span>
+      <span class="flex justify-center flex-col">
+        <img src="https://cdn-icons-png.flaticon.com/512/169/169301.png" width="20px" height="20px" alt="a" class=" m-auto h-4 w-4 mb-1">
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{features.bathrooms}</p>
+      </span>
+      <span class="flex justify-center flex-col">
+        <img src="https://cdn-icons-png.flaticon.com/512/243/243232.png" width="20px" height="20px" alt="a" class=" m-auto h-4 w-4 mb-1">
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{features.slots}</p>
+      </span>
+
+    </div>
+
+    
+  </div>
+
+
+  <!-- AGENT/CY INFO -->
+<div class="static bottom-0">
+
+  <div class="p-1 m-0 border-t">
+   <p class="text-xs text-center relative font-secondaryFont uppercase text-terciaryColor">{agency}</p>
+  </div>
+  <div class="relative items-center border-t border-r-white p-3 grid grid-cols-2 justify-end">
+    <div class="flex w-fit bottom-0">
+      <!-- Agent Image -->
+      <img
+      src="https://placehold.co/100x100"
+      alt="Agent Image"
+      class="h-12 w-12 aspect-square rounded-xl object-cover"
+      draggable="false"
+      />
+      
+      <!-- Agent Details -->
+      <div class="flex flex-col ml-2 w-full overflow-hidden">
+          <p class="font-secondaryFont font-medium text-terciaryColor text-xs text-left my-2 truncate uppercase">
+            {agentName[0]} <br> {agentName[1]}
+          </p>
+        </div>
+    </div>
+
+    <!-- Image Section -->
+    <div class="absolute inset-y-0 right-0 overflow-hidden rounded-br-2xl w-[35%] sm:w-[50%] md:w-[50%]">
+      <img
+      src="https://placehold.co/1920x1080"
+      alt="#"
+      class="h-full object-cover w-full border-l"
+      draggable="false"
+      />
+
+    </div>
+  </div>
+
+  </div>
+</a>
+
+

@@ -1,0 +1,49 @@
+---
+
+import Layout from "../../layouts/Layout.astro";
+import listings from "../../content/propertyListings";
+
+export async function getStaticPaths() {
+  return listings.map((listing) => ({
+    params: { slug: listing.slug },
+    props: listing
+  }));
+}
+
+const property = Astro.props;
+
+---
+
+
+<Layout title={`${property.location.address} - ${property.location.city}`}>
+  <h1>{property.price}</h1>
+  <p>{property.description}</p>
+  <p> Ubicación: {property.location.address}, {property.location.city}, {property.location.state}</p>
+  <img src={property.media[0]} alt="Imagen principal" />
+</Layout>
+
+
+
+<!-----
+directorio:
+
+    src/content/config.ts
+    src/content/propertyListings.ts
+    src/content/realEstate/[slug].astro
+
+    src/pages.realEstateSearch.astro 
+
+    src/components/subComponents/forList/Realestate-Card.astro 
+    src/components/subComponents/Proplist.astro 
+
+fin directorio.
+
+config.ts: 
+
+    VACIO
+
+.
+
+propertyListings.ts:
+
+----->

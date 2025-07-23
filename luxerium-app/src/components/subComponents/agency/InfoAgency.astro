@@ -1,0 +1,21 @@
+---
+const { Agencia = "NOMBRE DE AGENCIA" } = Astro.props;
+
+const { Description = "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Repudiandae suscipit facere tempora asperiores tempore blanditiis, quasi eos fugit eaque culpa quaerat, sunt repellendus officiis pariatur quam atque magnam ipsum at! Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam quis porro laudantium saepe distinctio sapiente ipsa totam voluptatem omnis magnam iste aliquid, voluptate sint accusantium veritatis suscipit nisi? Sint, necessitatibus!" } = Astro.props;
+
+
+---
+
+<div class="pl-16 pr-16 md:pr-3 mt-4 border-b pb-4 flex flex-col md:flex-row font-secondaryFont">
+    <span class="pb-4 md:pb-0">
+        <h1 class="text-primaryColor text-3xl grid grid-cols-2 w-fit text-nowrap"> {Agencia} 
+        </h1>
+        <p class="text-primaryColor text-md pt-4  max-w-[128ch] text-justify font-secondaryFont leading-[1lh]">{Description}</p>
+    </span>
+    <div class="h-48 w-full ml-0 md:ml-16 flex flex-col outline outline-1 outline-secondaryColor rounded-xl p-4">
+        <h2 class="text-center text-xl text-primaryColor uppercase">Contact Info</h2>
+    </div>
+</div>
+
+
+

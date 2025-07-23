@@ -1,8 +1,14 @@
+/* src/styles/fonts.css */
 @font-face {
-    font-family: "Genera Grotesk";
-    src: url("/fonts/genera-grotesk.ttf") format("ttf");
-  }
-  @font-face {
-    font-family: "Archivo";
-    src: url("/fonts/archivo.ttf") format("ttf");
-  }
+  font-family: "Genera Grotesk";
+  src: url("/fonts/genera-grotesk.ttf") format("truetype");
+  font-weight: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Archivo";
+  src: url("/fonts/archivo.ttf") format("truetype");
+  font-weight: normal;
+  font-display: swap;
+}
