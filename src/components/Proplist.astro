@@ -1,6 +1,14 @@
 ---
-import RealestateCard from "./subComponents/forList/Realestate-Card.astro";
-import listings from "../content/propertyListings";
+import RealestateCard from "./subComponents/forList/RealestateCard.astro";
+import { supabase } from "../lib/supabase";
+
+// 1. Obtener los datos de Supabase
+const { data: propertyListingsRE } = await supabase
+  .from('propertyListingsRE')
+  .select('*');
+
+
+
 ---
 
 <div class="h-full overflow-y-auto no-scrollbar p-3">
@@ -15,16 +23,41 @@ import listings from "../content/propertyListings";
     />
   </form>
 
+  <!-- GRID CON LOS DATOS DE SUPABASE -->
   <div id="propertyGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-2 pb-40 static">
-    {listings.map(listing => (
-      <RealestateCard
-        {...listing}
-        data-type={listing.features.type}
-        data-beds={listing.features.bedrooms}
-        data-price={listing.price.replace(/[^0-9]/g, '')}
-        data-location={`${listing.location.country} ${listing.location.city} ${listing.location.state} ${listing.location.zipcode}`.toLowerCase()}
-      />
-    ))}
+   
+    {
+      propertyListingsRE?.map(listing => {
+        const {
+          id,
+          price,
+          extra,
+          location_address,
+          location_city,
+          location_state,
+          location_country,
+          status,
+          features_type,
+          features_area,
+          features_year,
+          features_bedrooms,
+          features_bathrooms,
+          features_slots,
+          agency,
+          agentName_1,
+          agentName_2,
+        } = listing;
+        return (
+          <RealestateCard {...{ price, extra, location_country, location_state, location_city, location_address, status, features_type, features_area, features_year, features_bedrooms, features_bathrooms, features_slots, agency, agentName_1,
+          agentName_2}}
+          data-type={listing.features_type}
+          data-beds={listing.features_bedrooms}
+          data-price={listing.price}
+          data-location={`${listing.location_country} ${listing.location_city} ${listing.location_state}`.toLowerCase()}
+          />
+        )
+      })
+    }
   </div>
 </div>
 

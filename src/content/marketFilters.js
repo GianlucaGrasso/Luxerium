@@ -97,6 +97,9 @@ export const MarketFilters = {
                     },
                 },
             },
+            allRealEstate: {
+                title: "All Real Estate",
+            }
         },
     },
 
@@ -215,8 +218,12 @@ export const MarketFilters = {
                         title: "Task Vehicles",
                         image: "./images/market/Offroad/TaskVehicles.webp",
                     },
-                }
-            }
+                },
+            },
+            allVehicles: {
+                title: "All Vehicles",
+            },
+            
         },
             
     },
@@ -249,6 +256,9 @@ export const MarketFilters = {
                 title: "EVTOLs",
                 image: "./images/market/Aircrafts/EVTOLs.webp",
             },
+            allAircrafts: {
+                title: "All Aircrafts",
+            }
         }
     },
 
@@ -280,8 +290,12 @@ export const MarketFilters = {
                 title: "Jet Skis",
                 image: "./images/market/Ships/JetSkis.webp",
             },
+            allShips: {
+                title: "All Ships",
+            }
         }
-    }
+    },
+
     
 }
 

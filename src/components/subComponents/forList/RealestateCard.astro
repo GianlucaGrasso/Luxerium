@@ -1,6 +1,9 @@
 ---
+import { number, string } from "astro:schema";
+import { idText } from "typescript";
 
 
+/*
 export interface Props {
   id: number;
   slug: string;
@@ -46,17 +49,9 @@ const {
   agentName,
   media
 } = Astro.props;
-
-
-/*
-import { getCollection } from "astro:content";
-
-const Props = await getCollection('Props');
-console.log(Props);
 */
 
-
-const Status = {
+const statusLabel = {
   0: "NO STATE",
   1: "FOR SALE",
   2: "FOR RENT",
@@ -64,7 +59,7 @@ const Status = {
   4: "TEMPO"
 } as const;
 
-const StatusClasses = {
+const statusStyles = {
   0: "text-slate-500 bg-slate-500",
   1: "text-forSale bg-forSale",
   2: "text-forRent bg-forRent",
@@ -72,19 +67,62 @@ const StatusClasses = {
   4: "text-forRentTemp bg-forRentTemp"
 } as const;
 
+const listing : {
+  id: string;
+  slug: string;
+  price: number;
+  extra: number;
+  location_address: string;
+  location_city: string;
+  location_state: string;
+  location_country: string;
+  status: number;
+  features_type: string;
+  features_area: string;
+  features_year: number;
+  features_bedrooms: number;
+  features_bathrooms: number;
+  features_slots: number;
+  agency: string;
+  agentName_1: string;
+  agentName_2: string;
+  media: string;
+  agentImage: string;
+} = Astro.props;
 
+function formatPrice(price: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(price);
+}
+
+function formatExtra(extra: number): string {
+  return new Intl.NumberFormat('US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(extra);
+}
+
+const formatedPrice = formatPrice(listing.price);
+const formatedExtra = formatExtra(listing.extra);
+
+const {slug} = Astro.params;
 
 ---
 
 <!-- CARD -->
 
-<a href={`/propiedad/${slug}`} 
+<a href={`/${listing.slug}`} 
 class="h-full rounded-2xl bg-primaryColor select-none text-terciaryColor flex flex-col justify-between duration-[0.15s] ease-in-out hover:outline hover:outline-2 hover:outline-secondaryColor"
-data-type={features.type}
-data-beds={features.bedrooms}
-data-price={price.replace(/[^0-9]/g, '')}
-data-location={`${location.country} ${location.city} ${location.state} ${location.zipcode}`.toLowerCase()}
-
+data-type={listing.features_type}
+data-beds={listing.features_bedrooms}
+data-price={listing.price}
+data-location={`${listing.location_country} ${listing.location_city} ${listing.location_state}`.toLowerCase()}
 >
   <div>
     <div class="w-full h-48 rounded-t-2xl">
@@ -99,18 +137,18 @@ data-location={`${location.country} ${location.city} ${location.state} ${locatio
       <!-- Price -->
       <div class="flex flex-row items-center justify-between">
         <div class="flex flex-col">
-          <span class="font-secondaryFont text-2xl ">{price}</span>
-          <span class="font-secondaryFont text-md text-terciaryColor/75">{extra}</span>
+          <span class="font-secondaryFont text-2xl ">{formatedPrice}</span>
+          <span class="font-secondaryFont text-md text-terciaryColor/75">{formatedExtra}</span>
         </div>
 
         <!-- Dynamic Status -->
         <span
         class:list={[
           "font-secondaryFont font-semibold bg-opacity-35 h-full text-sm px-3 py-1 w-24 rounded-2xl text-center text-nowrap mb-2",
-          StatusClasses[status]        // <-- usa directamente "status"
+          statusStyles[listing.status]
         ]}
       >
-        {Status[status]}
+        {statusLabel[listing.status]}
       </span>
       </span>
     </div>
@@ -118,7 +156,7 @@ data-location={`${location.country} ${location.city} ${location.state} ${locatio
       <!-- Location -->
       <p class="font-secondaryFont mt-2 text-sm font-light leading-tight text-terciaryColor/75 flex">
         <img src="https://www.svgrepo.com/show/424575/location-direction-gps.svg" alt="Type Icon" class="mr-1 h-4 hidden" />
-        {location.address}, {location.city}, {location.state}, {location.country}.
+        {listing.location_address}, {listing.location_city}, {listing.location_state}, {listing.location_country}.
       </p>
 
     </div>
@@ -128,28 +166,28 @@ data-location={`${location.country} ${location.city} ${location.state} ${locatio
   
       <span class="flex justify-center flex-col">
         <img src="https://cdn-icons-png.flaticon.com/512/1946/1946488.png" width="20px" height="20px" alt="a" class=" m-auto h-4 w-4 mb-1">
-        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{features.type}</p>
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{listing.features_type}</p>
       </span>
       <span class="flex justify-center flex-col">
         <img src="https://cdn-icons-png.flaticon.com/512/93/93640.png" alt="a" width="20px" height="20px" class=" m-auto h-4 w-4 mb-1">
-        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{features.area}</p>
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{listing.features_area} m²</p>
       </span>
       <span class="flex justify-center flex-col">
         <img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" width="20px" height="20px" alt="a" class=" m-auto h-4 w-4 mb-1">
-        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{features.year}</p>
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">BUILT IN {listing.features_year}</p>
       </span>
 
       <span class="flex justify-center flex-col">
         <img src="https://cdn-icons-png.flaticon.com/512/952/952772.png" width="20px" height="20px" alt="a" class=" m-auto h-4 w-4 mb-1">
-        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{features.bedrooms}</p>
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{listing.features_bedrooms} BEDS</p>
       </span>
       <span class="flex justify-center flex-col">
         <img src="https://cdn-icons-png.flaticon.com/512/169/169301.png" width="20px" height="20px" alt="a" class=" m-auto h-4 w-4 mb-1">
-        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{features.bathrooms}</p>
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{listing.features_bathrooms} BATHS</p>
       </span>
       <span class="flex justify-center flex-col">
         <img src="https://cdn-icons-png.flaticon.com/512/243/243232.png" width="20px" height="20px" alt="a" class=" m-auto h-4 w-4 mb-1">
-        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{features.slots}</p>
+        <p class="text-xs text-center justify-end w-full font-secondaryFont uppercase text-nowrap">{listing.features_slots} SLOTS</p>
       </span>
 
     </div>
@@ -162,7 +200,7 @@ data-location={`${location.country} ${location.city} ${location.state} ${locatio
 <div class="static bottom-0">
 
   <div class="p-1 m-0 border-t">
-   <p class="text-xs text-center relative font-secondaryFont uppercase text-terciaryColor">{agency}</p>
+   <p class="text-xs text-center relative font-secondaryFont uppercase text-terciaryColor">{listing.agency}</p>
   </div>
   <div class="relative items-center border-t border-r-white p-3 grid grid-cols-2 justify-end">
     <div class="flex w-fit bottom-0">
@@ -177,7 +215,7 @@ data-location={`${location.country} ${location.city} ${location.state} ${locatio
       <!-- Agent Details -->
       <div class="flex flex-col ml-2 w-full overflow-hidden">
           <p class="font-secondaryFont font-medium text-terciaryColor text-xs text-left my-2 truncate uppercase">
-            {agentName[0]} <br> {agentName[1]}
+            {listing.agentName_1} <br> {listing.agentName_2}
           </p>
         </div>
     </div>

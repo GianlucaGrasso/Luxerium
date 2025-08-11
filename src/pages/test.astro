@@ -1,0 +1,32 @@
+---
+import HamburgerMenu from "../components/subComponents/navbarElements/HamburgerMenu.astro";
+import Layout from "../layouts/Layout.astro"
+
+function openClose() {
+  const hamburger = document.getElementById("hamburger");
+  
+  hamburger.addEventListener("click", openClose);
+
+}
+
+
+
+---
+<Layout title="Test">
+
+  <div class="absolute h-full w-full sm:w-1/3 bg-fuchsia-500" class=`${}` >
+    <button onclick="openClose" id="hamburger" >
+      <img src="https://placehold.co/60" alt="#" class="px-8">
+    </button>
+    <img src="/icons/brand/luxerium.svg" alt="" class="w-full h-[45px] m-auto mt-4">
+    <div class="grid grid-cols-1 mt-20 gap-20 w-fit m-auto text-center font-secondaryFont text-xl">
+      <a href="">REAL ESTATE</a>
+      <a href="">VEHICLES</a>
+      <a href="">AIRCRAFT</a>
+      <a href="">SHIPS</a>
+    </div>
+  </div>
+
+</Layout>
+
+

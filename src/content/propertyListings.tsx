@@ -1,10 +1,5 @@
 // src/content/propertyListings.ts
 
-const basePrice = Math.round(Math.random() * 500000 + 500000);
-const price = `$${basePrice.toLocaleString()}`;
-const extra = `$${Math.round(basePrice / 48).toLocaleString()} per month`;
-
-
 export default [
   {
     id: 1,
@@ -32,7 +27,7 @@ export default [
     tags: ["modern", "city view", "balcony"],
     amenities: ["gym", "pool", "parking"],
     agency: "Realtor Sur",
-    agentName: ["Sebastian", "Banfield"],
+    agentName: ["Sebastiana", "Banfield"],
     media: [
       "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
       "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
