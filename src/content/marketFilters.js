@@ -95,6 +95,10 @@ export const MarketFilters = {
                         title: "Industrial",
                         image: "./images/market/Lands/Industrial.webp",
                     },
+                    islands:{
+                        title: "Islands",
+                        image: "./images/market/Lands/Islands.webp",
+                    },
                 },
             },
             allRealEstate: {
