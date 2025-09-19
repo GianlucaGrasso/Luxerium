@@ -58,7 +58,12 @@ const allTypes = getNestedTypes(MarketFilters, 3);
 </div>
 
 <div class="max-w-[100vw] flex flex-col">
-  <h1 class="text-center w-fit m-auto text-primaryColor font-secondaryFont text-[18px]">BROWSE BY TYPE</h1>
+  <h1 class="text-center w-fit m-auto text-primaryColor font-secondaryFont text-[18px]">BROWSE BY
+    
+    <button class="transition-all ease-in-out duration-300 bg-primaryColor text-terciaryColor active:bg-transparent active:outline active:outline-secondaryColor active:text-primaryColor active:outline-1 px-4 py-1 rounded-full ml-1">TYPE</button>
+    <button class="transition-all ease-in-out duration-300 bg-primaryColor text-terciaryColor active:bg-transparent active:outline active:outline-secondaryColor active:text-primaryColor active:outline-1 px-4 py-1 rounded-full ml-1">LOCATION</button>
+
+  </h1>
   
   <div class="my-[1.5em] w-full grid px-[2em] gap-[10px] grid-cols-1 md:grid-cols-3 lg:grid-cols-4">  
     {

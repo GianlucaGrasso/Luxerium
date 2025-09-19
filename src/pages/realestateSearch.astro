@@ -2,7 +2,7 @@
 import Layout from "../layouts/Layout.astro"
 import Navbar from "../components/core/Navbar.astro"
 import SecondaryNavbar from "../components/core/SecondaryNavbar.astro"
-import Map from "../components/Map.astro"
+import MapView from "../components/core/map/MapView.jsx"
 import Proplist from "../components/Proplist.astro"
 import Filters from "../components/subComponents/navbarElements/Filters.astro"
 
@@ -14,8 +14,8 @@ import Filters from "../components/subComponents/navbarElements/Filters.astro"
     <Navbar />
     <SecondaryNavbar />
     <Filters/>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-0 h-screen static">
-        <Map />
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-0 h-[83dvh] static">
+        <MapView />
         <Proplist />
     </div>
 </Layout>
