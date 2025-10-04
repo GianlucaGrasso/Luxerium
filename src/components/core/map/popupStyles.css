@@ -1,0 +1,29 @@
+.leaflet-popup-content-wrapper{
+    width: 32rem;
+    display: block;
+    background: rgba(37, 37, 37, 0.95);
+    backdrop-filter: blur(15px);
+    border: 1px solid #f6f6f6;
+    transition: ease-in-out 0.25s;
+}
+.leaflet-popup-content-wrapper:hover{
+    border: 1px solid #F99929;
+}
+
+.leaflet-popup-close-button{
+    padding-right: 0.45rem;
+    padding-top: .2rem;
+    scale: 1.25;
+}
+
+
+
+.leaflet-popup-close-button > span{
+    color: #f6f6f6;
+    transition: ease-in-out 0.25s;
+}
+
+.leaflet-popup-close-button > span:hover{
+    color: #F99929;
+    scale: 1.35;
+}

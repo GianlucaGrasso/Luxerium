@@ -1,20 +1,35 @@
-import pkg from 'react';
-const { createContext, use } = pkg;
-import React from 'react';
-import {Map, TileLayer} from 'react-leaflet'
-import 'leaflet/dist/leaflet.css'
+'use server';
 
+import React from 'react'
+import {MapContainer, TileLayer} from 'react-leaflet'
+import 'leaflet/dist/leaflet.css'
+import Markers from './Markers';
+import './SearchEngine';
+
+const mapCenter = [-34.60370660860292, -58.381612744514086];
 
 
 const MapView = () => {
   return (
-    <MapView center={{lat:'-34.60370660860292', lng:'-58.381612744514086'}} zoom={13} noWrap={true} minZoom={6} maxZoom={20} worldCopyJump={true}>
-      <TileLayer />
-    </MapView>
+    <MapContainer center={mapCenter} zoom={13} noWrap={true} minZoom={6} maxZoom={18} worldCopyJump={true} className='z-0' >
+      <TileLayer 
+      url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      className='flex-grow-0 h-auto w-full static z-0  invert-[100%] hue-rotate-[3rad] saturate-[300%] grayscale-[85%]'
+      />
+      
+      <button id="nightMode" className="h-16 w-16 absolute z-[1000] bottom-0 left-0 ml-3 mb-3 ">
+        <img src="https://png.pngtree.com/png-vector/20230303/ourmid/pngtree-night-mode-vector-png-image_6626192.png" className="object-cover aspect-square saturate-[0]" />
+      </button>
+
+      <Markers />
+
+    </MapContainer>
   )
 }
 
-export default Map
+
+export default MapView
 
 
 

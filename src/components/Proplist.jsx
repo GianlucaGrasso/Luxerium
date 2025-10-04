@@ -1,6 +1,87 @@
+
+import React, { useEffect, useState } from 'react';
+import RealestateCard from "./subComponents/forList/RealestateCard.jsx";
+import { supabase } from "../lib/supabase";
+import SearchEngine from "./core/map/SearchEngine.jsx";
+
+const Proplist = () => {
+  const [propertyListingsRE, setPropertyListingsRE] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data } = await supabase
+        .from('propertyListingsRE')
+        .select('*');
+      setPropertyListingsRE(data || []);
+    };
+    fetchData();
+  }, []);
+
+  return (
+    <div className="h-full overflow-y-auto no-scrollbar p-3">
+      <SearchEngine />
+
+      <div id="propertyGrid" className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-2 pb-40 static">
+        {propertyListingsRE?.map(listing => {
+          const {
+            id,
+            price,
+            extra,
+            location_address,
+            location_city,
+            location_state,
+            location_country,
+            status,
+            features_type,
+            features_area,
+            features_year,
+            features_bedrooms,
+            features_bathrooms,
+            features_slots,
+            agency,
+            agentName_1,
+            agentName_2,
+          } = listing;
+          
+          return (
+            <RealestateCard
+              key={id}
+              price={price}
+              extra={extra}
+              location_country={location_country}
+              location_state={location_state}
+              location_city={location_city}
+              location_address={location_address}
+              status={status}
+              features_type={features_type}
+              features_area={features_area}
+              features_year={features_year}
+              features_bedrooms={features_bedrooms}
+              features_bathrooms={features_bathrooms}
+              features_slots={features_slots}
+              agency={agency}
+              agentName_1={agentName_1}
+              agentName_2={agentName_2}
+              data-type={features_type}
+              data-beds={features_bedrooms}
+              data-price={price}
+              data-location={`${location_country} ${location_city} ${location_state}`.toLowerCase()}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+export default Proplist;
+
+
+/*
 ---
 import RealestateCard from "./subComponents/forList/RealestateCard.astro";
 import { supabase } from "../lib/supabase";
+import SearchEngine from "./core/map/SearchEngine.jsx";
 
 // 1. Obtener los datos de Supabase
 const { data: propertyListingsRE } = await supabase
@@ -11,17 +92,10 @@ const { data: propertyListingsRE } = await supabase
 
 ---
 
+
 <div class="h-full overflow-y-auto no-scrollbar p-3">
   <!-- BARRA DE BÚSQUEDA -->
-  <form id="searchForm" class="flex sticky m-auto mb-2 w-full">
-    <input
-      id="searchInput"
-      type="text"
-      maxlength="40"
-      placeholder="COUNTRY / CITY / STATE / ZIP"
-      class="h-[50px] w-full text-center rounded-xl outline-none min-w-[250px] sm:min-w-[30vw] px-4 bg-transparent border-primaryColor border-t border-b border-x text-primaryColor focus:ring-2 focus:ring-primaryColor placeholder:text-primaryColor font-secondaryFont text-[16px] transition-all duration-300 uppercase"
-    />
-  </form>
+  <SearchEngine client:only="react" />
 
   <!-- GRID CON LOS DATOS DE SUPABASE -->
   <div id="propertyGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-2 pb-40 static">
@@ -62,6 +136,7 @@ const { data: propertyListingsRE } = await supabase
 </div>
 
 <script>
+  /*
   const searchInput = document.getElementById("searchInput") as HTMLInputElement;
   const propertyGrid = document.getElementById("propertyGrid") as HTMLDivElement;
   const allCards = Array.from(propertyGrid.children) as HTMLElement[];
@@ -102,4 +177,6 @@ const { data: propertyListingsRE } = await supabase
 
   // Inicial
   applyFilters();
-</script>
+  
+  </script>
+  */
