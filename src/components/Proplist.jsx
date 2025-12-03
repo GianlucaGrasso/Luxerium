@@ -5,14 +5,14 @@ import { supabase } from "../lib/supabase";
 import SearchEngine from "./core/map/SearchEngine.jsx";
 
 const Proplist = () => {
-  const [propertyListingsRE, setPropertyListingsRE] = useState([]);
+  const [listingsRealEstate, setlistingsRealEstate] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       const { data } = await supabase
-        .from('propertyListingsRE')
+        .from('listingsRealEstate')
         .select('*');
-      setPropertyListingsRE(data || []);
+      setlistingsRealEstate(data || []);
     };
     fetchData();
   }, []);
@@ -22,7 +22,7 @@ const Proplist = () => {
       <SearchEngine />
 
       <div id="propertyGrid" className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-2 pb-40 static">
-        {propertyListingsRE?.map(listing => {
+        {listingsRealEstate?.map(listing => {
           const {
             id,
             price,
