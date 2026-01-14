@@ -1,3 +1,5 @@
+//Realestate Card Component
+
 import React from 'react';
 
 const statusLabel = {

@@ -1,3 +1,4 @@
+//Map Component using React-Leaflet
 'use server';
 
 import React from 'react'
@@ -18,10 +19,6 @@ const MapView = () => {
       className='flex-grow-0 h-auto w-full static z-0  invert-[100%] hue-rotate-[3rad] saturate-[300%] grayscale-[85%]'
       />
       
-      <button id="nightMode" className="h-16 w-16 absolute z-[1000] bottom-0 left-0 ml-3 mb-3 ">
-        <img src="https://png.pngtree.com/png-vector/20230303/ourmid/pngtree-night-mode-vector-png-image_6626192.png" className="object-cover aspect-square saturate-[0]" />
-      </button>
-
       <Markers />
 
     </MapContainer>

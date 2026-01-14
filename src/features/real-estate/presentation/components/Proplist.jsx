@@ -1,8 +1,9 @@
+// React component to fetch and display real estate listings with filtering capabilities
 
 import React, { useEffect, useState } from 'react';
-import RealestateCard from "./subComponents/forList/RealestateCard.jsx";
-import { supabase } from "../lib/supabase";
-import SearchEngine from "./core/map/SearchEngine.jsx";
+import RealestateCard from "./RealestateCard.jsx";
+import { supabase } from "../../../../shared/infrastructure/lib/supabase.js";
+import SearchEngine from "../../../../shared/utils/map/SearchEngine.jsx";
 
 const Proplist = () => {
   const [listingsRealEstate, setlistingsRealEstate] = useState([]);

@@ -232,39 +232,40 @@ export const MarketFilters = {
             
     },
 
-    aircrafts: {
-        title: "Aircrafts",
-        image: "./images/market/Aircrafts.webp",
-        types: {
-            privateJets: {
-                title: "Private Jets",
-                image: "./images/market/Aircrafts/PrivateJets.webp",
-            },
-            commercialAircrafts: {
-                title: "Commercial Aircrafts",
-                image: "./images/market/Aircrafts/CommercialAircrafts.webp",
-            },
-            helicopters: {
-                title: "Helicopters",
-                image: "./images/market/Aircrafts/Helicopters.webp",
-            },
-            gliders: {
-                title: "Gliders",
-                image: "./images/market/Aircrafts/Gliders.webp",
-            },
-            seaplanes: {
-                title: "Seaplanes",
-                image: "./images/market/Aircrafts/Seaplanes.webp",
-            },
-            evtols: {
-                title: "EVTOLs",
-                image: "./images/market/Aircrafts/EVTOLs.webp",
-            },
-            allAircrafts: {
-                title: "All Aircrafts",
-            }
+   /*
+   aircrafts: {
+    title: "Aircrafts",
+    image: "./images/market/Aircrafts.webp",
+    types: {
+        privateJets: {
+            title: "Private Jets",
+            image: "./images/market/Aircrafts/PrivateJets.webp",
+        },
+        commercialAircrafts: {
+            title: "Commercial Aircrafts",
+            image: "./images/market/Aircrafts/CommercialAircrafts.webp",
+        },
+        helicopters: {
+            title: "Helicopters",
+            image: "./images/market/Aircrafts/Helicopters.webp",
+        },
+        gliders: {
+            title: "Gliders",
+            image: "./images/market/Aircrafts/Gliders.webp",
+        },
+        seaplanes: {
+            title: "Seaplanes",
+            image: "./images/market/Aircrafts/Seaplanes.webp",
+        },
+        evtols: {
+            title: "EVTOLs",
+            image: "./images/market/Aircrafts/EVTOLs.webp",
+        },
+        allAircrafts: {
+            title: "All Aircrafts",
         }
-    },
+    }
+},
 
     ships: {
         title: "Ships",
@@ -299,8 +300,9 @@ export const MarketFilters = {
             }
         }
     },
-
     
+    
+    */ 
 }
 
 

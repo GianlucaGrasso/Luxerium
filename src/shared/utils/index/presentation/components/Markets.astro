@@ -1,6 +1,6 @@
 ---
-import BrowseBy from "./subComponents/BrowseBy.astro"
-import { MarketFilters } from "../content/marketFilters"
+import BrowseBy from "./BrowseBy.astro"
+import { MarketFilters } from "../../../../../content/marketFilters"
 import react from "@astrojs/react"
 
 const getNestedTypes = (
@@ -34,7 +34,7 @@ const allTypes = getNestedTypes(MarketFilters, 3);
 <div class="max-w-[100vw] flex flex-col">
   <h1 class="text-center w-fit m-auto mt-[.75em] text-primaryColor font-secondaryFont text-[18px] pt-3">BROWSE BY MARKETPLACE</h1>
   
-  <div class="my-[1.5em] w-full grid grid-cols-1 md:grid-cols-4 lg:grid-cols-8 justify-center px-[2em] gap-[10px]">
+  <div class="my-[1.5em] w-full flex md:grid-cols-2 justify-center px-[2em] gap-[10px]">
 
     {
       Object.values(MarketFilters).map((filter) => {
@@ -67,7 +67,7 @@ const allTypes = getNestedTypes(MarketFilters, 3);
   
   <div class="my-[1.5em] w-full grid px-[2em] gap-[10px] grid-cols-1 md:grid-cols-3 lg:grid-cols-4">  
     {
-      Object.values({ ...MarketFilters.realEstate.types, ...MarketFilters.vehicles.types, ...MarketFilters.aircrafts.types, ...MarketFilters.ships.types}).map((filter) => {
+      Object.values({ ...MarketFilters.realEstate.types, ...MarketFilters.vehicles.types}).map((filter) => {
         return (
           <BrowseBy 
             title={filter.title.toUpperCase()} 
@@ -94,6 +94,9 @@ const allTypes = getNestedTypes(MarketFilters, 3);
     <BrowseBy title="" size="sm" image="https://images.unsplash.com/photo-1721902474248-3d6d2f2b595e?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
     <BrowseBy title="" size="md" image="https://images.unsplash.com/photo-1629644494884-7580538c3d43?q=80&w=889&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dhttps://images.pexels.com/photos/10550012/pexels-photo-10550012.jpeg" />
     <BrowseBy title="" size="sm" image="https://images.unsplash.com/photo-1682380116425-f103d66c5cf1?q=80&w=880&auto=format&full=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+
+    my-[1.5em] w-full grid grid-cols-1 md:grid-cols-4 lg:grid-cols-8 justify-center px-[2em] gap-[10px] IF 4 MARKET TYPES
+
     -->
   </div
 

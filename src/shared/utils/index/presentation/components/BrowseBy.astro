@@ -9,6 +9,11 @@ var basisSizes = {
   lg: 'col-span-3',
 };
 
+const navigator = '/browse/realestateSearch';
+
+// Corregir Navigator -> Browse dependiendo del titulo ya que si es VEHICLES debe ir a /browse/vehicleSearch etc. 
+// Actualmente esta hardcodeado a realestateSearch incluso para los subtipos de real estate y vehicles
+
 ---
 
 <button 
@@ -16,8 +21,7 @@ var basisSizes = {
   style={`background-image: url('${image}');`}
 >
   <div class="bg-lightGreyFade w-full h-[3em] absolute bottom-0 flex justify-center items-center group-hover:h-full transition-all duration-300 ease-in-out backdrop-blur-sm">
-    <a href="#" class="text-primaryColor font-primaryFont text-[1.26rem] tracking-[0.2em] transition-all duration-300 ease-in-out hover:text-secondaryColor ">
-
+    <a href=`${navigator}` class="text-primaryColor font-primaryFont text-[1.26rem] tracking-[0.2em] transition-all duration-300 ease-in-out hover:text-secondaryColor ">
       {title}
     </a>
   </div>

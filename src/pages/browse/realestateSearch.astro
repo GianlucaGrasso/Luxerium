@@ -1,0 +1,37 @@
+---
+//REALESTATE SEARCH PAGE
+import Layout from "../../shared/presentation/layouts/Layout.astro"
+import Navbar from "../../shared/presentation/components/layout/navbar/Navbar.astro"
+import SecondaryNavbar from "../../shared/presentation/components/layout/navbar/SecondaryNavbar.astro"
+import MapView from "../../shared/utils/map/MapView"
+import Proplist from "../../features/real-estate/presentation/components/Proplist"
+import Filters from "../../shared/presentation/components/layout/navbar/components/Filters.astro"
+
+
+
+---
+
+<Layout title="Real Estate">
+    <Navbar />
+    <SecondaryNavbar />
+    <Filters/>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-0 h-[82.5dvh] static">
+        <MapView client:only="react" />
+        <Proplist client:only="react" />
+    </div>
+</Layout>
+
+
+
+  
+
+
+<!-- 
+    <Layout title="RealEstate">
+        <Navbar/>
+        <div class="grid grid-cols-2 p-0 m-0 gap-0">
+            <Map/>
+            <Proplist/>
+        </div>
+    </Layout>
+ -->
