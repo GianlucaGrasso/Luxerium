@@ -44,7 +44,7 @@ const RealestateCard = (props) => {
 
   return (
     <a 
-      href={`/${listing.slug}`}
+      href="/listing/TestListing"
       className="h-full rounded-2xl bg-primaryColor select-none text-terciaryColor flex flex-col justify-between duration-[0.15s] ease-in-out hover:outline hover:outline-2 hover:outline-secondaryColor"
       data-type={listing.features_type}
       data-beds={listing.features_bedrooms}

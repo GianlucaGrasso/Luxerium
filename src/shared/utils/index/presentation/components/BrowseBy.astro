@@ -15,13 +15,27 @@ const navigator = '/browse/realestateSearch';
 // Actualmente esta hardcodeado a realestateSearch incluso para los subtipos de real estate y vehicles
 
 ---
-
-<button 
-  class={`group flex-grow ${basisSizes[size]} h-[15em] w-full duration-[0.3s] ease-in-out bg-top bg-cover relative hover:bg-bottom hover:outline hover:outline-2 hover:outline-secondaryColor hover:shadow-inner hover:shadow-secondaryColor`} 
-  style={`background-image: url('${image}');`}
+<button
+  class={`group flex-grow ${basisSizes[size]} h-[15em] w-full relative overflow-hidden 
+    hover:outline hover:outline-2 hover:outline-secondaryColor 
+    hover:shadow-inner hover:shadow-secondaryColor`}
 >
-  <div class="bg-lightGreyFade w-full h-[3em] absolute bottom-0 flex justify-center items-center group-hover:h-full transition-all duration-300 ease-in-out backdrop-blur-sm">
-    <a href=`${navigator}` class="text-primaryColor font-primaryFont text-[1.26rem] tracking-[0.2em] transition-all duration-300 ease-in-out hover:text-secondaryColor ">
+  <div
+    class="absolute inset-0 bg-cover bg-center transition-transform duration-300 ease-in-out scale-110 group-hover:scale-[.98]"
+    style={`background-image: url('${image}');`}
+  ></div>
+
+  <div
+    class="bg-lightGreyFade w-full h-[3em] absolute bottom-0 
+      flex justify-center items-center 
+      group-hover:h-full transition-all duration-300 ease-in-out 
+      backdrop-blur-sm z-10"
+  >
+    <a
+      href={`${navigator}`}
+      class="text-primaryColor font-primaryFont text-[1.26rem] tracking-[0.2em] 
+        transition-all duration-100 ease-in-out hover:text-secondaryColor h-full w-full justify-center flex items-center"
+    >
       {title}
     </a>
   </div>
