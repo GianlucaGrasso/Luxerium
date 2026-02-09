@@ -101,9 +101,7 @@ export const MarketFilters = {
                     },
                 },
             },
-            allRealEstate: {
-                title: "All Real Estate",
-            }
+
         },
     },
 
@@ -224,9 +222,7 @@ export const MarketFilters = {
                     },
                 },
             },
-            allVehicles: {
-                title: "All Vehicles",
-            },
+
             
         },
             

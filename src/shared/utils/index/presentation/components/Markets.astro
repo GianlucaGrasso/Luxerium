@@ -27,76 +27,196 @@ const getNestedTypes = (
 };
 
 const allTypes = getNestedTypes(MarketFilters, 3);
-
-
 ---
 
-<div class="max-w-[100vw] flex flex-col">
-  <h1 class="text-center w-fit m-auto mt-[.75em] text-primaryColor font-secondaryFont text-[18px] pt-3">BROWSE BY MARKETPLACE</h1>
-  
-  <div class="my-[1.5em] w-full flex md:grid-cols-2 justify-center px-[2em] gap-[10px]">
+<div class="max-w-[100vw] flex flex-col relative">
 
-    {
-      Object.values(MarketFilters).map((filter) => {
-        return (
-          <BrowseBy 
-            title={filter.title.toUpperCase()} 
-            size="md" 
-            image={filter.image} 
-          />
-        )
-      })
-    }
+  <!-- START sentinel: marca el inicio de la sección Markets -->
+  <section id="markets" class="w-full">
+    <div id="markets-start" class="w-full h-1"></div>
 
-    <!--
-    <BrowseBy size="md"  title="REAL ESTATE" image="https://images.unsplash.com/photo-1721902474248-3d6d2f2b595e?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
-    <BrowseBy size="md" title="VEHICLES" image="https://images.unsplash.com/photo-1629644494884-7580538c3d43?q=80&w=889&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dhttps://images.pexels.com/photos/10550012/pexels-photo-10550012.jpeg" />
-    <BrowseBy size="md" title="AIRCRAFTS" image="https://images.unsplash.com/photo-1682380116425-f103d66c5cf1?q=80&w=880&auto=format&full=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
-    <BrowseBy size="md" title="SHIPS" image="https://www.charterworld.com/news/wp-content/uploads/2013/03/Mega-Yacht-Red-Square-by-Dunya-Yachts-Image-courtesy-of-Dunya-Yachts.jpg" />
-    -->
+    <h1 class="text-center w-fit m-auto mt-[.75em] text-primaryColor font-secondaryFont text-[18px] pt-3">
+      BROWSE BY MARKETPLACE
+    </h1>
+    
+    <div class="my-[1.5em] w-full flex md:grid-cols-2 justify-center px-[2em] gap-[10px]">
+      {
+        Object.values(MarketFilters).map((filter) => {
+          return (
+            <BrowseBy 
+              title={filter.title.toUpperCase()} 
+              size="md" 
+              image={filter.image}
+            />
+          )
+        })
+      }
+    </div>
+  </section>
+
+  <div class="max-w-[100vw] flex flex-col">
+    <h1 class="text-center w-fit m-auto text-primaryColor font-secondaryFont text-[18px]">BROWSE BY TYPE</h1>
+    
+    <div class="my-[1.5em] w-full grid px-[2em] gap-[10px] grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
+      {
+        Object.values({ ...MarketFilters.realEstate.types, ...MarketFilters.vehicles.types}).map((filter) => {
+          return (
+            <BrowseBy 
+              title={filter.title.toUpperCase()} 
+              size="sm" 
+              image={filter.image} 
+            />
+          )
+        })
+      }
+
+      {
+        allTypes.map((type) => {
+          return (
+            <BrowseBy 
+              title={type.title.toUpperCase()} 
+              size="sm" 
+              image={type.image} 
+            />
+          )
+        })
+      }
+    </div>
+  </div>
+
+  <!-- END sentinel: marca el final de la sección Markets -->
+  <div id="markets-end" class="w-full h-1"></div>
+
+  <!-- WRAPPER del botón: inicialmente oculto (Status 0) -->
+  <div
+    id="search-all-wrapper"
+    class="w-full px-8 z-50 pointer-events-none opacity-0 translate-y-4 transition-all duration-300 ease-in-out"
+    aria-hidden="true"
+  >
+    <button
+      id="search-all-btn"
+      class="text-center font-secondaryFont w-full m-auto py-3 rounded-none"
+      type="button"
+    >
+      SEARCH ALL [ ... ]
+    </button>
   </div>
 </div>
 
-<div class="max-w-[100vw] flex flex-col">
-  <h1 class="text-center w-fit m-auto text-primaryColor font-secondaryFont text-[18px]">BROWSE BY
-    
-    <button class="transition-all ease-in-out duration-300 bg-primaryColor text-terciaryColor active:bg-transparent active:outline active:outline-secondaryColor active:text-primaryColor active:outline-1 px-4 py-1 rounded-full ml-1">TYPE</button>
-    <button class="transition-all ease-in-out duration-300 bg-primaryColor text-terciaryColor active:bg-transparent active:outline active:outline-secondaryColor active:text-primaryColor active:outline-1 px-4 py-1 rounded-full ml-1">LOCATION</button>
+<script type="module">
+  const wrapper = document.getElementById('search-all-wrapper');
+  const btn = document.getElementById('search-all-btn');
+  const startSentinel = document.getElementById('markets-start');
+  const endSentinel = document.getElementById('markets-end');
 
-  </h1>
-  
-  <div class="my-[1.5em] w-full grid px-[2em] gap-[10px] grid-cols-1 md:grid-cols-3 lg:grid-cols-4">  
-    {
-      Object.values({ ...MarketFilters.realEstate.types, ...MarketFilters.vehicles.types}).map((filter) => {
-        return (
-          <BrowseBy 
-            title={filter.title.toUpperCase()} 
-            size="sm" 
-            image={filter.image} 
-          />
-        )
-      })
+  if (wrapper && startSentinel && endSentinel) {
+    // Flags de estado
+    let startIsIntersecting = true; // true cuando el inicio está visible (usuario en top)
+    let atBottom = false;           // true cuando el final está visible (estado final)
+    let isVisible = false;          // true cuando el wrapper está visible (Status 1 o Final)
+
+    // Clases Tailwind
+    const fixedClasses = [
+      'fixed','bottom-0','left-0','right-0',
+      'backdrop-blur-sm','bg-primaryColor/60',
+      'pb-[env(safe-area-inset-bottom)]','shadow-lg'
+    ];
+    const staticClasses = ['static','bg-primaryColor','backdrop-blur-none','shadow-none'];
+
+    // Helpers para mostrar/ocultar con transiciones
+    function applyVisible() {
+      wrapper.setAttribute('aria-hidden', 'false');
+      wrapper.classList.remove('pointer-events-none','opacity-0','translate-y-4');
+      wrapper.classList.add('pointer-events-auto','opacity-100','translate-y-0');
+      isVisible = true;
+    }
+    function applyHidden() {
+      wrapper.setAttribute('aria-hidden', 'true');
+      wrapper.classList.remove('pointer-events-auto','opacity-100','translate-y-0');
+      wrapper.classList.add('pointer-events-none','opacity-0','translate-y-4');
+      isVisible = false;
     }
 
-    {
-      allTypes.map((type) => {
-        return (
-          <BrowseBy 
-            title={type.title.toUpperCase()} 
-            size="sm" 
-            image={type.image} 
-          />
-        )
-      })
+    // Status 1: fixed + blur (aparece cuando el usuario scrollea dentro de la sección)
+    function showBlurFixed() {
+      if (atBottom) return; // si estamos en final, no aplicar
+      applyVisible();
+      wrapper.classList.remove(...staticClasses);
+      wrapper.classList.add(...fixedClasses);
+      wrapper.style.position = ''; // dejar que las clases controlen fixed
     }
 
-    <!--
-    <BrowseBy title="" size="sm" image="https://images.unsplash.com/photo-1721902474248-3d6d2f2b595e?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
-    <BrowseBy title="" size="md" image="https://images.unsplash.com/photo-1629644494884-7580538c3d43?q=80&w=889&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dhttps://images.pexels.com/photos/10550012/pexels-photo-10550012.jpeg" />
-    <BrowseBy title="" size="sm" image="https://images.unsplash.com/photo-1682380116425-f103d66c5cf1?q=80&w=880&auto=format&full=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+    // Status Final: estático y claro (cuando el final entra en viewport)
+    function makeStaticClear() {
+      atBottom = true;
+      applyVisible();
+      wrapper.classList.remove(...fixedClasses);
+      wrapper.classList.add(...staticClasses);
+      // Forzar posición estática para que ocupe flujo normal
+      wrapper.style.position = 'static';
+    }
 
-    my-[1.5em] w-full grid grid-cols-1 md:grid-cols-4 lg:grid-cols-8 justify-center px-[2em] gap-[10px] IF 4 MARKET TYPES
+    // Revertir del estado final al anterior (cuando el final deja de intersectar)
+    function unsetStatic() {
+      if (!atBottom) return;
+      atBottom = false;
+      wrapper.classList.remove(...staticClasses);
+      wrapper.style.position = '';
+      // Volver al comportamiento según si el inicio está visible o no
+      if (startIsIntersecting) {
+        // Si el inicio es visible -> oculto (Status 0)
+        applyHidden();
+      } else {
+        // Si el inicio no es visible -> mostrar blur fixed (Status 1)
+        showBlurFixed();
+      }
+    }
 
-    -->
-  </div>
+    // Observer para el inicio: controla oculto <-> blur
+    const startObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        startIsIntersecting = entry.isIntersecting;
 
+        if (entry.isIntersecting) {
+          // Usuario en la parte superior -> ocultar (Status 0)
+          applyHidden();
+        } else {
+          // Usuario scrollea hacia abajo -> mostrar blur fixed (Status 1) salvo que estemos en final
+          if (!atBottom) showBlurFixed();
+        }
+      });
+    }, { root: null, threshold: 0.05 });
+
+    // Observer para el final: controla transición a estado final y reversibilidad
+    const endObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // Llegamos al final -> estado final (estático y claro)
+          makeStaticClear();
+        } else {
+          // Salimos del final -> volver al estado anterior (reversible)
+          unsetStatic();
+        }
+      });
+    }, { root: null, threshold: 0.05 });
+
+    // Iniciar observadores
+    startObserver.observe(startSentinel);
+    endObserver.observe(endSentinel);
+
+    // Escape para ocultar (opcional)
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        applyHidden();
+      }
+    });
+  }
+</script>
+<!--
+<BrowseBy title="" size="sm" image="https://images.unsplash.com/photo-1721902474248-3d6d2f2b595e?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+<BrowseBy title="" size="md" image="https://images.unsplash.com/photo-1629644494884-7580538c3d43?q=80&w=889&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dhttps://images.pexels.com/photos/10550012/pexels-photo-10550012.jpeg" />
+<BrowseBy title="" size="sm" image="https://images.unsplash.com/photo-1682380116425-f103d66c5cf1?q=80&w=880&auto=format&full=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+
+my-[1.5em] w-full grid grid-cols-1 md:grid-cols-4 lg:grid-cols-8 justify-center px-[2em] gap-[10px] IF 4 MARKET TYPES
+
+-->
