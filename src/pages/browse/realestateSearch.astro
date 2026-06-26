@@ -1,11 +1,11 @@
 ---
 //REALESTATE SEARCH PAGE
-import Layout from "../../shared/presentation/layouts/Layout.astro"
-import Navbar from "../../shared/presentation/components/layout/navbar/Navbar.astro"
-import SecondaryNavbar from "../../shared/presentation/components/layout/navbar/SecondaryNavbar.astro"
-import MapView from "../../shared/utils/map/MapView"
-import Proplist from "../../features/real-estate/presentation/components/Proplist"
-import Filters from "../../shared/presentation/components/layout/navbar/components/Filters.astro"
+import Layout from "../../layouts/Layout.astro"
+import Navbar from "../../ui/navbar/Navbar.astro"
+import SecondaryNavbar from "../../ui/navbar/SecondaryNavbar.astro"
+import MapView from "../../ui/map/MapView"
+import Proplist from "../../ui/real-estate/Proplist"
+import Filters from "../../playground/playground-components/Filters.astro" //*ESTO ES UN FILTRO DE PRUEBA*//
 
 
 
@@ -23,7 +23,21 @@ import Filters from "../../shared/presentation/components/layout/navbar/componen
 
 
 
-  
+<!-- 
+---
+import Layout from "../../layouts/Layout.astro"
+import Navbar from "../../ui/navbar/Navbar.astro"
+import SecondaryNavbar from "../../ui/navbar/SecondaryNavbar.astro"
+import RealEstatePage from "../../ui/real-estate/RealEstatePage.jsx"
+---
+
+<Layout title="Real Estate">
+  <Navbar />
+  <SecondaryNavbar />
+  <RealEstatePage client:only="react" />
+</Layout>
+
+-->
 
 
 <!-- 

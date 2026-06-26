@@ -1,0 +1,64 @@
+---
+---
+
+<header class="flex m-auto w-fit">
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-1 sm:gap-2 md:gap-4 lg:gap-10 p-2 flex-row justify-between uppercase">
+      <!-- Property Type -->
+      <select
+        id="filterType"
+        class="bg-primaryColor text-terciaryColor font-secondaryFont p-2 rounded-2xl w-full appearance-none cursor-pointer uppercase flex"
+        > 
+        <option value="">All Types ▼</option> 
+        <option value="Apartment">Apartment</option>
+        <option value="House">House</option>
+        <option value="Condo">Condo</option>
+
+      </select>
+  
+      <!-- Bedrooms -->
+      <select
+        id="filterBeds"
+        class="bg-primaryColor text-terciaryColor font-secondaryFont p-2 rounded-2xl w-full appearance-none cursor-pointer uppercase"
+      >
+        <option value="">Any Beds</option>
+        <option value="1">1+</option>
+        <option value="2">2+</option>
+        <option value="3">3+</option>
+        <option value="4">4+</option>
+      </select>
+  
+      <!-- Price Range -->
+      <select
+        id="filterPrice"
+        class="bg-primaryColor text-terciaryColor font-secondaryFont p-2 rounded-2xl w-full appearance-none cursor-pointer uppercase"
+      >
+        <option value="">Any Price</option>
+        <option value="250000">≤ $250K</option>
+        <option value="500000">≤ $500K</option>
+        <option value="1000000">≤ $1M</option>
+        <option value="15000000">≤ $1.5M</option>
+        <option value="2000000">≤ $2M</option>
+      </select>
+    </div>
+  </header>
+  
+  <script>
+    const typeSelect = document.getElementById("filterType") as HTMLSelectElement;
+    const bedsSelect = document.getElementById("filterBeds") as HTMLSelectElement;
+    const priceSelect = document.getElementById("filterPrice") as HTMLSelectElement;
+  
+    function updateFilters() {
+      const params = new URLSearchParams(window.location.search);
+      params.set("type", typeSelect.value);
+      params.set("beds", bedsSelect.value);
+      params.set("maxPrice", priceSelect.value);
+      history.replaceState(null, "", `?${params.toString()}`);
+  
+      // Disparar evento global para que Proplist lo escuche
+      window.dispatchEvent(new Event("filterUpdated"));
+    }
+  
+    typeSelect.addEventListener("change", updateFilters);
+    bedsSelect.addEventListener("change", updateFilters);
+    priceSelect.addEventListener("change", updateFilters);
+  </script>
