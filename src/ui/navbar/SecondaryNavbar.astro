@@ -1,17 +1,22 @@
 ---
 import SecondaryAnchor from "./components/SecondaryAnchor.astro"
 
+import Searchbar from "../Searchbar.astro"
+
+
 ---
 
-<header class="w-full py-[10px] bg-terciaryColor border-primaryColor border-y top-[60px] sticky z-50">
-    <div class="flex justify-center">
-      <nav>
-        <ul class="grid grid-cols-2 sm:grid-cols-2 gap-x-16 gap-y-2 sm:gap-x-12 md:gap-x-24 lg:gap-x-44 xl:gap-x-52 2xl:gap-x-[26rem]">
-            <SecondaryAnchor market="REAL ESTATE" url="browse/realestateSearch"/>
-            <SecondaryAnchor market="VEHICLES" />
-        </ul>
-      </nav>
-    </div>
-  </header>
+<header id="secondary-nav" class="w-full py-2 bg-transparent border-primaryColor/50 border-b top-[60px] sticky z-40 transition-colors">
+  <div class="flex justify-center">
+    <nav>
+      <ul class="flex flex-nowrap justify-center gap-x-12 sm:gap-x-14 md:gap-x-24 lg:gap-x-28 xl:gap-x-32 2xl:gap-x-40 pb-[0.1rem]">
+          <SecondaryAnchor market="REAL ESTATE" url="browse/realestateSearch"/>
+          <SecondaryAnchor market="VEHICLES" />
+          <SecondaryAnchor market="AIRCRAFTS" />
+          <SecondaryAnchor market="SHIPS" />
+      </ul>
+    </nav>
+  </div>
+</header>
   
   <!-- grid grid-cols-2 sm:grid-cols-4 gap-x-16 gap-y-2 sm:gap-x-12 md:gap-x-24 lg:gap-x-44 xl:gap-x-52 2xl:gap-x-64 IF ADD SHIPS AND AIRCRAFTS -->

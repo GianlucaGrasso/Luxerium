@@ -1,60 +1,330 @@
 ---
-
+// Searchbar.astro
 ---
-<!-- SEARCHBAR -->
 
-<div class="absolute left-1/2 transform -translate-x-1/2 z-10 my-5 w-[95%] sm:w-auto">
-  <div class="flex relative items-center rounded-lg bg-secondaryColor/40 backdrop-blur-[.25em] inset-0">
-    <!-- Boton de tipo de propiedades -->
-    
-    <!--
-    <div>
-      <button class="w-[75px] sm:w-[100px] h-[50px] border border-r-0 border-secondaryColor rounded-tl-md rounded-bl-md hover:bg-secondaryColor hover:text-white transition-all duration-300 flex items-center justify-center">
-        <img src="icons/tags/arrowTag.svg" alt="Property Type" class="w-[30px] h-[30px]">
-      </button>
-    </div>
-    -->
-
-    <!-- Input de búsqueda -->
+<div class="absolute left-1/2 transform -translate-x-1/2 z-10 my-[7.5rem] w-[95%] sm:w-auto">
+  <div class="relative">
     <input 
+      id="search-input"
       type="text"
-      maxlength="40" 
-      placeholder="COUNTRY / CITY / STATE / ZIP / BRAND" 
-      class="h-[50px] w-full text-center rounded-tl-md rounded-bl-md outline-none min-w-[250px] sm:min-w-[30vw] px-4 bg-transparent border-primaryColor border-t border-b border-x text-primaryColor focus:ring-2 focus:ring-primaryColor placeholder:text-primaryColor font-secondaryFont text-[16px] transition-all duration-300 uppercase"
+      maxlength="60" 
+      placeholder="Location / Brand / Make" 
+      class="h-9 w-full text-center outline-none min-w-[280px] sm:min-w-[36vw] px-4 backdrop-blur-[2px] bg-transparent border border-primaryColor/50 text-primaryColor rounded-sm focus:ring-2 focus:ring-primaryColor placeholder:text-primaryColor font-secondaryFont text-sm transition-all duration-300 uppercase"
+      autocomplete="off"
     >
 
-    <!-- Boton de búsqueda -->
-    <div>
-      <button class="w-[75px] h-[50px] border border-primaryColor rounded-tr-md rounded-br-md border-l-0 hover:bg-secondaryColor hover:text-white transition-all duration-300 flex items-center justify-center">
-        <img src="/icons/tags/searchTag.svg" alt="Search" class="w-[30px] h-[30px]">
-      </button>
+    <div id="suggestions-dropdown" class="hidden absolute top-full left-0 right-0 mt-1 bg-terciaryColor/75 backdrop-blur-md border border-terciaryColor max-h-80 overflow-y-auto z-50 rounded-md">
+      <div id="suggestions-list" class="divide-y divide-primaryColor/10"></div>
     </div>
   </div>
 </div>
 
-<!-- COUNTRY / CITY / STATE / ZIP CODE -->
+<script>
+  // =============================================
+  //  HELPERS DE TEXTO
+  // =============================================
+  function normalizeString(str) {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  }
 
+  // =============================================
+  //  MAPEO DE ETIQUETAS MEJORADO (con place_rank)
+  // =============================================
+  function getPlaceLabel(osmItem) {
+    const type = osmItem.type || osmItem.category || '';
+    const address = osmItem.address || {};
+    const name = osmItem.display_name?.split(',')[0]?.trim();
+    const rank = osmItem.place_rank ? parseInt(osmItem.place_rank) : 0;
 
-<!--
----
+    // Mapeo directo de tipos OSM
+    const labels = {
+      country: 'Country',
+      state: 'State',
+      province: 'State',
+      region: 'State',
+      district: 'State',
+      county: 'State',
+      municipality: 'City',
+      city: 'City',
+      town: 'Town',
+      village: 'Town',
+      hamlet: 'Town',
+      borough: 'Suburb',
+      suburb: 'Suburb',
+      quarter: 'Suburb',
+      neighbourhood: 'Suburb',
+      city_block: 'Suburb'
+    };
 
----
+    if (labels[type]) return labels[type];
 
+    // Si no hay coincidencia exacta, usar el rank como respaldo fiable
+    if (rank >= 4 && rank <= 6) return 'Country';
+    if (rank >= 8 && rank <= 12) return 'State';
+    if (rank >= 13 && rank <= 17) return 'City';    // ciudades y grandes pueblos
+    if (rank >= 18 && rank <= 20) return 'Town';
+    if (rank >= 21 && rank <= 22) return 'Suburb';
 
-<div class="absolute z-10 my-5 w-fit flex ">
-    <div>
-      <button class=" w-[100px] h-[50px] bg-blackBackground">
-        <img src="icons/tags/arrowTag.svg" alt="" class="w-[40px] h-[40px] flex m-auto">
-      </button>
-    </div>
-    <input type="text" name="" id="" placeholder="SEARCH PROPERTIES" class=" h-[50px]  w-[40px] text-center min-w-[30vw] p-2 bg-primaryColor opacity-65 text-terciaryColor outline-none">
-    
-    <div>
-      <button class=" w-[75px] h-[50px] bg-blackBackground">
-        <img src="icons/tags/searchTag.svg" alt="" class="w-[40px] h-[40px] flex m-auto">
-      </button>
-    </div>    
-    
-</div>
+    // Heurísticas clásicas si no hay rank
+    if (address.country && name === address.country) return 'Country';
+    if (address.state && name === address.state) return 'State';
+    if (address.city || address.town || address.village) return 'City';
+    if (address.suburb || address.borough || address.quarter || address.neighbourhood) return 'Suburb';
 
--->
+    return 'Place';
+  }
+
+  // =============================================
+  //  BANDERAS (SOLO ESTADOS DE USA)
+  // =============================================
+  const SUBDIVISION_FLAGS = {
+    us: {
+      "Alabama": "al", "Alaska": "ak", "Arizona": "az", "Arkansas": "ar", "California": "ca",
+      "Colorado": "co", "Connecticut": "ct", "Delaware": "de", "Florida": "fl", "Georgia": "ga",
+      "Hawaii": "hi", "Idaho": "id", "Illinois": "il", "Indiana": "in", "Iowa": "ia",
+      "Kansas": "ks", "Kentucky": "ky", "Louisiana": "la", "Maine": "me", "Maryland": "md",
+      "Massachusetts": "ma", "Michigan": "mi", "Minnesota": "mn", "Mississippi": "ms", "Missouri": "mo",
+      "Montana": "mt", "Nebraska": "ne", "Nevada": "nv", "New Hampshire": "nh", "New Jersey": "nj",
+      "New Mexico": "nm", "New York": "ny", "North Carolina": "nc", "North Dakota": "nd", "Ohio": "oh",
+      "Oklahoma": "ok", "Oregon": "or", "Pennsylvania": "pa", "Rhode Island": "ri", "South Carolina": "sc",
+      "South Dakota": "sd", "Tennessee": "tn", "Texas": "tx", "Utah": "ut", "Vermont": "vt",
+      "Virginia": "va", "Washington": "wa", "West Virginia": "wv", "Wisconsin": "wi", "Wyoming": "wy"
+    }
+  };
+
+  function getFlagIcons(osmItem) {
+    const address = osmItem.address || {};
+    const countryCode = address.country_code?.toLowerCase() || '';
+    const stateName = address.state || '';
+    const flags = [];
+
+    if (countryCode) {
+      flags.push({
+        url: `https://flagcdn.com/w40/${countryCode}.png`,
+        alt: countryCode.toUpperCase(),
+        type: 'country'
+      });
+    }
+
+    if (countryCode === 'us' && stateName) {
+      const stateMap = SUBDIVISION_FLAGS.us;
+      const normalizedInput = normalizeString(stateName);
+      
+      let code = null;
+      for (const [key, val] of Object.entries(stateMap)) {
+        if (normalizeString(key) === normalizedInput) {
+          code = val;
+          break;
+        }
+      }
+      
+      if (code) {
+        flags.push({
+          url: `https://flagcdn.com/w40/us-${code}.png`,
+          alt: stateName,
+          type: 'state'
+        });
+      }
+    }
+
+    return flags.slice(0, 2);
+  }
+
+  function renderFlags(flags) {
+    if (flags.length === 0) return '';
+    return flags.map(f => 
+      `<img src="${f.url}" alt="${f.alt}" class="inline-block w-5 h-3.5 object-cover mr-0.5" />`
+    ).join('');
+  }
+
+  // =============================================
+  //  FILTRO ANTI-BASURA: solo lugares desde Country hasta Neighbourhood
+  // =============================================
+  function isValidPlace(osmItem) {
+    const type = osmItem.type || osmItem.category || '';
+    const rank = osmItem.place_rank ? parseInt(osmItem.place_rank) : 30;
+
+    const forbiddenTypes = [
+      'house', 'building', 'street', 'road', 'service', 'track', 'path',
+      'yes', 'no', 'isolated_dwelling', 'farm', 'allotments', 'pitch',
+      'park', 'garden', 'bus_stop', 'station', 'stop', 'locality'
+    ];
+    if (forbiddenTypes.includes(type)) return false;
+
+    if (rank < 4 || rank > 22) return false;
+
+    return true;
+  }
+
+  // =============================================
+  //  API DE UBICACIONES (Nominatim)
+  // =============================================
+  async function searchLocations(query) {
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&extratags=1&limit=20&accept-language=en`;
+      const res = await fetch(url, {
+        headers: { 'User-Agent': 'LuxeriumApp/1.0' }
+      });
+      const data = await res.json();
+      
+      return data
+        .filter(isValidPlace)
+        .slice(0, 5)
+        .map(item => ({
+          type: 'location',
+          displayName: item.display_name,
+          flags: getFlagIcons(item),
+          label: getPlaceLabel(item),
+          address: item.address,
+          lat: item.lat,
+          lon: item.lon
+        }));
+    } catch(e) {
+      return [];
+    }
+  }
+
+  // =============================================
+  //  API DE VEHÍCULOS (sin hardcodear)
+  // =============================================
+  async function searchVehicles(query) {
+    try {
+      const url = `https://freetestapi.com/api/v1/cars?search=${encodeURIComponent(query)}&limit=5`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Vehicle API error');
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        return data.map(car => ({
+          type: 'vehicle',
+          displayName: `${car.make} ${car.model}`,
+          icon: `<svg class="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg>`,
+          label: 'Vehicle',
+          make: car.make,
+          model: car.model,
+          year: car.year
+        }));
+      }
+      return [];
+    } catch(e) {
+      return [];
+    }
+  }
+
+  // =============================================
+  //  SUGERENCIAS COMBINADAS
+  // =============================================
+  async function fetchSuggestions(query) {
+    if (query.length < 2) {
+      document.getElementById('suggestions-dropdown').classList.add('hidden');
+      return;
+    }
+
+    const [locations, vehicles] = await Promise.all([
+      searchLocations(query),
+      searchVehicles(query)
+    ]);
+
+    const combined = locations.concat(vehicles.slice(0, 3));
+    renderSuggestions(combined.slice(0, 8));
+  }
+
+  function renderSuggestions(suggestions) {
+    const list = document.getElementById('suggestions-list');
+    if (!suggestions.length) {
+      document.getElementById('suggestions-dropdown').classList.add('hidden');
+      return;
+    }
+
+    list.innerHTML = '';
+    suggestions.forEach(s => {
+      const div = document.createElement('div');
+      div.className = 'flex items-center gap-3 px-4 py-3 hover:bg-secondaryColor/20 cursor-pointer transition-colors text-primaryColor';
+      
+      const title = s.type === 'location' ? s.displayName.split(',')[0].trim() : s.displayName;
+      const subtitle = s.type === 'location'
+        ? s.displayName.split(',').slice(1, 3).join(',').trim()
+        : (s.year ? `${s.label} · ${s.year}` : s.label);
+
+      const iconHtml = s.type === 'location' 
+        ? renderFlags(s.flags) 
+        : (s.icon || '');
+
+      div.innerHTML = `
+        <div class="flex-shrink-0 flex items-center gap-1">${iconHtml}</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-sm uppercase tracking-wider truncate">${title}</div>
+          <div class="text-xs text-primaryColor/50 truncate">${subtitle || s.label}</div>
+        </div>
+        <span class="text-xs text-primaryColor/50 uppercase bg-primaryColor/10 px-2 py-0.5">${s.label}</span>
+      `;
+
+      div.addEventListener('click', () => handleSuggestionClick(s));
+      list.appendChild(div);
+    });
+
+    document.getElementById('suggestions-dropdown').classList.remove('hidden');
+  }
+
+  // =============================================
+  //  REDIRECCIÓN A SLUG DE ASTRO ([...place].astro)
+  // =============================================
+  function handleSuggestionClick(suggestion) {
+    document.getElementById('suggestions-dropdown').classList.add('hidden');
+
+    if (suggestion.type === 'location') {
+      const addr = suggestion.address || {};
+      const hierarchy = [
+        addr.continent,
+        addr.country,
+        addr.state || addr.province || addr.region,
+        addr.city || addr.town || addr.village,
+        addr.suburb || addr.borough || addr.quarter || addr.neighbourhood
+      ].filter(Boolean).map(part => part.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''));
+
+      // Construir slug para Astro: /place/asia/japan/tokyo/...
+      const slugPath = hierarchy.join('/');
+      window.location.href = `/place/${slugPath}`;
+    } else {
+      const makeSlug = suggestion.make.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      const modelSlug = suggestion.model.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      window.location.href = `/vehicle/${makeSlug}/${modelSlug}`;
+    }
+  }
+
+  // =============================================
+  //  EVENTOS (sin botón ni Enter)
+  // =============================================
+  let debounceTimer;
+  const searchInput = document.getElementById('search-input');
+
+  searchInput.addEventListener('input', (e) => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => fetchSuggestions(e.target.value.trim()), 300);
+  });
+
+  searchInput.addEventListener('focus', () => {
+    if (searchInput.value.trim().length >= 2) fetchSuggestions(searchInput.value.trim());
+  });
+
+  document.addEventListener('click', (e) => {
+    const dd = document.getElementById('suggestions-dropdown');
+    if (!dd.contains(e.target) && e.target !== searchInput) {
+      dd.classList.add('hidden');
+    }
+  });
+
+  // No hay evento keypress ni botón de búsqueda
+</script>
+
+<style>
+  #suggestions-dropdown {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.1) transparent;
+  }
+  #suggestions-dropdown::-webkit-scrollbar {
+    width: 4px;
+  }
+  #suggestions-dropdown::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+  }
+</style>

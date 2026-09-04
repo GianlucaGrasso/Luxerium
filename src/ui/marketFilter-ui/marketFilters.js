@@ -13,6 +13,10 @@ export const MarketFilters = {
                         title: "Mansions",
                         image: "./images/market/Houses/Mansions.webp",
                     },
+                    castles: {
+                        title: "Castles",
+                        image: "./images/market/Houses/Castles.webp",
+                    },
                     townhouses: {
                         title: "Townhouses",
                         image: "./images/market/Houses/Townhouses.webp",
@@ -40,8 +44,8 @@ export const MarketFilters = {
                 image: "./images/market/Apartments/Apartments.webp",
                 types: {
                     studios: {
-                        title: "Studios",
-                        image: "./images/market/Apartments/Studios.webp",
+                        title: "Apartments",
+                        image: "./images/market/Apartments/Apartments2.webp",
                     },
                     penthouses: {
                         title: "Penthouses",
@@ -227,8 +231,8 @@ export const MarketFilters = {
         },
             
     },
-
-   /*
+/* 
+   
    aircrafts: {
     title: "Aircrafts",
     image: "./images/market/Aircrafts.webp",
@@ -260,8 +264,8 @@ export const MarketFilters = {
         allAircrafts: {
             title: "All Aircrafts",
         }
-    }
-},
+    } */
+/* },
 
     ships: {
         title: "Ships",
@@ -297,8 +301,8 @@ export const MarketFilters = {
         }
     },
     
+     */
     
-    */ 
 }
 
 

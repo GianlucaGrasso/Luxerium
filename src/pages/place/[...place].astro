@@ -1,0 +1,135 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Feature from "../../ui/indexComponents/Feature.astro";
+import Navbar from "../../ui/navbar/Navbar.astro";
+import SecondaryNavbar from "../../ui/navbar/SecondaryNavbar.astro";
+import Proplist from "../../ui/real-estate/Proplist";
+
+// src/pages/place/[...place].astro
+export const prerender = false; // SSR para rutas dinámicas
+
+const placeParam = Astro.params.place;
+const place = placeParam 
+  ? (Array.isArray(placeParam) ? placeParam : [placeParam]) 
+  : [];
+
+const slugPath = place.join('/');
+
+// Obtener nombre legible del último segmento
+const placeName = place.length > 0 
+  ? place[place.length - 1].replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+  : 'Select a location';
+
+// Breadcrumbs con rutas acumulativas
+const breadcrumbs = place.map((seg, idx) => {
+  const path = place.slice(0, idx + 1).join('/');
+  const label = seg.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  return { label, path };
+});
+
+// Fetch básico a Nominatim para obtener coordenadas y datos extra
+let locationDetails = null;
+if (place.length > 0) {
+  try {
+    const query = place.map(p => p.replace(/-/g, ' ')).join(', ');
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=1&accept-language=en`;
+    const res = await fetch(url, { headers: { 'User-Agent': 'LuxeriumApp/1.0' } });
+    const data = await res.json();
+    if (data && data.length > 0) {
+      locationDetails = {
+        displayName: data[0].display_name,
+        lat: data[0].lat,
+        lon: data[0].lon,
+        type: data[0].type,
+        address: data[0].address
+      };
+    }
+  } catch(e) {
+    // Silencioso
+  }
+}
+---
+
+<Layout title="LUXERIUM - PLACE">
+  <html>
+    <head>
+      <title>LOCATION | LUXERIUM</title>
+    </head>
+  
+    <body class="bg-terciaryColor text-primaryColor">
+  
+      <div class="relative w-full h-[50vh]">
+        <Feature showSearchbar={true} heightClass="h-[50vh]"/>
+        <Navbar />
+        <SecondaryNavbar />
+      </div>
+  
+      <!-- El texto ahora se posiciona abajo de forma natural -->
+      <h1 class="text-secondaryColor text-md font-secondaryFont my-2 uppercase text-center w-fit mx-auto border-b border-primaryColor/20"> 
+        {placeName}
+      </h1>
+
+      <div class="grid grid-cols-2">
+        <!-- Descripcion y/o historia de la localidad -->
+        <article>
+          <h3 class="text-secondaryColor font-secondaryFont text-md text-center">BRIEF DESCRIPTION OF THE PLACE</h3>
+          <p class="w-[52rem] ml-2 text-primaryColor font-secondaryFont uppercase text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam ipsam maxime veritatis quasi optio. Voluptas maxime eligendi aliquid molestiae voluptatibus! Tenetur quas magnam labore, ex fugit numquam quos quibusdam et? Lorem ipsum dolor sit amet consectetur adipisicing elit. Libero, corporis voluptas! Pariatur obcaecati possimus veniam sint ratione rerum accusantium eveniet eum maiores delectus molestias voluptas quasi, mollitia perspiciatis doloremque suscipit! Lorem ipsum dolor, sit amet consectetur adipisicing elit. Laudantium facere deserunt harum consequatur nesciunt reprehenderit, repellat animi consequuntur sunt cupiditate ducimus earum quod optio asperiores aliquam odio at nihil minus.</p>
+
+        </article>
+
+        <article class="mx-1 p-1">
+          <h3 class="text-secondaryColor font-secondaryFont text-md text-center">URBAN EQUIPMENT</h3>
+          <!-- Agregar separacion de Equipamiento Urbano en: Institutos, Centros de Salud, Seguridad, Transporte y Recreacion -->
+          <ul class="grid grid-cols-5 text-primaryColor uppercase list-none text-center text-sm gap-y-2 mt-2">
+            <div class="flex flex-col gap-1">
+              <img src="https://placehold.co/1080" alt="test" class="w-6 h-6 mx-auto">
+              <li>COLEGIO SAN JOSE</li>
+              <li>PLAZA BERNARDO HUSSAY</li>
+              <li>PARQUE CENTENARIO</li>
+              <li>PARQUE CENTENARIO</li>
+              <li>PARQUE CENTENARIO</li>
+            </div>
+            <div class="flex flex-col gap-1">
+              <img src="https://placehold.co/1080" alt="test" class="w-6 h-6 mx-auto">
+              <li>FACULTAD DE MEDICINA</li>
+              <li>HOSPITAL BRITANICO</li>
+              <li>SANATORIO GUEMES</li>
+              <li>PARQUE CENTENARIO</li>
+              <li>PARQUE CENTENARIO</li>
+
+            </div>
+            <div class="flex flex-col gap-1">
+              <img src="https://placehold.co/1080" alt="test" class="w-6 h-6 mx-auto">
+              <li>OBELISCO</li>
+              <li>ATENEO GRAN SPLENDID</li>
+              <li>BARRIO CHINO</li>
+              <li>PARQUE CENTENARIO</li>
+              <li>PARQUE CENTENARIO</li>
+            </div>
+            <div class="flex flex-col gap-1">
+              <img src="https://placehold.co/1080" alt="test" class="w-6 h-6 mx-auto">
+              <li>OBELISCO</li>
+              <li>ATENEO GRAN SPLENDID</li>
+              <li>BARRIO CHINO</li>
+              <li>PARQUE CENTENARIO</li>
+              <li>PARQUE CENTENARIO</li>
+            </div>
+            <div class="flex flex-col gap-1">
+              <img src="https://placehold.co/1080" alt="test" class="w-6 h-6 mx-auto">
+              <li>OBELISCO</li>
+              <li>ATENEO GRAN SPLENDID</li>
+              <li>BARRIO CHINO</li>
+              <li>PARQUE CENTENARIO</li>
+              <li>PARQUE CENTENARIO</li>
+            </div>
+          </ul>
+        </article>
+
+      </div>
+  
+      
+      <Proplist client:only />
+
+    </body>
+  </html>
+</Layout>

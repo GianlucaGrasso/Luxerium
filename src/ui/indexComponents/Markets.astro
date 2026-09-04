@@ -1,247 +1,899 @@
 ---
-import BrowseBy from "./BrowseBy.astro"
-import { MarketFilters } from "../marketFilter-ui/marketFilters"
-import react from "@astrojs/react"
-
-const getNestedTypes = (
-  obj: Record<string, any>,
-  maxDepth: number = 3,
-  currentDepth: number = 1
-): any[] => {
-  if (currentDepth > maxDepth) return [];
-
-  return Object.values(obj).flatMap(value => {
-    if (!value?.types) return [];
-
-    const typesArray = Object.values(value.types);
-    const currentResults = currentDepth >= 2 ? typesArray : [];
-    
-    const nestedResults = getNestedTypes(
-      value.types,
-      maxDepth,
-      currentDepth + 1
-    );
-
-    return [...currentResults, ...nestedResults];
-  });
-};
-
-const allTypes = getNestedTypes(MarketFilters, 3);
+import { MarketFilters } from "../marketFilter-ui/marketFilters";
 ---
 
-<div class="max-w-[100vw] flex flex-col relative">
-
-  <!-- START sentinel: marca el inicio de la sección Markets -->
-  <section id="markets" class="w-full">
-    <div id="markets-start" class="w-full h-1"></div>
-
-    <h1 class="text-center w-fit m-auto mt-[.75em] text-primaryColor font-secondaryFont text-[18px] pt-3">
-      BROWSE BY MARKETPLACE
-    </h1>
-    
-    <div class="my-[1.5em] w-full flex md:grid-cols-2 justify-center px-[2em] gap-[10px]">
-      {
-        Object.values(MarketFilters).map((filter) => {
-          return (
-            <BrowseBy 
-              title={filter.title.toUpperCase()} 
-              size="md" 
-              image={filter.image}
-            />
-          )
-        })
-      }
-    </div>
-  </section>
-
-  <div class="max-w-[100vw] flex flex-col">
-    <h1 class="text-center w-fit m-auto text-primaryColor font-secondaryFont text-[18px]">BROWSE BY TYPE</h1>
-    
-    <div class="my-[1.5em] w-full grid px-[2em] gap-[10px] grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
-      {
-        Object.values({ ...MarketFilters.realEstate.types, ...MarketFilters.vehicles.types}).map((filter) => {
-          return (
-            <BrowseBy 
-              title={filter.title.toUpperCase()} 
-              size="sm" 
-              image={filter.image} 
-            />
-          )
-        })
-      }
-
-      {
-        allTypes.map((type) => {
-          return (
-            <BrowseBy 
-              title={type.title.toUpperCase()} 
-              size="sm" 
-              image={type.image} 
-            />
-          )
-        })
-      }
+<div class="max-w-[100vw] flex flex-col relative px-8 py-3">
+  
+  <div class="w-full flex justify-between items-center mb-3">
+    <div id="breadcrumb-container" class="flex flex-wrap items-center gap-2 text-primaryColor font-secondaryFont text-[14px] uppercase tracking-widest">
     </div>
   </div>
 
-  <!-- END sentinel: marca el final de la sección Markets -->
-  <div id="markets-end" class="w-full h-1"></div>
+  <!-- Dropdown de ubicación -->
+  <div id="location-dropdown-container" class="hidden w-full mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      
+      <!-- Continente -->
+      <div class="relative">
+        <label class="block text-primaryColor/70 font-secondaryFont text-[12px] uppercase tracking-wider mb-2">Continente</label>
+        <div class="relative">
+          <button id="continent-btn" class="w-full bg-transparent border border-primaryColor/30 text-primaryColor px-4 py-3 text-left font-secondaryFont text-sm uppercase tracking-wider hover:border-secondaryColor transition-colors flex justify-between items-center">
+            <span>Seleccionar continente</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div id="continent-options" class="absolute top-full left-0 right-0 mt-1 bg-black border border-primaryColor/20 max-h-64 overflow-hidden hidden z-30">
+            <div class="p-2 border-b border-primaryColor/10">
+              <input type="text" id="continent-search" placeholder="Buscar continente..." class="w-full bg-transparent text-primaryColor text-xs px-3 py-2 border border-primaryColor/20 focus:outline-none focus:border-secondaryColor">
+            </div>
+            <div class="overflow-y-auto max-h-48" id="continent-list"></div>
+          </div>
+        </div>
+      </div>
 
-  <!-- WRAPPER del botón: inicialmente oculto (Status 0) -->
-  <div
-    id="search-all-wrapper"
-    class="w-full px-8 z-50 pointer-events-none opacity-0 -translate-y-3 transition-all duration-300 ease-in-out"
-    aria-hidden="true"
-  >
-    <button
-      id="search-all-btn"
-      class="text-center font-secondaryFont w-full m-auto py-3 rounded-none text-terciaryColor"
-      type="button"
-    >
-      SEARCH ALL [ ... ]
+      <!-- País -->
+      <div class="relative">
+        <label class="block text-primaryColor/70 font-secondaryFont text-[12px] uppercase tracking-wider mb-2">País</label>
+        <div class="relative">
+          <button id="country-btn" class="w-full bg-transparent border border-primaryColor/30 text-primaryColor/50 px-4 py-3 text-left font-secondaryFont text-sm uppercase tracking-wider flex justify-between items-center disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            <span>Seleccionar país</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div id="country-options" class="absolute top-full left-0 right-0 mt-1 bg-black border border-primaryColor/20 max-h-64 overflow-hidden hidden z-30">
+            <div class="p-2 border-b border-primaryColor/10">
+              <input type="text" id="country-search" placeholder="Buscar país..." class="w-full bg-transparent text-primaryColor text-xs px-3 py-2 border border-primaryColor/20 focus:outline-none focus:border-secondaryColor">
+            </div>
+            <div class="overflow-y-auto max-h-48" id="country-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado/Región -->
+      <div class="relative">
+        <label class="block text-primaryColor/70 font-secondaryFont text-[12px] uppercase tracking-wider mb-2">Estado / Región</label>
+        <div class="relative">
+          <button id="region-btn" class="w-full bg-transparent border border-primaryColor/30 text-primaryColor/50 px-4 py-3 text-left font-secondaryFont text-sm uppercase tracking-wider flex justify-between items-center disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            <span>Seleccionar estado</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div id="region-options" class="absolute top-full left-0 right-0 mt-1 bg-black border border-primaryColor/20 max-h-64 overflow-hidden hidden z-30">
+            <div class="p-2 border-b border-primaryColor/10">
+              <input type="text" id="region-search" placeholder="Buscar estado..." class="w-full bg-transparent text-primaryColor text-xs px-3 py-2 border border-primaryColor/20 focus:outline-none focus:border-secondaryColor">
+            </div>
+            <div class="overflow-y-auto max-h-48" id="region-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ciudad -->
+      <div class="relative">
+        <label class="block text-primaryColor/70 font-secondaryFont text-[12px] uppercase tracking-wider mb-2">Ciudad</label>
+        <div class="relative">
+          <button id="city-btn" class="w-full bg-transparent border border-primaryColor/30 text-primaryColor/50 px-4 py-3 text-left font-secondaryFont text-sm uppercase tracking-wider flex justify-between items-center disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            <span>Seleccionar ciudad</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div id="city-options" class="absolute top-full left-0 right-0 mt-1 bg-black border border-primaryColor/20 max-h-64 overflow-hidden hidden z-30">
+            <div class="p-2 border-b border-primaryColor/10">
+              <input type="text" id="city-search" placeholder="Buscar ciudad..." class="w-full bg-transparent text-primaryColor text-xs px-3 py-2 border border-primaryColor/20 focus:outline-none focus:border-secondaryColor">
+            </div>
+            <div class="overflow-y-auto max-h-48" id="city-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barrio -->
+      <div class="relative md:col-span-2">
+        <label class="block text-primaryColor/70 font-secondaryFont text-[12px] uppercase tracking-wider mb-2">Barrio / Zona</label>
+        <div class="relative">
+          <button id="neighborhood-btn" class="w-full bg-transparent border border-primaryColor/30 text-primaryColor/50 px-4 py-3 text-left font-secondaryFont text-sm uppercase tracking-wider flex justify-between items-center disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            <span>Seleccionar barrio</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div id="neighborhood-options" class="absolute top-full left-0 right-0 mt-1 bg-black border border-primaryColor/20 max-h-80 overflow-hidden hidden z-30">
+            <div class="p-2 border-b border-primaryColor/10">
+              <input type="text" id="neighborhood-search" placeholder="Buscar barrio o zona específica..." class="w-full bg-transparent text-primaryColor text-xs px-3 py-2 border border-primaryColor/20 focus:outline-none focus:border-secondaryColor">
+            </div>
+            <div class="overflow-y-auto max-h-64" id="neighborhood-list"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="drilldown-grid" class="w-full grid gap-[10px] grid-cols-1 md:grid-cols-2 lg:grid-cols-4 justify-center">
+  </div>
+
+  <!-- BOTONES CON TRANSICIÓN MEJORADA -->
+  <div class="flex items-center gap-3 mt-3 w-fit mx-auto">
+    <button id="view-all-btn" class="btn-hidden bg-transparent border border-secondaryColor text-secondaryColor px-5 py-2 font-secondaryFont text-[14px] uppercase tracking-widest hover:bg-secondaryColor/10 hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-400 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer will-change-transform">
+      Ver Resultados
+    </button>
+    <button id="next-filter-btn" class="btn-hidden bg-secondaryColor text-primaryColor px-6 py-2 font-secondaryFont text-[14px] uppercase tracking-widest hover:bg-secondaryColor/90 hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-400 ease-[cubic-bezier(0.34,1.56,0.64,1)] cursor-pointer will-change-transform">
+      Siguiente →
     </button>
   </div>
 </div>
 
-<script type="module">
-  const wrapper = document.getElementById('search-all-wrapper');
-  const btn = document.getElementById('search-all-btn');
-  const startSentinel = document.getElementById('markets-start');
-  const endSentinel = document.getElementById('markets-end');
+<script define:vars={{ marketData: MarketFilters }}>
+  
+  // =============================================
+  //  DATOS ESTÁTICOS
+  // =============================================
+  const CONTINENT_COUNTRIES = {
+    "Africa": ["Algeria","Angola","Benin","Botswana","Burkina Faso","Burundi","Cabo Verde","Cameroon","Central African Republic","Chad","Comoros","Congo","DR Congo","Djibouti","Egypt","Equatorial Guinea","Eritrea","Eswatini","Ethiopia","Gabon","Gambia","Ghana","Guinea","Guinea-Bissau","Ivory Coast","Kenya","Lesotho","Liberia","Libya","Madagascar","Malawi","Mali","Mauritania","Mauritius","Morocco","Mozambique","Namibia","Niger","Nigeria","Rwanda","Sao Tome and Principe","Senegal","Seychelles","Sierra Leone","Somalia","South Africa","South Sudan","Sudan","Tanzania","Togo","Tunisia","Uganda","Zambia","Zimbabwe"],
+    "Asia": ["Afghanistan","Armenia","Azerbaijan","Bahrain","Bangladesh","Bhutan","Brunei","Cambodia","China","Cyprus","Georgia","India","Indonesia","Iran","Iraq","Israel","Japan","Jordan","Kazakhstan","Kuwait","Kyrgyzstan","Laos","Lebanon","Malaysia","Maldives","Mongolia","Myanmar","Nepal","North Korea","Oman","Pakistan","Palestine","Philippines","Qatar","Saudi Arabia","Singapore","South Korea","Sri Lanka","Syria","Taiwan","Tajikistan","Thailand","Timor-Leste","Turkey","Turkmenistan","UAE","Uzbekistan","Vietnam","Yemen"],
+    "Europe": ["Albania","Andorra","Austria","Belarus","Belgium","Bosnia and Herzegovina","Bulgaria","Croatia","Czech Republic","Denmark","Estonia","Finland","France","Germany","Greece","Hungary","Iceland","Ireland","Italy","Kosovo","Latvia","Liechtenstein","Lithuania","Luxembourg","Malta","Moldova","Monaco","Montenegro","Netherlands","North Macedonia","Norway","Poland","Portugal","Romania","Russia","San Marino","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","Ukraine","United Kingdom","Vatican City"],
+    "North America": ["Antigua and Barbuda","Bahamas","Barbados","Belize","Canada","Costa Rica","Cuba","Dominica","Dominican Republic","El Salvador","Grenada","Guatemala","Haiti","Honduras","Jamaica","Mexico","Nicaragua","Panama","Saint Kitts and Nevis","Saint Lucia","Saint Vincent","Trinidad and Tobago","United States"],
+    "South America": ["Argentina","Bolivia","Brazil","Chile","Colombia","Ecuador","Guyana","Paraguay","Peru","Suriname","Uruguay","Venezuela"],
+    "Oceania": ["Australia","Fiji","Kiribati","Marshall Islands","Micronesia","Nauru","New Zealand","Palau","Papua New Guinea","Samoa","Solomon Islands","Tonga","Tuvalu","Vanuatu"]
+  };
 
-  if (wrapper && startSentinel && endSentinel) {
-    // Flags de estado
-    let startIsIntersecting = true; // true cuando el inicio está visible (usuario en top)
-    let atBottom = false;           // true cuando el final está visible (estado final)
-    let isVisible = false;          // true cuando el wrapper está visible (Status 1 o Final)
+  const CONTINENT_NAMES_ES = {
+    "Africa": "África", "Asia": "Asia", "Europe": "Europa",
+    "North America": "Norteamérica", "South America": "Sudamérica", "Oceania": "Oceanía"
+  };
 
-    // Clases Tailwind
-    // Estado semi-visible (Status 1): borde secondaryColor, fondo terciaryColor/50, texto primaryColor
-    const semiVisibleClasses = [
-      'fixed','bottom-0','left-0','right-0',
-      'border-2','border-secondaryColor',
-      'bg-terciaryColor/50','backdrop-blur-sm',
-      'pb-[env(safe-area-inset-bottom)]','shadow-lg'
-    ];
-    // Estado final (estático y claro)
-    const staticClasses = [
-      'static','bg-primaryColor','backdrop-blur-none','shadow-none'
-    ];
+  // Estado de la aplicación
+  const rootData = marketData;
+  let navigationHistory = [
+    { key: 'root', title: 'MARKETS', data: rootData, type: 'market' }
+  ];
+  let selectedItems = [];
+  let currentMarketplace = null;
 
-    // Helpers para mostrar/ocultar con transiciones
-    function applyVisible() {
-      wrapper.setAttribute('aria-hidden', 'false');
-      wrapper.classList.remove('pointer-events-none','opacity-0','translate-y-4');
-      wrapper.classList.add('pointer-events-auto','opacity-100','translate-y-0');
-      isVisible = true;
+  let locationState = {
+    continent: null, country: null, region: null, city: null, neighborhood: null
+  };
+
+  // Cachés
+  let cachedWorldData = null;
+  let cachedStateCities = {};
+  let cachedNeighborhoods = {};
+
+  // Elementos DOM
+  const breadcrumbContainer = document.getElementById('breadcrumb-container');
+  const gridContainer = document.getElementById('drilldown-grid');
+  const nextBtn = document.getElementById('next-filter-btn');
+  const viewAllBtn = document.getElementById('view-all-btn');
+  const locationDropdownContainer = document.getElementById('location-dropdown-container');
+
+  // =============================================
+  //  HELPERS
+  // =============================================
+  function slugify(text) {
+    return text.toLowerCase().trim()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
+  }
+
+  function updateActionButtons() {
+    const currentStep = navigationHistory[navigationHistory.length - 1];
+    const isCategoryStep = ['market', 'type', 'subtype'].includes(currentStep.type);
+    if (isCategoryStep) {
+      const show = selectedItems.length > 0;
+      nextBtn.classList.toggle('btn-hidden', !show);
+      viewAllBtn.classList.toggle('btn-hidden', !show);
+    } else {
+      nextBtn.classList.add('btn-hidden');
+      viewAllBtn.classList.remove('btn-hidden');
     }
-    function applyHidden() {
-      wrapper.setAttribute('aria-hidden', 'true');
-      wrapper.classList.remove('pointer-events-auto','opacity-100','translate-y-0');
-      wrapper.classList.add('pointer-events-none','opacity-0','translate-y-4');
-      isVisible = false;
+  }
+
+  function closeAllDropdowns() {
+    ['continent', 'country', 'region', 'city', 'neighborhood'].forEach(type => {
+      const options = document.getElementById(`${type}-options`);
+      if (options) options.classList.add('hidden');
+    });
+  }
+
+  function levenshteinDistance(a, b) {
+    const matrix = [];
+    for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+    for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+    for (let i = 1; i <= b.length; i++) {
+      for (let j = 1; j <= a.length; j++) {
+        matrix[i][j] = b.charAt(i-1) === a.charAt(j-1) 
+          ? matrix[i-1][j-1] 
+          : Math.min(matrix[i-1][j-1] + 1, matrix[i][j-1] + 1, matrix[i-1][j] + 1);
+      }
+    }
+    return matrix[b.length][a.length];
+  }
+
+  function stringSimilarity(a, b) {
+    const longer = a.length > b.length ? a : b;
+    const shorter = a.length > b.length ? b : a;
+    if (longer.length === 0) return 1.0;
+    return (longer.length - levenshteinDistance(longer, shorter)) / parseFloat(longer.length);
+  }
+
+  // =============================================
+  //  API DE DATOS
+  // =============================================
+  async function fetchCompleteWorldDatabase() {
+    if (cachedWorldData) return cachedWorldData;
+    const localCache = localStorage.getItem('luxerium_world_geo_v6');
+    if (localCache) {
+      try { cachedWorldData = JSON.parse(localCache); return cachedWorldData; }
+      catch(e) { localStorage.removeItem('luxerium_world_geo_v6'); }
+    }
+    try {
+      const res = await fetch('https://countriesnow.space/api/v0.1/countries/states');
+      const json = await res.json();
+      if (!json || !json.data) throw new Error("API error");
+      const worldMap = {};
+      json.data.forEach((countryItem) => {
+        const countryName = countryItem.name;
+        const countryKey = 'country-' + slugify(countryName);
+        const regionsMap = {};
+        if (countryItem.states && Array.isArray(countryItem.states)) {
+          countryItem.states.forEach((stateItem, sIdx) => {
+            const stateName = stateItem.name;
+            const stateKey = 'state-' + sIdx + '-' + slugify(stateName);
+            regionsMap[stateKey] = {
+              title: stateName, queryName: stateName, parentCountry: countryName
+            };
+          });
+        }
+        worldMap[countryKey] = { title: countryName, queryName: countryName, regions: regionsMap };
+      });
+      cachedWorldData = worldMap;
+      localStorage.setItem('luxerium_world_geo_v6', JSON.stringify(worldMap));
+      return worldMap;
+    } catch (error) {
+      console.error("Error cargando datos mundiales:", error);
+      return {};
+    }
+  }
+
+  async function fetchCitiesForState(countryName, stateName) {
+    const cacheKey = `${countryName}||${stateName}`;
+    if (cachedStateCities[cacheKey]) return cachedStateCities[cacheKey];
+    try {
+      const res = await fetch(`https://countriesnow.space/api/v0.1/countries/state/cities`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ country: countryName, state: stateName })
+      });
+      const json = await res.json();
+      const citiesMap = {};
+      if (json && json.data && Array.isArray(json.data)) {
+        json.data.forEach((cityName, cIdx) => {
+          const cityKey = 'city-' + cIdx + '-' + slugify(cityName);
+          citiesMap[cityKey] = { 
+            title: cityName, queryName: cityName, parentCountry: countryName, parentState: stateName
+          };
+        });
+      }
+      cachedStateCities[cacheKey] = citiesMap;
+      return citiesMap;
+    } catch (e) {
+      console.error("Error cargando ciudades:", e);
+      return {};
+    }
+  }
+
+  // =============================================
+  //  BARRIOS - Filtrado inteligente sin hardcodear
+  // =============================================
+  async function fetchNeighborhoodsForCity(countryName, cityName, stateName = '') {
+    const cacheKey = `${countryName}||${stateName}||${cityName}`;
+    if (cachedNeighborhoods[cacheKey]) return cachedNeighborhoods[cacheKey];
+
+    const cityLower = cityName.toLowerCase();
+    const countryLower = countryName.toLowerCase();
+    const allNeighborhoods = new Map();
+    const seenNames = new Set();
+
+    // Palabras prohibidas (estados, términos administrativos, etc.)
+    const forbiddenWords = new Set([
+      'state', 'estado', 'province', 'provincia', 'department', 'departamento',
+      'county', 'condado', 'municipality', 'municipio', 'district', 'distrito',
+      'region', 'región', 'country', 'país', 'nation', 'nación',
+      'republic', 'república', 'kingdom', 'reino', 'united', 'federal'
+    ]);
+
+    // Lista de estados de EE.UU. para filtrar
+    const usStates = new Set([
+      'alabama', 'alaska', 'arizona', 'arkansas', 'california', 'colorado',
+      'connecticut', 'delaware', 'florida', 'georgia', 'hawaii', 'idaho',
+      'illinois', 'indiana', 'iowa', 'kansas', 'kentucky', 'louisiana',
+      'maine', 'maryland', 'massachusetts', 'michigan', 'minnesota',
+      'mississippi', 'missouri', 'montana', 'nebraska', 'nevada',
+      'new hampshire', 'new jersey', 'new mexico', 'new york', 'north carolina',
+      'north dakota', 'ohio', 'oklahoma', 'oregon', 'pennsylvania',
+      'rhode island', 'south carolina', 'south dakota', 'tennessee', 'texas',
+      'utah', 'vermont', 'virginia', 'washington', 'west virginia',
+      'wisconsin', 'wyoming'
+    ]);
+
+    try {
+      // Buscar en Nominatim con múltiples queries
+      const queries = [
+        { q: `${cityName}, ${countryName}`, ft: 'neighbourhood' },
+        { q: `${cityName}, ${countryName}`, ft: 'suburb' },
+        { q: `${cityName}, ${countryName}`, ft: 'quarter' },
+        { q: `${cityName}, ${countryName}`, ft: 'borough' },
+      ];
+
+      if (stateName) {
+        queries.unshift(
+          { q: `${cityName}, ${stateName}, ${countryName}`, ft: 'neighbourhood' },
+          { q: `${cityName}, ${stateName}, ${countryName}`, ft: 'suburb' }
+        );
+      }
+
+      for (const query of queries) {
+        try {
+          const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query.q)}&format=json&featuretype=${query.ft}&limit=50&accept-language=en&addressdetails=1&namedetails=1`;
+          const res = await fetch(url, {
+            headers: { 'User-Agent': 'LuxeriumApp/1.0' }
+          });
+          const json = await res.json();
+          
+          if (Array.isArray(json)) {
+            json.forEach(item => {
+              const name = extractValidNeighborhood(item, cityLower, countryLower, forbiddenWords, usStates);
+              if (name && !seenNames.has(name.toLowerCase())) {
+                // Verificar similitud con la ciudad (rechazar si es muy similar)
+                const similarity = stringSimilarity(name.toLowerCase(), cityLower);
+                if (similarity < 0.7) {
+                  seenNames.add(name.toLowerCase());
+                  const key = 'nb-' + slugify(name);
+                  allNeighborhoods.set(key, { title: name, queryName: name, parentCity: cityName, parentCountry: countryName });
+                }
+              }
+            });
+          }
+          await new Promise(resolve => setTimeout(resolve, 100));
+        } catch(e) {
+          console.warn(`Error en query ${query.q}:`, e);
+        }
+      }
+
+      // Si hay pocos resultados, buscar por área geográfica
+      if (allNeighborhoods.size < 5) {
+        await searchByArea(cityName, countryName, cityLower, countryLower, allNeighborhoods, seenNames, forbiddenWords, usStates);
+      }
+
+    } catch(e) {
+      console.error("Error en fetchNeighborhoods:", e);
     }
 
-    // Status 1: fixed + blur + border + terciary bg (aparece cuando el usuario scrollea dentro de la sección)
-    function showSemiVisible() {
-      if (atBottom) return; // si estamos en final, no aplicar
-      applyVisible();
+    const neighborhoodsMap = Object.fromEntries(allNeighborhoods);
+    cachedNeighborhoods[cacheKey] = neighborhoodsMap;
+    return neighborhoodsMap;
+  }
 
-      // Quitar estado estático si existía
-      wrapper.classList.remove(...staticClasses);
+  function extractValidNeighborhood(item, cityLower, countryLower, forbiddenWords, usStates) {
+    const address = item.address || {};
+    const namedetails = item.namedetails || {};
+    
+    let name = namedetails.name || '';
+    if (!name || name.toLowerCase() === cityLower) {
+      name = address.neighbourhood || address.suburb || address.quarter || 
+             address.borough || address.hamlet || address.village || address.locality || '';
+    }
+    
+    if (!name || name.toLowerCase() === cityLower) {
+      const parts = item.display_name.split(',');
+      for (const part of parts) {
+        const trimmed = part.trim();
+        const trimmedLower = trimmed.toLowerCase();
+        if (trimmedLower !== cityLower && trimmedLower !== countryLower) {
+          // Verificar que no sea una palabra prohibida
+          const words = trimmedLower.split(/\s+/);
+          const hasForbidden = words.some(w => forbiddenWords.has(w));
+          if (!hasForbidden) {
+            name = trimmed;
+            break;
+          }
+        }
+      }
+    }
+    
+    if (!name) return null;
+    
+    const nameLower = name.toLowerCase();
+    const nameWords = nameLower.split(/\s+/);
+    
+    // Filtrar estados de EE.UU.
+    if (usStates.has(nameLower)) return null;
+    
+    // Verificar cada palabra
+    for (const word of nameWords) {
+      if (forbiddenWords.has(word)) return null;
+      if (usStates.has(word)) return null;
+    }
+    
+    // Rechazar si contiene el nombre exacto de la ciudad
+    if (nameLower === cityLower) return null;
+    if (nameLower === countryLower) return null;
+    
+    // Rechazar nombres que contienen "island" + ciudad
+    if (nameLower.includes('island') && nameLower.includes(cityLower)) return null;
+    
+    // Rechazar si es solo un número o muy corto/largo
+    if (/^\d+$/.test(name)) return null;
+    if (name.length < 3 || name.length > 60) return null;
+    
+    // Rechazar números romanos solos
+    if (/^[IVXLC]+$/i.test(name)) return null;
+    
+    return name;
+  }
 
-      // Quitar cualquier clase previa de semiVisible para evitar duplicados
-      wrapper.classList.remove(...semiVisibleClasses);
-      // Aplicar semi-visible
-      wrapper.classList.add(...semiVisibleClasses);
+  async function searchByArea(cityName, countryName, cityLower, countryLower, neighborhoodsMap, seenNames, forbiddenWords, usStates) {
+    try {
+      const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(cityName + ', ' + countryName)}&format=json&limit=1&accept-language=en`;
+      const geoRes = await fetch(geoUrl, {
+        headers: { 'User-Agent': 'LuxeriumApp/1.0' }
+      });
+      const geoJson = await geoRes.json();
+      
+      if (geoJson.length > 0 && geoJson[0].boundingbox) {
+        const [south, north, west, east] = geoJson[0].boundingbox;
+        const placesUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(cityName)}&format=json&featuretype=place&limit=50&accept-language=en&bounded=1&viewbox=${west},${south},${east},${north}&addressdetails=1`;
+        const placesRes = await fetch(placesUrl, {
+          headers: { 'User-Agent': 'LuxeriumApp/1.0' }
+        });
+        const placesJson = await placesRes.json();
+        
+        if (Array.isArray(placesJson)) {
+          placesJson.forEach(item => {
+            const name = extractValidNeighborhood(item, cityLower, countryLower, forbiddenWords, usStates);
+            if (name && !seenNames.has(name.toLowerCase())) {
+              const similarity = stringSimilarity(name.toLowerCase(), cityLower);
+              if (similarity < 0.7) {
+                seenNames.add(name.toLowerCase());
+                const key = 'nb-area-' + slugify(name);
+                neighborhoodsMap.set(key, { title: name, queryName: name, parentCity: cityName, parentCountry: countryName });
+              }
+            }
+          });
+        }
+      }
+    } catch(e) {
+      console.warn('Error en búsqueda por área:', e);
+    }
+  }
 
-      // Botón: texto primaryColor
-      btn.classList.remove('text-terciaryColor');
-      btn.classList.add('text-primaryColor');
+  // =============================================
+  //  RENDERIZADO DE DROPDOWNS
+  // =============================================
+  function renderDropdown(type, items, popularItems = []) {
+    const btn = document.getElementById(`${type}-btn`);
+    const optionsContainer = document.getElementById(`${type}-options`);
+    const searchInput = document.getElementById(`${type}-search`);
+    const listContainer = document.getElementById(`${type}-list`);
+
+    if (!btn || !optionsContainer || !listContainer) return;
+
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const isHidden = optionsContainer.classList.contains('hidden');
+      closeAllDropdowns();
+      if (isHidden) {
+        optionsContainer.classList.remove('hidden');
+        if (searchInput) setTimeout(() => searchInput.focus(), 100);
+        if (searchInput) searchInput.value = '';
+        renderFilteredItems(items, popularItems, '', listContainer, type);
+      }
+    };
+
+    if (searchInput) {
+      searchInput.oninput = (e) => {
+        renderFilteredItems(items, popularItems, e.target.value, listContainer, type);
+      };
+      searchInput.onclick = (e) => e.stopPropagation();
     }
 
-    // Status Final: estático y claro (cuando el final entra en viewport)
-    function makeStaticClear() {
-      atBottom = true;
-      applyVisible();
+    renderFilteredItems(items, popularItems, '', listContainer, type);
+  }
 
-      // Quitar semi-visible y aplicar estático
-      wrapper.classList.remove(...semiVisibleClasses);
-      wrapper.classList.add(...staticClasses);
+  function renderFilteredItems(items, popularItems, filterText, listContainer, type) {
+    listContainer.innerHTML = '';
+    const filter = filterText.toLowerCase().trim();
+    
+    let filteredItems = items;
+    if (filter) {
+      // Búsqueda con similitud
+      filteredItems = items
+        .map(item => ({
+          item,
+          similarity: stringSimilarity((item.title || item.name || '').toLowerCase(), filter)
+        }))
+        .filter(({ item, similarity }) => {
+          const title = (item.title || item.name || '').toLowerCase();
+          return title.includes(filter) || similarity > 0.5;
+        })
+        .sort((a, b) => b.similarity - a.similarity)
+        .map(({ item }) => item);
+    }
 
-      // Forzar posición estática para que ocupe flujo normal
-      wrapper.style.position = 'static';
+    // Populares sin filtro
+    if (!filter && popularItems.length > 0) {
+      const popularLabel = document.createElement('div');
+      popularLabel.className = 'px-4 py-2 text-secondaryColor text-xs uppercase tracking-wider font-bold border-b border-primaryColor/10';
+      popularLabel.textContent = '⭐ Más Populares';
+      listContainer.appendChild(popularLabel);
 
-      // Botón: texto terciaryColor (contraste con bg-primaryColor)
+      popularItems.forEach(popName => {
+        const item = filteredItems.find(i => (i.title || i.name)?.toLowerCase() === popName.toLowerCase());
+        if (item) {
+          listContainer.appendChild(createOption(item, type, true));
+        }
+      });
+
+      const separator = document.createElement('div');
+      separator.className = 'px-4 py-2 text-primaryColor/50 text-xs uppercase tracking-wider border-t border-b border-primaryColor/10';
+      separator.textContent = 'Todos';
+      listContainer.appendChild(separator);
+    }
+
+    const shownPopular = new Set(popularItems.map(p => p.toLowerCase()));
+    filteredItems.forEach(item => {
+      const itemTitle = (item.title || item.name || '').toLowerCase();
+      if (filter || !shownPopular.has(itemTitle)) {
+        listContainer.appendChild(createOption(item, type, false));
+      }
+    });
+
+    if (filteredItems.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'px-4 py-3 text-primaryColor/50 text-sm text-center';
+      empty.textContent = 'Sin resultados';
+      listContainer.appendChild(empty);
+    }
+  }
+
+  function createOption(item, type, isPopular) {
+    const option = document.createElement('div');
+    option.className = `px-4 py-3 hover:bg-secondaryColor/20 text-primaryColor cursor-pointer text-sm transition-colors ${isPopular ? 'font-medium' : ''}`;
+    option.textContent = item.title || item.name;
+    option.onclick = (e) => {
+      e.stopPropagation();
+      selectOption(type, item);
+      closeAllDropdowns();
+    };
+    return option;
+  }
+
+  function selectOption(type, item) {
+    const btn = document.getElementById(`${type}-btn`);
+    if (!btn) return;
+
+    btn.querySelector('span').textContent = item.title || item.name;
+
+    switch(type) {
+      case 'continent':
+        locationState = {
+          continent: { key: item.key, name: item.title, countries: item.countries },
+          country: null, region: null, city: null, neighborhood: null
+        };
+        enableDropdown('country');
+        renderDropdown('country', item.countries.map(c => ({ title: c, name: c })), 
+          ["United States", "United Kingdom", "France", "Italy", "Spain", "Germany", "UAE", "Japan", "Australia", "Brazil"]);
+        resetDropdownsAfter('country');
+        break;
+      case 'country':
+        selectCountry(item.title);
+        break;
+      case 'region':
+        selectRegion(item);
+        break;
+      case 'city':
+        selectCity(item);
+        break;
+      case 'neighborhood':
+        selectNeighborhood(item);
+        break;
+    }
+    updateLocationButtons();
+  }
+
+  async function selectCountry(countryName) {
+    locationState.country = { name: countryName };
+    locationState.region = null; locationState.city = null; locationState.neighborhood = null;
+    document.getElementById('country-btn').querySelector('span').textContent = countryName;
+    
+    const worldDB = await fetchCompleteWorldDatabase();
+    const countryKey = 'country-' + slugify(countryName);
+    const countryData = worldDB[countryKey];
+    
+    if (countryData?.regions && Object.keys(countryData.regions).length > 0) {
+      enableDropdown('region');
+      renderDropdown('region', Object.values(countryData.regions), []);
+    } else {
+      resetDropdown('region');
+      await loadCitiesDirectly(countryName);
+    }
+    resetDropdownsAfter('region');
+  }
+
+  async function selectRegion(region) {
+    locationState.region = region;
+    locationState.city = null; locationState.neighborhood = null;
+    document.getElementById('region-btn').querySelector('span').textContent = region.title;
+    
+    const cities = await fetchCitiesForState(region.parentCountry, region.queryName);
+    if (cities && Object.keys(cities).length > 0) {
+      enableDropdown('city');
+      renderDropdown('city', Object.values(cities), 
+        ["New York", "London", "Paris", "Milan", "Madrid", "Berlin", "Dubai", "Tokyo", "Sydney", "São Paulo"]);
+    } else {
+      resetDropdown('city');
+    }
+    resetDropdownsAfter('city');
+  }
+
+  async function selectCity(city) {
+    locationState.city = city;
+    locationState.neighborhood = null;
+    document.getElementById('city-btn').querySelector('span').textContent = city.title;
+    
+    const neighborhoods = await fetchNeighborhoodsForCity(city.parentCountry, city.title, city.parentState || '');
+    if (neighborhoods && Object.keys(neighborhoods).length > 0) {
+      enableDropdown('neighborhood');
+      renderDropdown('neighborhood', Object.values(neighborhoods), []);
+    } else {
+      resetDropdown('neighborhood');
+    }
+  }
+
+  function selectNeighborhood(neighborhood) {
+    locationState.neighborhood = neighborhood;
+    document.getElementById('neighborhood-btn').querySelector('span').textContent = neighborhood.title;
+  }
+
+  async function loadCitiesDirectly(countryName) {
+    const cities = await fetchCitiesForState(countryName, countryName);
+    if (cities && Object.keys(cities).length > 0) {
+      enableDropdown('city');
+      renderDropdown('city', Object.values(cities), 
+        ["New York", "London", "Paris", "Milan", "Madrid", "Berlin", "Dubai", "Tokyo", "Sydney", "São Paulo"]);
+    }
+  }
+
+  function enableDropdown(type) {
+    const btn = document.getElementById(`${type}-btn`);
+    if (!btn) return;
+    btn.disabled = false;
+    const labels = { region: 'Seleccionar estado', city: 'Seleccionar ciudad', neighborhood: 'Seleccionar barrio' };
+    btn.querySelector('span').textContent = labels[type] || 'Seleccionar';
+    btn.classList.remove('text-primaryColor/50');
+    btn.classList.add('text-primaryColor');
+  }
+
+  function resetDropdown(type) {
+    const btn = document.getElementById(`${type}-btn`);
+    const options = document.getElementById(`${type}-options`);
+    const list = document.getElementById(`${type}-list`);
+    if (btn) {
+      btn.disabled = true;
+      const labels = { region: 'Estado / Región', city: 'Ciudad', neighborhood: 'Barrio' };
+      btn.querySelector('span').textContent = labels[type] || 'Seleccionar';
       btn.classList.remove('text-primaryColor');
-      btn.classList.add('text-terciaryColor');
+      btn.classList.add('text-primaryColor/50');
+    }
+    if (list) list.innerHTML = '';
+    if (options) options.classList.add('hidden');
+  }
 
-      // Quitar borde si quedó
-      wrapper.classList.remove('border-2','border-secondaryColor');
+  function resetDropdownsAfter(type) {
+    const types = ['region', 'city', 'neighborhood'];
+    const startIndex = types.indexOf(type) + 1;
+    for (let i = startIndex; i < types.length; i++) resetDropdown(types[i]);
+  }
+
+  function updateLocationButtons() {
+    const hasLocation = locationState.continent || locationState.country || locationState.region || locationState.city || locationState.neighborhood;
+    if (hasLocation) {
+      nextBtn.classList.add('btn-hidden');
+      viewAllBtn.classList.remove('btn-hidden');
+    }
+  }
+
+  // =============================================
+  //  NUEVA FUNCIÓN: ACTUALIZAR SELECCIÓN SIN RE-RENDER
+  // =============================================
+  function updateSelection() {
+    const currentStep = navigationHistory[navigationHistory.length - 1];
+    const cards = gridContainer.querySelectorAll('[data-key]');
+    cards.forEach(card => {
+      const key = card.dataset.key;
+      let isSelected = false;
+      if (currentStep.type === 'market') {
+        isSelected = currentMarketplace?.key === key;
+      } else {
+        isSelected = selectedItems.includes(key);
+      }
+      card.classList.toggle('outline', isSelected);
+      card.classList.toggle('outline-2', isSelected);
+      card.classList.toggle('outline-secondaryColor', isSelected);
+      card.classList.toggle('shadow-inner', isSelected);
+      card.classList.toggle('shadow-secondaryColor', isSelected);
+    });
+  }
+
+  // =============================================
+  //  RENDERIZADO PRINCIPAL (modificado)
+  // =============================================
+  function renderGrid() {
+    saveCurrentSelection();
+    gridContainer.innerHTML = '';
+    const currentStep = navigationHistory[navigationHistory.length - 1];
+    const currentData = currentStep.data;
+
+    if (currentStep.type === 'location-select') {
+      gridContainer.innerHTML = ``;
+      return;
     }
 
-    // Revertir del estado final al anterior (cuando el final deja de intersectar)
-    function unsetStatic() {
-      if (!atBottom) return;
-      atBottom = false;
-      wrapper.classList.remove(...staticClasses);
-      wrapper.style.position = '';
+    if (!currentData || Object.keys(currentData).length === 0) {
+      gridContainer.innerHTML = `<div class="col-span-full text-center text-primaryColor py-10 uppercase tracking-widest">No hay elementos disponibles</div>`;
+      return;
+    }
 
-      // Volver al comportamiento según si el inicio está visible o no
-      if (startIsIntersecting) {
-        // Si el inicio es visible -> oculto (Status 0)
-        applyHidden();
-      } else {
-        // Si el inicio no es visible -> mostrar semi-visible (Status 1)
-        showSemiVisible();
+    Object.entries(currentData).forEach(([key, item]) => {
+      const gridSpan = currentStep.type === 'market' ? "md:col-span-2" : "";
+      const fallbackImage = "https://placehold.co/1920x1080/000/fff?text=" + (item.title ? item.title.toUpperCase().replace(/\s+/g, '+') : 'ITEM');
+
+      const card = document.createElement('button');
+      card.className = `group flex-grow col-span-1 ${gridSpan} h-[15em] w-full relative overflow-hidden hover:outline hover:outline-2 hover:outline-secondaryColor hover:shadow-inner hover:shadow-secondaryColor cursor-pointer transition-all`;
+      card.dataset.key = key;
+
+      // ⬇️ CAMBIO: escala normal y zoom sutil en hover (elimina el salto)
+      card.innerHTML = `
+        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-300 ease-in-out scale-100 group-hover:scale-105" style="background-image: url('${item.image || fallbackImage}');"></div>
+        <div class="bg-terciaryColor/20 w-full h-[3em] absolute bottom-0 flex justify-center items-center group-hover:h-full transition-all duration-300 ease-in-out backdrop-blur-sm z-10">
+          <span class="text-primaryColor font-primaryFont text-[1.26rem] tracking-[0.2em] transition-all duration-100 ease-in-out group-hover:text-secondaryColor h-full w-full justify-center flex items-center px-2 text-center">
+            ${item.title ? item.title.toUpperCase() : ''}
+          </span>
+        </div>
+      `;
+
+      // --- onclick optimizado (no recrea el grid) ---
+      card.onclick = () => {
+        if (currentStep.type === 'market') {
+          currentMarketplace = currentMarketplace?.key === key ? null : { key, title: item.title };
+          selectedItems = currentMarketplace ? [key] : [];
+        } else {
+          const idx = selectedItems.indexOf(key);
+          if (idx > -1) selectedItems.splice(idx, 1);
+          else selectedItems.push(key);
+        }
+        updateSelection();      // solo actualiza clases
+        updateActionButtons();  // actualiza botones
+      };
+
+      gridContainer.appendChild(card);
+    });
+
+    // Aplicar estado de selección a las cards recién creadas
+    updateSelection();
+  }
+
+  // =============================================
+  //  NAVEGACIÓN
+  // =============================================
+  nextBtn.onclick = async () => {
+    const currentStep = navigationHistory[navigationHistory.length - 1];
+    const currentData = currentStep.data;
+    const stepType = currentStep.type;
+
+    if (['market', 'type', 'subtype'].includes(stepType)) {
+      const allHaveTypes = selectedItems.every(key => currentData[key]?.types);
+      if (allHaveTypes) {
+        let combined = {};
+        selectedItems.forEach(key => {
+          const item = currentData[key];
+          if (item && item.types) combined = { ...combined, ...item.types };
+        });
+        const titles = selectedItems.map(k => currentData[k].title).join(' + ');
+        const nextType = stepType === 'market' ? 'type' : 'subtype';
+        navigationHistory.push({ key: 'subcats-' + Date.now(), title: titles, data: combined, type: nextType });
+        selectedItems = [];
+        updateActionButtons();
+        renderGrid();
+        renderBreadcrumbs();
+        return;
       }
     }
 
-    // Observer para el inicio: controla oculto <-> semi-visible
-    const startObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        startIsIntersecting = entry.isIntersecting;
+    if (!navigationHistory.some(s => s.type === 'location-select')) {
+      locationDropdownContainer.classList.remove('hidden');
+      initLocationDropdowns();
+      navigationHistory.push({ key: 'location-select', title: 'UBICACIÓN', data: {}, type: 'location-select' });
+      selectedItems = [];
+      updateActionButtons();
+      renderGrid();
+      renderBreadcrumbs();
+    }
+  };
 
-        if (entry.isIntersecting) {
-          // Usuario en la parte superior -> ocultar (Status 0)
-          applyHidden();
-        } else {
-          // Usuario scrollea hacia abajo -> mostrar semi-visible (Status 1) salvo que estemos en final
-          if (!atBottom) showSemiVisible();
+  viewAllBtn.onclick = () => redirectToBrowse();
+
+  function redirectToBrowse() {
+    let allFilters = [];
+    if (currentMarketplace) allFilters.push(slugify(currentMarketplace.title));
+    navigationHistory.forEach((step) => {
+      (step.selectedSnapshot || []).forEach(k => {
+        if (step.data && step.data[k]) {
+          const fs = slugify(step.data[k].title);
+          if (fs && !allFilters.includes(fs)) allFilters.push(fs);
         }
       });
-    }, { root: null, threshold: 0.05 });
+    });
+    if (locationState.continent) allFilters.push(slugify(locationState.continent.name));
+    if (locationState.country) allFilters.push(slugify(locationState.country.name));
+    if (locationState.region) allFilters.push(slugify(locationState.region.title));
+    if (locationState.city) allFilters.push(slugify(locationState.city.title));
+    if (locationState.neighborhood) allFilters.push(slugify(locationState.neighborhood.title));
+    window.location.href = `/browse?filter=${allFilters.join(',')}`;
+  }
 
-    // Observer para el final: controla transición a estado final y reversibilidad
-    const endObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          // Llegamos al final -> estado final (estático y claro)
-          makeStaticClear();
-        } else {
-          // Salimos del final -> volver al estado anterior (reversible)
-          unsetStatic();
-        }
-      });
-    }, { root: null, threshold: 0.05 });
+  function saveCurrentSelection() {
+    const cs = navigationHistory[navigationHistory.length - 1];
+    if (cs) cs.selectedSnapshot = [...selectedItems];
+  }
 
-    // Iniciar observadores
-    startObserver.observe(startSentinel);
-    endObserver.observe(endSentinel);
-
-    // Escape para ocultar (opcional)
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        applyHidden();
+  function renderBreadcrumbs() {
+    breadcrumbContainer.innerHTML = '';
+    navigationHistory.forEach((step, index) => {
+      const isLast = index === navigationHistory.length - 1;
+      const btn = document.createElement('button');
+      btn.className = `uppercase transition-colors duration-200 ${isLast ? 'text-secondaryColor font-bold cursor-default' : 'text-primaryColor hover:text-secondaryColor cursor-pointer'}`;
+      btn.innerText = step.title;
+      if (!isLast) {
+        btn.onclick = () => {
+          navigationHistory = navigationHistory.slice(0, index + 1);
+          selectedItems = (navigationHistory[navigationHistory.length - 1].selectedSnapshot || []);
+          if (!navigationHistory.some(s => s.type === 'location-select')) {
+            locationDropdownContainer.classList.add('hidden');
+          }
+          updateActionButtons();
+          renderGrid();
+          renderBreadcrumbs();
+        };
+      }
+      breadcrumbContainer.appendChild(btn);
+      if (!isLast) {
+        const sep = document.createElement('span');
+        sep.innerText = ' > ';
+        sep.className = 'text-primaryColor/50 mx-2';
+        breadcrumbContainer.appendChild(sep);
       }
     });
   }
+
+  // Inicializar
+  renderBreadcrumbs();
+  renderGrid();
 </script>
-<!--
-<BrowseBy title="" size="sm" image="https://images.unsplash.com/photo-1721902474248-3d6d2f2b595e?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
-<BrowseBy title="" size="md" image="https://images.unsplash.com/photo-1629644494884-7580538c3d43?q=80&w=889&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dhttps://images.pexels.com/photos/10550012/pexels-photo-10550012.jpeg" />
-<BrowseBy title="" size="sm" image="https://images.unsplash.com/photo-1682380116425-f103d66c5cf1?q=80&w=880&auto=format&full=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
 
-my-[1.5em] w-full grid grid-cols-1 md:grid-cols-4 lg:grid-cols-8 justify-center px-[2em] gap-[10px] IF 4 MARKET TYPES
+<style>
+  #drilldown-grid { grid-auto-rows: max-content; }
+  
+  /* Evita que el outline desplace el contenido */
+  #drilldown-grid button {
+    outline-offset: -1px;
+  }
 
--->
+  #continent-list::-webkit-scrollbar, #country-list::-webkit-scrollbar,
+  #region-list::-webkit-scrollbar, #city-list::-webkit-scrollbar,
+  #neighborhood-list::-webkit-scrollbar { width: 4px; }
+  #continent-list::-webkit-scrollbar-thumb, #country-list::-webkit-scrollbar-thumb,
+  #region-list::-webkit-scrollbar-thumb, #city-list::-webkit-scrollbar-thumb,
+  #neighborhood-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+
+  /* =============================================
+     CLASE PARA OCULTAR BOTONES CON TRANSICIÓN
+     ============================================= */
+  .btn-hidden {
+    opacity: 0;
+    transform: translateY(24px) scale(0.92);
+    pointer-events: none;
+  }
+</style>

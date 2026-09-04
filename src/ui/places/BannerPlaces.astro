@@ -1,0 +1,22 @@
+---
+/*https://cdn.pixabay.com/video/2022/12/22/143861-784164182_large.mp4*/
+---
+
+<div>
+    <!-- Eliminamos 'absolute' para que ocupe espacio real en la página -->
+    <div class="absolute w-full h-[65vh]">
+        <!-- El video ahora empuja lo que esté abajo -->
+        <video 
+          src="https://cdn.pixabay.com/video/2022/12/22/143861-784164182_large.mp4" 
+          autoplay 
+          loop 
+          muted 
+          preload="metadata" 
+          class="h-[45vh] object-cover w-full">
+        </video>
+        <div 
+        class="absolute inset-0" 
+        style="background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.65) 85%);"
+      ></div>
+    </div>
+</div>

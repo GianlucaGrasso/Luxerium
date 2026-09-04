@@ -1,0 +1,479 @@
+---
+// src/pages/listing/[id].astro
+import { supabase } from '../../infrastructure/supabase';
+
+export async function getStaticPaths() {
+  const { data: listings, error } = await supabase
+    .from('listingsRealEstate')
+    .select('id');
+
+  if (error || !listings) {
+    console.error("❌ Error en getStaticPaths:", error);
+    return [];
+  }
+
+  return listings.map((listing) => ({
+    params: { id: String(listing.id) },
+  }));
+}
+
+const { id } = Astro.params;
+
+const { data: listing, error } = await supabase
+  .from('listingsRealEstate')
+  .select('*')
+  .eq('id', id)
+  .single();
+
+if (error || !listing) {
+  return Astro.redirect('/404');
+}
+
+const temporaryAgentName = "John Doe & Jane Doe";
+const temporaryAgencyName = "Luxerium Realtors";
+
+// --- SOPORTE DE MODELO 3D ---
+const has3DModel = listing.model_3d_url || false; 
+
+// --- TUS FOTOS DE PRUEBA EXACTAS ---
+const propertyImages = listing.images || [
+  { url: "https://cdn.pixabay.com/photo/2017/06/26/14/12/asakusa-2443949_1280.jpg", category: "Exterior" },
+  { url: "https://cdn.pixabay.com/photo/2019/02/04/13/52/japan-3974720_1280.jpg", category: "Living" },
+  { url: "https://cdn.pixabay.com/photo/2016/10/18/13/12/japan-1750132_1280.jpg", category: "Cocina" },
+  { url: "https://cdn.pixabay.com/photo/2022/02/04/01/47/thatched-roof-house-6991698_1280.jpg", category: "Dormitorio" },
+  { url: "https://images.adsttc.com/media/images/66e4/895b/2e09/f174/e55a/c0df/newsletter/first-floor-plan-2.jpg?1726253407", category: "Planos" }
+];
+
+const categories = [...new Set(propertyImages.map(img => img.category))];
+const hasBlueprints = categories.includes("Planos");
+const filterCategories = categories.filter(c => c !== "Planos");
+
+// Extras simulados si tu base de datos no los trae todavía
+const features = listing.features || ["Seguridad 24h", "Piscina", "Gimnasio", "Solarium", "Sum", "Calefacción Central", "Parrilla", "Apto Mascotas"];
+
+import Navbar from '../../ui/navbar/Navbar.astro';
+import SecondaryNavbar from '../../ui/navbar/SecondaryNavbar.astro';
+---
+
+<html lang="en" class="h-full md:overflow-hidden">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="shortcut icon" href="/icons/brand/favicon.svg" type="image/x-icon">
+    <title>{listing.property_type} en {listing.address}</title>
+  </head>
+
+  <body class="bg-terciaryColor min-h-full h-auto md:h-full flex flex-col m-0 p-0 selection:bg-secondaryColor selection:text-white overflow-y-auto md:overflow-hidden">
+
+    <Navbar/>
+    <SecondaryNavbar/>
+
+    <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-0 min-h-0 h-auto md:h-[calc(100vh-112px)] font-secondaryFont">
+    
+      <!-- ================= GALERÍA DE IMÁGENES ================= -->
+      <div class="h-64 sm:h-80 md:h-full w-full bg-neutral-950 relative group flex flex-col overflow-hidden select-none md:col-span-2 shrink-0">
+        
+        <div class="absolute top-3 left-3 z-20 flex flex-wrap gap-1.5 max-w-[90%]">
+          <button class="gallery-filter-btn font-secondaryFont uppercase bg-secondaryColor text-white text-[11px] font-medium px-2.5 py-1 rounded-full backdrop-blur-md shadow-sm transition-all" data-target="Todos">
+            Todos ({propertyImages.length})
+          </button>
+          {filterCategories.map(cat => (
+            <button class="gallery-filter-btn font-secondaryFont uppercase bg-black/50 hover:bg-black/70 text-white/90 text-[11px] font-medium px-2.5 py-1 rounded-full backdrop-blur-md shadow-sm transition-all" data-target={cat}>
+              {cat}
+            </button>
+          ))}
+          
+          {hasBlueprints && (
+            <button class="gallery-filter-btn font-secondaryFont uppercase bg-amber-600/80 hover:bg-amber-600 text-white text-[11px] font-medium px-2.5 py-1 rounded-full backdrop-blur-md shadow-sm transition-all border border-amber-500/30" data-target="Planos">
+              → Planos
+            </button>
+          )}
+
+          {has3DModel && (
+            <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-medium px-2.5 py-1 rounded-full shadow-sm transition-all flex items-center gap-1">
+              Recorrido 3D
+            </button>
+          )}
+        </div>
+
+        <div 
+          id="slider-container" 
+          class="flex flex-1 h-full w-full overflow-x-auto snap-x snap-mandatory scroll-smooth scrollbar-none bg-neutral-950 font-secondaryFont uppercase"
+        >
+          {propertyImages.map((img: {url: string, category: string}, index: number) => (
+            <div 
+              class="gallery-slide w-full h-full flex-shrink-0 snap-start relative cursor-zoom-in bg-neutral-950" 
+              data-category={img.category}
+            >
+              <img 
+                src={img.url} 
+                alt={`Foto de ${img.category}`} 
+                class="h-full w-full object-cover gallery-trigger-img"
+                data-index={index}
+                draggable="false"
+              />
+              <span class="absolute bottom-3 left-3 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-full backdrop-blur-sm z-10 font-mono">
+                {img.category.toUpperCase()} | <span class="slide-counter-current">{index + 1}</span> / {propertyImages.length}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <button id="prev-btn" class="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white p-1.5 rounded-full backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 z-10" aria-label="Foto anterior">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+        </button>
+
+        <button id="next-btn" class="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white p-1.5 rounded-full backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 z-10" aria-label="Siguiente foto">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+        </button>
+      </div>
+      
+      <!-- ================= PANEL DE INFORMACIÓN ================= -->
+      <div class="h-auto md:h-full w-full bg-terciaryColor md:border-l font-secondaryFont md:overflow-y-auto flex flex-col min-h-0">
+        
+<!-- ================= SECCIÓN AGENTE/AGENCIA (MODIFICADA) ================= -->
+        <!-- Bloque Agente/Agencia Estilo Banner Dual -->
+        <div class="relative items-center border-b p-3 grid grid-cols-2 justify-end shrink-0 bg-neutral-900 md:bg-transparent">
+          <div class="flex w-fit bottom-0 z-10">
+            <img 
+              src="https://thispersondoesnotexist.com/random-person.jpeg" 
+              alt="Agent Image" 
+              class="h-20 w-20 aspect-square rounded-xl object-cover my-auto" 
+              draggable="false" 
+            />
+            <div class="flex flex-col ml-2.5 w-full overflow-hidden justify-center">
+              <p class="font-secondaryFont font-medium text-primaryColor text-base sm:text-lg text-left truncate uppercase leading-tight">
+                {temporaryAgentName}
+              </p>
+              <p class="font-secondaryFont font-medium text-secondaryColor text-xs sm:text-sm text-left truncate uppercase">
+                {temporaryAgencyName}
+              </p>
+              
+              <!-- BOTÓN FUTURO LINK AL SLUG DEL AGENTE -->
+              <!-- Usa tu color personalizado tailwind "text-Green" -->
+              <a 
+                href={`/agents/${listing.agent_id || 'slug-temporal-agente'}`}
+                class="text-primaryColor font-secondaryFont uppercase text-[11px] font-bold tracking-wider bg-Green mt-1 px-2 py-1 rounded-sm flex items-center gap-1 hover:text-white transition-colors w-fit"
+              >
+                <span>Contact Agent</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+              </a>
+            </div>
+          </div>
+          
+          <div class="absolute inset-y-0 right-0 overflow-hidden w-[45%] sm:w-[40%] md:w-[40%]">
+            <img 
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRhXKYgQ0rUZOC6wOJDA3hYdxYywsqBYL4atFIfL-pdnTjAPcrNEheg98&s=10" 
+              alt="Lepore Logo" 
+              class="h-full object-cover w-full border-l border-neutral-800" 
+              draggable="false" 
+            />
+          </div>
+        </div>
+
+        <div class="p-4 flex flex-col gap-4 flex-1 pb-16">
+          <!-- Bloque Precios -->
+          <div>
+            <h1 class="font-primaryFont font-semibold text-3xl sm:text-4xl uppercase text-secondaryColor">
+              ${listing.price?.toLocaleString()} {listing.currency}
+            </h1>
+            <h2 class="font-secondaryFont text-xl sm:text-2xl uppercase text-primaryColor mt-0.5">
+              ${listing.rental_price?.toLocaleString()} {listing.currency} / per Month
+            </h2>
+            <p class="text-primaryColor/75 text-sm mt-1.5 flex items-start gap-1">
+              <span>🚩</span> <span>{listing.address}, {listing.neighborhood}, {listing.city}, {listing.state}, {listing.country}</span>
+            </p>
+          </div>
+          
+          <!-- Lista de Atributos con Iconos Invertidos -->
+          <div class="text-primaryColor text-sm py-3 border-y border-primaryColor/20">
+            <ul class="grid grid-cols-4 w-full gap-x-2 gap-y-4">
+              <li class="uppercase flex flex-col items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/1946/1946488.png" alt="Prop" class="h-7 w-7 invert">
+                <span class="text-[10px] text-center font-bold mt-1.5 truncate max-w-full">{listing.property_type}</span>
+              </li>
+              <li class="uppercase flex flex-col items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/951/951867.png" alt="Subprop" class="h-7 w-7 invert">
+                <span class="text-[10px] text-center font-bold mt-1.5 truncate max-w-full">{listing.property_subtype || 'N/A'}</span>
+              </li>
+              <li class="uppercase flex flex-col items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/952/952772.png" alt="Beds" class="h-7 w-7 invert">
+                <span class="text-[10px] text-center font-bold mt-1.5 truncate max-w-full">{listing.bedrooms} Beds</span>
+              </li>
+              <li class="uppercase flex flex-col items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/169/169301.png" alt="Baths" class="h-7 w-7 invert">
+                <span class="text-[10px] text-center font-bold mt-1.5 truncate max-w-full">{listing.bathrooms} Baths</span>
+              </li>
+              <li class="uppercase flex flex-col items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/243/243232.png" alt="Slots" class="h-7 w-7 invert">
+                <span class="text-[10px] text-center font-bold mt-1.5 truncate max-w-full">{listing.garage_slots || 0} Slots</span>
+              </li>
+              <li class="uppercase flex flex-col items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/93/93640.png" alt="Area" class="h-7 w-7 invert">
+                <span class="text-[10px] text-center font-bold mt-1.5 truncate max-w-full">{listing.total_area} m²</span>
+              </li>
+              <li class="uppercase flex flex-col items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/833/833593.png" alt="Built" class="h-7 w-7 invert">
+                <span class="text-[10px] text-center font-bold mt-1.5 truncate max-w-full">Año {listing.built_year || '—'}</span>
+              </li>
+              <li class="uppercase flex flex-col items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/993/993069.png" alt="Orient" class="h-7 w-7 invert">
+                <span class="text-[10px] text-center font-bold mt-1.5 truncate max-w-full">{listing.orientation || '—'}</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- ================= DESCRIPCIÓN CON EFECTO BLUR / FADE ================= -->
+          <div class="relative">
+            <h3 class="text-xs uppercase tracking-wider text-secondaryColor font-bold mb-2">Descripción</h3>
+            <div id="description-wrapper" class="relative max-h-40 overflow-hidden transition-all duration-500 ease-in-out">
+              <p class="text-sm text-primaryColor/90 leading-relaxed text-justify">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius laborum optio labore, laudantium aliquid qui asperiores veritatis doloribus accusantium aspernatur doloremque ullam quisquam provident fugit nisi facere illum saepe officiis! Lorem ipsum dolor, sit amet consectetur adipisicing elit. Alias, culpa molestias? Quidem fugit blanditiis aut omnis corrupti eius, reiciendis cupiditate aliquam commodi et fugiat atque quo amet corporis impedit voluptatem. Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut, dicta expedita, at cum aliquid reprehenderit eos enim quos omnis, eaque distinctio illo. Dicta quis cumque eligendi. Quidem dolore quisquam quia? Lorem ipsum, dolor sit amet consectetur adipisicing elit.
+              </p>
+              <!-- Capa de Degradado Difuminada centrada -->
+              <div id="description-fade" class="absolute bottom-0 left-0 w-full h-20 bg-gradient-to-t from-terciaryColor to-transparent pointer-events-none flex items-center justify-center"></div>
+            </div>
+            <!-- Botón Ver Más centrado con color terciaryColor -->
+            <div class="flex justify-center mt-2">
+              <button id="toggle-description-btn" class="bg-primaryColor text-terciaryColor font-secondaryFont uppercase text-[11px] tracking-wider font-bold px-4 py-1.5 rounded-full shadow-md hover:bg-secondaryColor hover:text-white transition-all">
+                Ver más
+              </button>
+            </div>
+          </div>
+
+          <!-- ================= CARACTERÍSTICAS EXTRA / AMENITIES ================= -->
+          <div class="border-t border-primaryColor/10 pt-4">
+            <h3 class="text-xs uppercase tracking-wider text-secondaryColor font-bold mb-3">Características Generales</h3>
+            <div class="grid grid-cols-2 gap-2">
+              {features.map((feature) => (
+                <div class="flex items-center gap-2 text-xs text-primaryColor/80 uppercase">
+                  <span class="text-secondaryColor">✓</span>
+                  <span>{feature}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <!-- ================= MAPA / UBICACIÓN SIMULADA ================= -->
+          <div class="border-t border-primaryColor/10 pt-4">
+            <h3 class="text-xs uppercase tracking-wider text-secondaryColor font-bold mb-2">Ubicación aproximada</h3>
+            <div class="w-full h-40 bg-neutral-900 rounded-lg relative overflow-hidden border border-neutral-800 flex items-center justify-center">
+              <div class="absolute inset-0 opacity-40 bg-[radial-gradient(#2c2c2c_1px,transparent_1px)] [background-size:16px_16px]"></div>
+              <div class="z-10 text-center p-4">
+                <span class="text-2xl block mb-1">📍</span>
+                <span class="text-[11px] uppercase tracking-wider text-primaryColor/60">{listing.neighborhood || 'Zona'}, {listing.city || 'Ciudad'}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================= FORMULARIO DE CONTACTO PREMIUM ================= -->
+          <div class="border-t border-primaryColor/10 pt-4">
+            <h3 class="text-xs uppercase tracking-wider text-secondaryColor font-bold mb-3">Consultar por esta propiedad</h3>
+            <form class="space-y-2.5" onsubmit="event.preventDefault();">
+              <input type="text" placeholder="Nombre Completo" class="w-full bg-neutral-900 border border-neutral-800 text-primaryColor text-xs px-3 py-2.5 rounded-md focus:outline-none focus:border-secondaryColor uppercase" />
+              <input type="email" placeholder="Correo Electrónico" class="w-full bg-neutral-900 border border-neutral-800 text-primaryColor text-xs px-3 py-2.5 rounded-md focus:outline-none focus:border-secondaryColor uppercase" />
+              <input type="tel" placeholder="Teléfono" class="w-full bg-neutral-900 border border-neutral-800 text-primaryColor text-xs px-3 py-2.5 rounded-md focus:outline-none focus:border-secondaryColor uppercase" />
+              <textarea rows="3" placeholder="Hola, estoy interesado en esta propiedad..." class="w-full bg-neutral-900 border border-neutral-800 text-primaryColor text-xs px-3 py-2.5 rounded-md focus:outline-none focus:border-secondaryColor uppercase resize-none"></textarea>
+              <button class="w-full bg-secondaryColor hover:bg-secondaryColor/90 text-white font-secondaryFont uppercase font-bold text-xs py-3 rounded-md tracking-wider transition-all shadow-md">
+                Enviar Mensaje
+              </button>
+            </form>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- VIEWER (LIGHTBOX) -->
+    <div id="photo-viewer" class="fixed inset-0 bg-black/95 z-[100] hidden flex-col items-center justify-center opacity-0 transition-opacity duration-300">
+      <button id="close-viewer" class="absolute top-4 right-4 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 p-2.5 rounded-full backdrop-blur-md transition-all z-[110]" aria-label="Cerrar vista">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+      <button id="viewer-prev" class="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 p-3 rounded-full backdrop-blur-md transition-all z-10">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+      </button>
+      <img id="viewer-img" src="" alt="Vista ampliada" class="max-w-[95%] max-h-[75vh] md:max-w-[90%] md:max-h-[80vh] object-contain rounded-lg shadow-2xl select-none" draggable="false" />
+      <button id="viewer-next" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 p-3 rounded-full backdrop-blur-md transition-all z-10">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+      </button>
+      <div class="text-center mt-4 select-none">
+        <div id="viewer-tag" class="text-secondaryColor text-xs uppercase tracking-widest font-bold mb-1"></div>
+        <div id="viewer-counter" class="text-white/60 text-sm font-medium"></div>
+      </div>
+    </div>
+   
+  </body>
+</html>
+
+<style is:global>
+  @media (min-width: 768px) {
+    html, body {
+      overflow: hidden !important;
+      height: 100% !important;
+    }
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
+
+<script define:vars={{ propertyImages }}>
+  const slider = document.getElementById('slider-container');
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+
+  const viewer = document.getElementById('photo-viewer');
+  const viewerImg = document.getElementById('viewer-img');
+  const closeViewerBtn = document.getElementById('close-viewer');
+  const viewerPrevBtn = document.getElementById('viewer-prev');
+  const viewerNextBtn = document.getElementById('viewer-next');
+  const viewerCounter = document.getElementById('viewer-counter');
+  const viewerTag = document.getElementById('viewer-tag');
+
+  let activeImages = [...propertyImages];
+  let currentViewerIndex = 0;
+  let activeCategory = "Todos";
+
+  // --- LÓGICA DE DETALLES (VER MÁS / VER MENOS) ---
+  const toggleBtn = document.getElementById('toggle-description-btn');
+  const wrapper = document.getElementById('description-wrapper');
+  const fade = document.getElementById('description-fade');
+
+  if (toggleBtn && wrapper && fade) {
+    toggleBtn.addEventListener('click', () => {
+      const isExpanded = wrapper.style.maxHeight === 'none' || wrapper.classList.contains('expanded');
+      
+      if (isExpanded) {
+        wrapper.style.maxHeight = '160px'; // Corresponde a max-h-40
+        wrapper.classList.remove('expanded');
+        fade.style.display = 'flex';
+        toggleBtn.textContent = 'Ver más';
+      } else {
+        wrapper.style.maxHeight = 'none';
+        wrapper.classList.add('expanded');
+        fade.style.display = 'none';
+        toggleBtn.textContent = 'Ver menos';
+      }
+    });
+  }
+
+  // --- FILTRADO DE AMBIENTES ---
+  const filterButtons = document.querySelectorAll('.gallery-filter-btn');
+  const slides = document.querySelectorAll('.gallery-slide');
+
+  filterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetCategory = btn.getAttribute('data-target');
+      activeCategory = targetCategory;
+
+      filterButtons.forEach(b => {
+        b.classList.remove('bg-secondaryColor', 'bg-amber-600');
+        b.classList.add('bg-black/50');
+      });
+      if (targetCategory === "Planos") {
+        btn.classList.remove('bg-black/50');
+        btn.classList.add('bg-amber-600');
+      } else {
+        btn.classList.remove('bg-black/50');
+        btn.classList.add('bg-secondaryColor');
+      }
+
+      let runningIndex = 1;
+      slides.forEach(slide => {
+        const slideCat = slide.getAttribute('data-category');
+        if (targetCategory === "Todos" || slideCat === targetCategory) {
+          slide.style.display = 'block';
+          const counterSpan = slide.querySelector('.slide-counter-current');
+          if (counterSpan) counterSpan.textContent = runningIndex;
+          runningIndex++;
+        } else {
+          slide.style.display = 'none';
+        }
+      });
+
+      if (targetCategory === "Todos") {
+        activeImages = [...propertyImages];
+      } else {
+        activeImages = propertyImages.filter(img => img.category === targetCategory);
+      }
+
+      if (slider) slider.scrollLeft = 0;
+    });
+  });
+
+  // --- MANEJO DE SCROLL DE LA GALERÍA ---
+  if (slider && prevBtn && nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      slider.scrollLeft += slider.clientWidth;
+    });
+    prevBtn.addEventListener('click', () => {
+      slider.scrollLeft -= slider.clientWidth;
+    });
+  }
+
+  // --- LIGHTBOX VIEWER ---
+  function updateViewer(index) {
+    currentViewerIndex = index;
+    const currentImg = activeImages[currentViewerIndex];
+    if (currentImg) {
+      viewerImg.src = currentImg.url;
+      viewerTag.textContent = currentImg.category;
+      viewerCounter.textContent = `${currentViewerIndex + 1} / ${activeImages.length}`;
+    }
+  }
+
+  document.querySelectorAll('.gallery-trigger-img').forEach(img => {
+    img.addEventListener('click', () => {
+      const globalUrl = img.getAttribute('src');
+      const indexInActive = activeImages.findIndex(item => item.url === globalUrl);
+      
+      updateViewer(indexInActive >= 0 ? indexInActive : 0);
+      viewer.classList.remove('hidden');
+      viewer.classList.add('flex');
+      setTimeout(() => {
+        viewer.classList.remove('opacity-0');
+        viewer.classList.add('opacity-100');
+      }, 10);
+    });
+  });
+
+  function closeViewer() {
+    viewer.classList.remove('opacity-100');
+    viewer.classList.add('opacity-0');
+    setTimeout(() => {
+      viewer.classList.remove('flex');
+      viewer.classList.add('hidden');
+    }, 300);
+  }
+
+  if (closeViewerBtn) {
+    closeViewerBtn.addEventListener('click', closeViewer);
+    viewer.addEventListener('click', (e) => {
+      if (e.target === viewer) closeViewer();
+    });
+  }
+
+  if (viewerPrevBtn && viewerNextBtn) {
+    viewerNextBtn.addEventListener('click', () => {
+      const nextIdx = (currentViewerIndex + 1) % activeImages.length;
+      updateViewer(nextIdx);
+    });
+    viewerPrevBtn.addEventListener('click', () => {
+      const prevIdx = (currentViewerIndex - 1 + activeImages.length) % activeImages.length;
+      updateViewer(prevIdx);
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (viewer.classList.contains('hidden')) return;
+      if (e.key === 'Escape') closeViewer();
+      if (e.key === 'ArrowRight') viewerNextBtn.click();
+      if (e.key === 'ArrowLeft') viewerPrevBtn.click();
+    });
+  }
+</script>

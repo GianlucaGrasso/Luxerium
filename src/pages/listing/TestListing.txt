@@ -1,0 +1,1223 @@
+---
+// src/pages/listing/TestListing.astro
+export const prerender = false;
+
+import { supabase } from '../../infrastructure/supabase';
+import Navbar from '../../ui/navbar/Navbar.astro';
+import { MarketFilters } from '../../ui/marketFilter-ui/marketFilters.js';
+
+let message = "";
+let messageType = "";
+
+const url = new URL(Astro.request.url);
+if (url.searchParams.get("success") === "true") {
+  message = "¡Propiedad publicada con éxito!";
+  messageType = "success";
+} else if (url.searchParams.get("error")) {
+  message = "Ocurrió un error al procesar el formulario. Por favor, inténtalo de nuevo.";
+  messageType = "error";
+}
+
+if (Astro.request.method === "POST") {
+  try {
+    const contentType = Astro.request.headers.get("content-type") || "";
+    if (!contentType.includes("application/x-www-form-urlencoded") && !contentType.includes("multipart/form-data")) {
+      throw new Error("Método de envío no válido");
+    }
+
+    const formData = await Astro.request.formData();
+    
+    const country = formData.get("country")?.toString().trim() || null;
+    const state = formData.get("state")?.toString().trim() || null;
+    const city = formData.get("city")?.toString().trim() || null;
+    const neighborhood = formData.get("neighborhood")?.toString().trim() || null;
+    const street = formData.get("street")?.toString().trim() || "";
+    const height = formData.get("height")?.toString().trim() || "";
+    
+    let address = "";
+    if (street) {
+      address = height ? `${street} ${height}` : street;
+    } else {
+      address = neighborhood || city || "Dirección sin calle";
+    }
+    
+    if (!country || !state || !city) {
+      throw new Error("Faltan datos de ubicación esenciales.");
+    }
+
+    const postal_code = formData.get("postal_code")?.toString().trim() || null;
+    const latitude = formData.get("latitude") ? Number(formData.get("latitude")) : null;
+    const longitude = formData.get("longitude") ? Number(formData.get("longitude")) : null;
+
+    const property_type = formData.get("property_type")?.toString() || "";
+    const property_subtype = formData.get("property_subtype")?.toString() || null;
+    const isLand = property_type === 'land';
+    
+    const total_area = formData.get("total_area") ? Number(formData.get("total_area")) : null;
+    const covered_area = formData.get("covered_area") ? Number(formData.get("covered_area")) : null;
+    
+    const bedrooms = isLand ? 0 : (formData.get("bedrooms") ? Number(formData.get("bedrooms")) : 0);
+    const bathrooms = isLand ? 0 : (formData.get("bathrooms") ? Number(formData.get("bathrooms")) : 0);
+    const garage_slots = isLand ? 0 : (formData.get("garage_slots") ? Number(formData.get("garage_slots")) : 0);
+    const built_year = formData.get("built_year") ? Number(formData.get("built_year")) : null;
+    const orientation = formData.get("orientation")?.toString() || null;
+    const floor_number = formData.get("floor_number") ? Number(formData.get("floor_number")) : null;
+    const unit_number = formData.get("unit_number")?.toString().trim() || null;
+
+    const status = formData.get("status")?.toString() || "sale";
+    const cleanPrice = (val) => {
+      if (!val) return null;
+      const cleaned = val.replace(/[^\d]/g, '');
+      return cleaned ? Number(cleaned) : null;
+    };
+
+    const rawPrice = formData.get("price")?.toString() || "";
+    const price = (status === "sale" && rawPrice) ? cleanPrice(rawPrice) : null;
+    const currency = status === "sale" ? (formData.get("currency")?.toString() || 'USD') : null;
+    
+    const rawRentalPrice = formData.get("rental_price")?.toString() || "";
+    const rental_price = (status === "rent" && rawRentalPrice) ? cleanPrice(rawRentalPrice) : null;
+    const rental_currency = status === "rent" ? (formData.get("rental_currency")?.toString() || 'ARS') : null;
+
+    const expenses = formData.get("expenses") ? cleanPrice(formData.get("expenses")?.toString()) : null;
+
+    const amenities = {
+      pool_common: formData.get("amenity_pool_common") === "true",
+      security: formData.get("amenity_security") === "true",
+      gym: formData.get("amenity_gym") === "true",
+      sum: formData.get("amenity_sum") === "true",
+      laundry: formData.get("amenity_laundry") === "true",
+      pool_private: formData.get("amenity_pool_private") === "true",
+      garden: formData.get("amenity_garden") === "true",
+      grill: formData.get("amenity_grill") === "true",
+      jacuzzi: formData.get("amenity_jacuzzi") === "true",
+      terrace: formData.get("amenity_terrace") === "true",
+      playroom: formData.get("amenity_playroom") === "true"
+    };
+
+    const description = formData.get("description")?.toString().trim() || null;
+    const primary_agent_id = formData.get("primary_agent_id")?.toString() || null;
+
+    const extraData = {
+      images: [],
+      model_3d_url: formData.get("model_3d_url")?.toString() || "",
+      amenities
+    };
+
+    const { error: insertError } = await supabase
+      .from('listingsRealEstate')
+      .insert([
+        {
+          country, state, city, neighborhood, address,
+          postal_code, latitude, longitude,
+          property_type, property_subtype,
+          total_area, covered_area,
+          bedrooms, bathrooms, garage_slots,
+          built_year, orientation,
+          floor: floor_number, unit: unit_number,
+          price, currency,
+          rental_price, rental_currency,
+          expenses, status,
+          description, primary_agent_id,
+          extra: extraData
+        }
+      ]);
+
+    if (insertError) throw insertError;
+
+    return Astro.redirect(`${url.pathname}?success=true`);
+
+  } catch (error) {
+    console.error("❌ Error en backend:", error);
+    return Astro.redirect(`${url.pathname}?error=true`);
+  }
+}
+
+const { data: agents } = await supabase.from('agents').select('id, name');
+const realEstateTypes = MarketFilters.realEstate.types;
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Luxerium - Panel de Publicación Profesional</title>
+  </head>
+  <body class="bg-neutral-950 min-h-screen text-neutral-100 font-secondaryFont pb-16">
+    <Navbar />
+
+    <main class="max-w-5xl mx-auto p-4 md:p-8 mt-6">
+      <!-- Cabecera -->
+      <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between border-b border-neutral-900 pb-6">
+        <div>
+          <span class="text-[9px] bg-secondaryColor/10 text-secondaryColor px-2.5 py-1 rounded-full font-bold uppercase tracking-widest border border-secondaryColor/20">
+            Console Engine v6.0 - Global Adaptive Geo Cascade
+          </span>
+          <h1 class="text-2xl font-black uppercase tracking-wider text-white mt-3">Panel de Publicación de Propiedades</h1>
+          <p class="text-xs text-neutral-500 mt-1">Precarga predictiva con soporte adaptativo internacional.</p>
+        </div>
+      </div>
+
+      {message && (
+        <div class={`p-4 rounded-xl text-xs uppercase tracking-wider font-bold mb-8 text-center border shadow-lg transition-all ${messageType === 'success' ? 'bg-Green/10 border-Green/30 text-Green' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
+          {message}
+        </div>
+      )}
+
+      <div class="flex flex-wrap gap-2 mb-8 border-b border-neutral-900 pb-4">
+        <button type="button" data-target="tab-ubicacion" class="tab-btn px-5 py-3 rounded-xl text-[10px] uppercase font-black tracking-wider transition-all bg-secondaryColor text-white">1. Ubicación Modular</button>
+        <button type="button" data-target="tab-caracteristicas" class="tab-btn px-5 py-3 rounded-xl text-[10px] uppercase font-black tracking-wider transition-all bg-neutral-900 text-neutral-400 hover:text-white">2. Características & Áreas</button>
+        <button type="button" data-target="tab-precios" class="tab-btn px-5 py-3 rounded-xl text-[10px] uppercase font-black tracking-wider transition-all bg-neutral-900 text-neutral-400 hover:text-white">3. Precios & Amenities</button>
+        <button type="button" data-target="tab-estimador" class="tab-btn px-5 py-3 rounded-xl text-[10px] uppercase font-black tracking-wider transition-all bg-neutral-900 text-neutral-400 hover:text-white">4. Estimador & Guardar</button>
+      </div>
+
+      <form id="form-listing" action="" method="POST" class="space-y-6">
+        
+        <!-- ================= TAB 1: UBICACIÓN (componentes internos) ================= -->
+        <div id="tab-ubicacion" class="tab-content block space-y-6">
+          <section class="bg-neutral-900 border border-neutral-800/80 rounded-2xl p-6 shadow-xl space-y-6">
+            <div class="flex items-center gap-3 border-b border-neutral-800/60 pb-4 mb-2">
+              <span class="w-7 h-7 bg-Green/10 border border-Green/20 text-Green text-xs rounded-lg flex items-center justify-center font-bold">1</span>
+              <h3 class="text-xs font-bold uppercase tracking-widest text-neutral-200">Localización Jerárquica</h3>
+            </div>
+
+            <!-- País (CountryInput) -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="relative">
+                <label class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">País</label>
+                <input 
+                  type="text" 
+                  id="search-country" 
+                  placeholder="Escribí o seleccioná un país..." 
+                  class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3 rounded-xl focus:outline-none uppercase font-bold"
+                  autocomplete="off"
+                />
+                <div id="suggest-country" class="hidden absolute left-0 right-0 top-full mt-1 bg-neutral-950 border border-neutral-800 rounded-xl shadow-2xl z-50 max-h-72 overflow-y-auto overscroll-contain divide-y divide-neutral-900"></div>
+                <input type="hidden" id="input-country" name="country" />
+                <input type="hidden" id="input-country-code" />
+                <div id="country-error" class="text-red-400 text-[10px] mt-1 hidden">Seleccioná un país de la lista.</div>
+              </div>
+
+              <!-- Estado (StateSelect) -->
+              <div class="relative">
+                <label id="label-state" class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Provincia / Estado</label>
+                <select 
+                  id="select-state" 
+                  name="state"
+                  disabled
+                  class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3.5 rounded-xl focus:outline-none uppercase font-bold disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  <option value="">Seleccione un País primero...</option>
+                </select>
+                <div id="state-error" class="text-red-400 text-[10px] mt-1 hidden">No se pudieron cargar los estados.</div>
+              </div>
+
+              <!-- Ciudad (CitySelect) -->
+              <div class="relative">
+                <label id="label-city" class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Ciudad / Localidad</label>
+                <select 
+                  id="select-city" 
+                  name="city"
+                  disabled
+                  class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3.5 rounded-xl focus:outline-none uppercase font-bold disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  <option value="">Seleccione una Provincia primero...</option>
+                </select>
+                <div id="city-error" class="text-red-400 text-[10px] mt-1 hidden">No se pudieron cargar las ciudades.</div>
+              </div>
+            </div>
+
+            <!-- Barrio y Estación (NeighborhoodAndStation) -->
+            <div id="wrapper-neighborhood-section" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-neutral-800/40">
+              <div class="relative">
+                <label id="label-neighborhood" class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Barrio / Comuna</label>
+                <input 
+                  type="text" 
+                  id="search-neighborhood" 
+                  placeholder="Ej: Palermo / Shibuya..." 
+                  class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3 rounded-xl focus:outline-none uppercase font-bold"
+                  autocomplete="off"
+                />
+                <div id="suggest-neighborhood" class="hidden absolute left-0 right-0 top-full mt-1 bg-neutral-950 border border-neutral-800 rounded-xl shadow-2xl z-50 max-h-40 overflow-y-auto divide-y divide-neutral-900"></div>
+                <input type="hidden" id="input-neighborhood" name="neighborhood" />
+              </div>
+              <div id="wrapper-subway-station" class="relative hidden">
+                <label class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Estación de Tren / Subte</label>
+                <input 
+                  type="text" 
+                  id="search-station" 
+                  placeholder="Ej: Shinjuku Station..." 
+                  class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3 rounded-xl focus:outline-none uppercase font-bold"
+                  autocomplete="off"
+                />
+                <div id="suggest-station" class="hidden absolute left-0 right-0 top-full mt-1 bg-neutral-950 border border-neutral-800 rounded-xl shadow-2xl z-50 max-h-40 overflow-y-auto divide-y divide-neutral-900"></div>
+                <input type="hidden" id="input-station" />
+              </div>
+            </div>
+
+            <!-- Calle y Altura (StreetAndHeight) -->
+            <div id="wrapper-street-section" class="hidden grid grid-cols-1 sm:grid-cols-4 gap-4 pt-4 border-t border-neutral-800/40">
+              <div class="relative sm:col-span-3">
+                <label id="label-street" class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Calle / Avenida / Bloque</label>
+                <input 
+                  type="text" 
+                  id="search-street" 
+                  placeholder="Ej: Felipe Vallese..." 
+                  class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3 rounded-xl focus:outline-none uppercase font-bold"
+                  autocomplete="off"
+                />
+                <div id="suggest-street" class="hidden absolute left-0 right-0 top-full mt-1 bg-neutral-950 border border-neutral-800 rounded-xl shadow-2xl z-50 max-h-40 overflow-y-auto divide-y divide-neutral-900"></div>
+                <input type="hidden" id="input-street" name="street" />
+              </div>
+              <div>
+                <label id="label-height" class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Altura / Número</label>
+                <input 
+                  type="text" 
+                  id="input-height" 
+                  name="height" 
+                  placeholder="Ej: 761" 
+                  class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3 rounded-xl focus:outline-none uppercase font-bold"
+                />
+              </div>
+            </div>
+
+            <!-- Previsualización (LocationPreview) -->
+            <div id="address-preview-card" class="hidden bg-neutral-950 border border-neutral-800 p-5 rounded-2xl">
+              <span class="text-[9px] uppercase tracking-widest font-black text-secondaryColor block mb-2">📍 Ficha de Ubicación Validada</span>
+              <div class="space-y-1.5">
+                <p id="preview-address" class="text-base font-black text-white tracking-wide"></p>
+                <p id="preview-details" class="text-[10px] text-neutral-400 uppercase font-semibold tracking-wider"></p>
+              </div>
+            </div>
+
+            <input type="hidden" id="input-postal" name="postal_code" />
+            <input type="hidden" id="input-latitude" name="latitude" />
+            <input type="hidden" id="input-longitude" name="longitude" />
+          </section>
+        </div>
+
+        <!-- ================= TAB 2: CARACTERÍSTICAS ================= -->
+        <div id="tab-caracteristicas" class="tab-content hidden space-y-6">
+          <section class="bg-neutral-900 border border-neutral-800/80 rounded-2xl p-6 shadow-xl">
+            <div class="flex items-center gap-3 border-b border-neutral-800/60 pb-4 mb-5">
+              <span class="w-7 h-7 bg-secondaryColor/10 border border-secondaryColor/20 text-secondaryColor text-xs rounded-lg flex items-center justify-center font-bold">2</span>
+              <h3 class="text-xs font-bold uppercase tracking-widest text-neutral-200">Tipología e Información Física</h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Tipo de Propiedad</label>
+                <select id="select-property-type" name="property_type" class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3.5 rounded-xl focus:outline-none uppercase font-bold cursor-pointer">
+                  <option value="">Seleccionar Tipo...</option>
+                  {Object.entries(realEstateTypes).map(([key, value]) => (
+                    <option value={key}>{value.title}</option>
+                  ))}
+                </select>
+                <div id="type-error" class="text-red-400 text-[10px] mt-1 hidden">Seleccioná un tipo de propiedad.</div>
+              </div>
+              <div>
+                <label class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Subtipo Oficial</label>
+                <select id="select-property-subtype" name="property_subtype" class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3.5 rounded-xl focus:outline-none uppercase font-bold disabled:opacity-30 disabled:cursor-not-allowed" disabled>
+                  <option value="">Seleccione el tipo primero...</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+              <div>
+                <label class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">M² Totales</label>
+                <input type="number" step="any" id="total_area" name="total_area" placeholder="250" class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3.5 rounded-xl focus:outline-none" />
+                <div id="area-error" class="text-red-400 text-[10px] mt-1 hidden">Ingresá un área válida.</div>
+              </div>
+              <div>
+                <label class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">M² Cubiertos</label>
+                <input type="number" step="any" id="covered_area" name="covered_area" placeholder="180" class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3.5 rounded-xl focus:outline-none" />
+              </div>
+              <div>
+                <label class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Año de Const.</label>
+                <input type="number" name="built_year" placeholder="2020" class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3.5 rounded-xl focus:outline-none" />
+              </div>
+              <div>
+                <label class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Orientación</label>
+                <select id="select-orientation" name="orientation" class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3.5 rounded-xl focus:outline-none uppercase font-bold">
+                  <option value="">No Especificar</option>
+                  <option value="norte">Norte</option>
+                  <option value="sur">Sur</option>
+                  <option value="este">Este</option>
+                  <option value="oeste">Oeste</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="unit-spec-section" class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-neutral-800/40 mb-6">
+              <div>
+                <label class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Nº de Piso</label>
+                <input type="number" id="input-floor" name="floor_number" placeholder="4" class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3.5 rounded-xl" />
+              </div>
+              <div>
+                <label class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Nº de Unidad</label>
+                <input type="text" id="input-unit" name="unit_number" placeholder="B" class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3.5 rounded-xl uppercase" />
+              </div>
+            </div>
+
+            <div id="residential-specs" class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-neutral-800/40">
+              <div>
+                <label class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Habitaciones</label>
+                <input type="number" id="input-bedrooms" name="bedrooms" placeholder="3" class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3.5 rounded-xl focus:outline-none" />
+              </div>
+              <div>
+                <label class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Baños</label>
+                <input type="number" id="input-bathrooms" name="bathrooms" placeholder="2" class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3.5 rounded-xl focus:outline-none" />
+              </div>
+              <div>
+                <label class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Cocheras</label>
+                <input type="number" id="input-garage" name="garage_slots" placeholder="1" class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3.5 rounded-xl focus:outline-none" />
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ================= TAB 3: PRECIOS Y AMENITIES ================= -->
+        <div id="tab-precios" class="tab-content hidden space-y-6">
+          <section class="bg-neutral-900 border border-neutral-800/80 rounded-2xl p-6 shadow-xl">
+            <div class="flex items-center gap-3 border-b border-neutral-800/60 pb-4 mb-5">
+              <span class="w-7 h-7 bg-neutral-850 border border-neutral-700 text-neutral-300 text-xs rounded-lg flex items-center justify-center font-bold">3</span>
+              <h3 class="text-xs font-bold uppercase tracking-widest text-neutral-200">Operación Comercial y Valores</h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+              <div>
+                <label class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Tipo de Operación</label>
+                <select id="select-status" name="status" class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3.5 rounded-xl focus:outline-none uppercase font-bold cursor-pointer">
+                  <option value="sale">Venta</option>
+                  <option value="rent">Alquiler</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Expensas Mensuales</label>
+                <input type="text" id="input-expenses" name="expenses" placeholder="85.000" class="money-format w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3.5 rounded-xl focus:outline-none" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-neutral-950/40 p-4 rounded-xl border border-neutral-800/40 mb-8">
+              <div id="box-sale" class="transition-all duration-300">
+                <label class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Valor Total de Venta</label>
+                <div class="flex gap-2">
+                  <input type="text" id="input-price" name="price" placeholder="450.000" class="money-format flex-1 bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-4 py-3.5 rounded-xl focus:outline-none" />
+                  <select name="currency" class="w-24 text-center bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs py-3.5 rounded-xl focus:outline-none font-bold cursor-pointer">
+                    <option value="USD">USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                    <option value="ARS">ARS ($)</option>
+                    <option value="BRL">BRL (R$)</option>
+                    <option value="UYU">UYU ($)</option>
+                  </select>
+                </div>
+                <div id="price-error" class="text-red-400 text-[10px] mt-1 hidden">Ingresá un precio de venta válido.</div>
+              </div>
+
+              <div id="box-rent" class="transition-all duration-300 opacity-40">
+                <label class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Valor Alquiler Mensual</label>
+                <div class="flex gap-2">
+                  <input type="text" id="input-rental-price" name="rental_price" disabled placeholder="1.200" class="money-format flex-1 bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-4 py-3.5 rounded-xl focus:outline-none disabled:cursor-not-allowed" />
+                  <select id="select-rental-currency" name="rental_currency" disabled class="w-24 text-center bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs py-3.5 rounded-xl focus:outline-none font-bold disabled:cursor-not-allowed">
+                    <option value="ARS">ARS ($)</option>
+                    <option value="USD">USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                    <option value="BRL">BRL (R$)</option>
+                  </select>
+                </div>
+                <div id="rent-error" class="text-red-400 text-[10px] mt-1 hidden">Ingresá un precio de alquiler válido.</div>
+              </div>
+            </div>
+
+            <!-- Amenities -->
+            <div id="amenities-wrapper" class="pt-6 border-t border-neutral-800/60 space-y-6">
+              <div id="group-building-amenities" class="space-y-3">
+                <span class="block text-[10px] uppercase tracking-widest font-black text-secondaryColor">Amenities del Edificio</span>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <label class="cursor-pointer bg-neutral-950 border border-neutral-800 hover:border-secondaryColor/50 p-3.5 rounded-xl flex items-center justify-between transition-colors">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-neutral-300">Piscina Común</span>
+                    <input type="checkbox" name="amenity_pool_common" value="true" class="accent-secondaryColor w-4 h-4" />
+                  </label>
+                  <label class="cursor-pointer bg-neutral-950 border border-neutral-800 hover:border-secondaryColor/50 p-3.5 rounded-xl flex items-center justify-between transition-colors">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-neutral-300">Seguridad 24 Hs</span>
+                    <input type="checkbox" name="amenity_security" value="true" class="accent-secondaryColor w-4 h-4" />
+                  </label>
+                  <label class="cursor-pointer bg-neutral-950 border border-neutral-800 hover:border-secondaryColor/50 p-3.5 rounded-xl flex items-center justify-between transition-colors">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-neutral-300">Gimnasio</span>
+                    <input type="checkbox" name="amenity_gym" value="true" class="accent-secondaryColor w-4 h-4" />
+                  </label>
+                  <label class="cursor-pointer bg-neutral-950 border border-neutral-800 hover:border-secondaryColor/50 p-3.5 rounded-xl flex items-center justify-between transition-colors">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-neutral-300">SUM / Club House</span>
+                    <input type="checkbox" name="amenity_sum" value="true" class="accent-secondaryColor w-4 h-4" />
+                  </label>
+                  <label class="cursor-pointer bg-neutral-950 border border-neutral-800 hover:border-secondaryColor/50 p-3.5 rounded-xl flex items-center justify-between transition-colors">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-neutral-300">Lavadero Común</span>
+                    <input type="checkbox" name="amenity_laundry" value="true" class="accent-secondaryColor w-4 h-4" />
+                  </label>
+                </div>
+              </div>
+              <div id="group-private-amenities" class="space-y-3">
+                <span class="block text-[10px] uppercase tracking-widest font-black text-secondaryColor">Amenities del Inmueble</span>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <label class="cursor-pointer bg-neutral-950 border border-neutral-800 hover:border-secondaryColor/50 p-3.5 rounded-xl flex items-center justify-between transition-colors">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-neutral-300">Pileta Privada</span>
+                    <input type="checkbox" name="amenity_pool_private" value="true" class="accent-secondaryColor w-4 h-4" />
+                  </label>
+                  <label class="cursor-pointer bg-neutral-950 border border-neutral-800 hover:border-secondaryColor/50 p-3.5 rounded-xl flex items-center justify-between transition-colors">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-neutral-300">Parque / Jardín</span>
+                    <input type="checkbox" name="amenity_garden" value="true" class="accent-secondaryColor w-4 h-4" />
+                  </label>
+                  <label class="cursor-pointer bg-neutral-950 border border-neutral-800 hover:border-secondaryColor/50 p-3.5 rounded-xl flex items-center justify-between transition-colors">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-neutral-300">Parrilla / Quincho</span>
+                    <input type="checkbox" name="amenity_grill" value="true" class="accent-secondaryColor w-4 h-4" />
+                  </label>
+                  <label class="cursor-pointer bg-neutral-950 border border-neutral-800 hover:border-secondaryColor/50 p-3.5 rounded-xl flex items-center justify-between transition-colors">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-neutral-300">Hidromasaje</span>
+                    <input type="checkbox" name="amenity_jacuzzi" value="true" class="accent-secondaryColor w-4 h-4" />
+                  </label>
+                  <label class="cursor-pointer bg-neutral-950 border border-neutral-800 hover:border-secondaryColor/50 p-3.5 rounded-xl flex items-center justify-between transition-colors">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-neutral-300">Terraza Propia</span>
+                    <input type="checkbox" name="amenity_terrace" value="true" class="accent-secondaryColor w-4 h-4" />
+                  </label>
+                  <label class="cursor-pointer bg-neutral-950 border border-neutral-800 hover:border-secondaryColor/50 p-3.5 rounded-xl flex items-center justify-between transition-colors">
+                    <span class="text-[10px] uppercase tracking-wider font-bold text-neutral-300">Sala de Juegos</span>
+                    <input type="checkbox" name="amenity_playroom" value="true" class="accent-secondaryColor w-4 h-4" />
+                  </label>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ================= TAB 4: ESTIMADOR Y DESCRIPCIÓN ================= -->
+        <div id="tab-estimador" class="tab-content hidden space-y-6">
+          <section class="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-secondaryColor/20 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+            <div class="absolute -right-16 -top-16 w-36 h-36 bg-secondaryColor/5 blur-3xl rounded-full"></div>
+            <div class="flex items-center gap-3 border-b border-neutral-800/60 pb-4 mb-5">
+              <span class="w-7 h-7 bg-secondaryColor/10 border border-secondaryColor/20 text-secondaryColor text-xs rounded-lg flex items-center justify-center font-bold">★</span>
+              <h3 class="text-xs font-bold uppercase tracking-widest text-secondaryColor">Módulo de Valuación Predictiva</h3>
+            </div>
+            <div class="bg-neutral-950 p-5 rounded-2xl border border-neutral-800 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div>
+                <span class="text-[9px] uppercase tracking-widest font-black text-neutral-500 block mb-1">Valor de Cierre Estimado</span>
+                <div class="flex items-baseline gap-2">
+                  <span class="text-xs font-black text-neutral-400">USD</span>
+                  <span id="estimated-price" class="text-2xl font-black text-white tracking-wider">0</span>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="text-[9px] uppercase tracking-widest font-black text-neutral-500 block mb-1">Rendimiento por M²</span>
+                <span id="estimated-m2" class="text-xs font-bold text-secondaryColor uppercase">Complete datos de ubicación y metros</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="bg-neutral-900 border border-neutral-800/80 rounded-2xl p-6 shadow-xl space-y-5">
+            <div class="flex items-center gap-3 border-b border-neutral-800/60 pb-4 mb-2">
+              <span class="w-7 h-7 bg-neutral-850 border border-neutral-700 text-neutral-300 text-xs rounded-lg flex items-center justify-center font-bold">4</span>
+              <h3 class="text-xs font-bold uppercase tracking-widest text-neutral-200">Ficha Descriptiva y Multimedia</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Descripción Premium</label>
+                <textarea name="description" rows="4" placeholder="Redactá un resumen atractivo..." class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-4 py-3.5 rounded-xl focus:outline-none uppercase resize-none h-32"></textarea>
+              </div>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Agente Representante</label>
+                  <select name="primary_agent_id" class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-3.5 py-3.5 rounded-xl focus:outline-none uppercase font-bold cursor-pointer">
+                    <option value="">Sin agente asignado</option>
+                    {agents?.map(agent => (
+                      <option value={agent.id}>{agent.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">Modelo 3D (Matterport)</label>
+                  <input type="url" name="model_3d_url" placeholder="https://my.matterport.com/show/..." class="w-full bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs px-4 py-3.5 rounded-xl focus:outline-none" />
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <button 
+          type="submit" 
+          id="btn-submit-listing"
+          disabled
+          class="w-full bg-neutral-800 text-neutral-500 font-secondaryFont uppercase font-black text-xs py-4.5 rounded-2xl tracking-widest transition-all cursor-not-allowed border border-neutral-700/50"
+        >
+          Guardar y Publicar Ficha (Complete los campos requeridos)
+        </button>
+
+      </form>
+    </main>
+
+    <!-- ================= SCRIPT DEFINITIVO (con subcomponentes y datos geográficos completos) ================= -->
+    <script define:vars={{ realEstateTypes }} type="module">
+      // ================================================================
+      // 1. FUENTE DE DATOS GEOGRÁFICOS
+      // Antes: un JSON "chunk" gigante + GeoNames con cuenta demo
+      // (compartida por todo internet, siempre sin cupo) como fallback,
+      // que terminaba devolviendo apenas 10 países hardcodeados.
+      // Ahora: @countrystatecity/countries-browser -> 250 países reales,
+      // 5000+ provincias/estados y 150.000+ ciudades, cargados en forma
+      // perezosa (país -> provincias -> ciudades) vía jsDelivr, sin API key.
+      //
+      // Nota: este <script> usa define:vars, así que Astro lo marca como
+      // is:inline y no lo pasa por Vite: un import con specifier "pelado"
+      // (bare, ej. 'paquete') NO se resolvería en el navegador. Por eso se
+      // agrega type="module" (habilita import nativo del navegador) y se
+      // importa directamente desde la URL del CDN de jsDelivr.
+      // ================================================================
+      import { getCountries, getStatesOfCountry, getCitiesOfState, NetworkError } from 'https://cdn.jsdelivr.net/npm/@countrystatecity/countries-browser@1.0.2/+esm';
+
+      // ================================================================
+      // 2. ESTADO GLOBAL
+      // ================================================================
+      const state = {
+        countries: [],         // [{ name, isoCode }]
+        statesByName: new Map(), // name -> isoCode (para poder pedir ciudades)
+        selectedCountry: null,
+        selectedState: null,
+        selectedCity: null,
+      };
+
+      // ================================================================
+      // 3. REFERENCIAS DOM
+      // ================================================================
+      const $ = (id) => document.getElementById(id);
+      const searchCountry = $('search-country');
+      const suggestCountry = $('suggest-country');
+      const inputCountry = $('input-country');
+      const inputCountryCode = $('input-country-code');
+      const selectState = $('select-state');
+      const selectCity = $('select-city');
+      const searchNeighborhood = $('search-neighborhood');
+      const suggestNeighborhood = $('suggest-neighborhood');
+      const inputNeighborhood = $('input-neighborhood');
+      const searchStation = $('search-station');
+      const suggestStation = $('suggest-station');
+      const inputStation = $('input-station');
+      const searchStreet = $('search-street');
+      const suggestStreet = $('suggest-street');
+      const inputStreet = $('input-street');
+      const inputHeight = $('input-height');
+      const addressPreview = $('address-preview-card');
+      const wrapperNeighborhood = $('wrapper-neighborhood-section');
+      const wrapperStreet = $('wrapper-street-section');
+      const wrapperStation = $('wrapper-subway-station');
+      const btnSubmit = $('btn-submit-listing');
+      const selectType = $('select-property-type');
+      const selectSubtype = $('select-property-subtype');
+      const selectStatus = $('select-status');
+      const inputPrice = $('input-price');
+      const inputRentalPrice = $('input-rental-price');
+      const totalArea = $('total_area');
+      const boxSale = $('box-sale');
+      const boxRent = $('box-rent');
+      const selectRentalCurrency = $('select-rental-currency');
+      const groupBuilding = $('group-building-amenities');
+      const groupPrivate = $('group-private-amenities');
+      const residentialSpecs = $('residential-specs');
+      const unitSpecSection = $('unit-spec-section');
+      const selectOrientation = $('select-orientation');
+      const inputFloor = $('input-floor');
+      const stateError = $('state-error');
+      const cityError = $('city-error');
+      const countryError = $('country-error');
+
+      // ================================================================
+      // 3b. TABS (faltaba por completo: los botones no hacían nada)
+      // ================================================================
+      const tabButtons = document.querySelectorAll('.tab-btn');
+      const tabContents = document.querySelectorAll('.tab-content');
+
+      function activateTab(targetId) {
+        tabContents.forEach(tc => tc.classList.toggle('hidden', tc.id !== targetId));
+        tabButtons.forEach(btn => {
+          const isActive = btn.dataset.target === targetId;
+          btn.classList.toggle('bg-secondaryColor', isActive);
+          btn.classList.toggle('text-white', isActive);
+          btn.classList.toggle('bg-neutral-900', !isActive);
+          btn.classList.toggle('text-neutral-400', !isActive);
+        });
+      }
+
+      tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => activateTab(btn.dataset.target));
+      });
+
+      // ================================================================
+      // 4. CONFIGURACIÓN INTERNACIONAL (etiquetas)
+      // ================================================================
+      const countryConfig = {
+        JP: { stateLabel: 'Prefectura', cityLabel: 'Municipio', neighborhoodLabel: 'Distrito / Chome', streetLabel: 'Bloque', heightLabel: 'Nº Edificio', showStation: true },
+        KR: { stateLabel: 'Do / Provincia', cityLabel: 'Si / Ciudad', neighborhoodLabel: 'Gu / Distrito', streetLabel: 'Calle / Bloque', heightLabel: 'Número', showStation: false },
+        CN: { stateLabel: 'Provincia', cityLabel: 'Ciudad', neighborhoodLabel: 'Distrito', streetLabel: 'Calle', heightLabel: 'Número', showStation: false },
+        RU: { stateLabel: 'Óblast / Krai', cityLabel: 'Ciudad', neighborhoodLabel: 'Distrito', streetLabel: 'Calle', heightLabel: 'Número', showStation: false },
+        DE: { stateLabel: 'Bundesland', cityLabel: 'Stadt', neighborhoodLabel: 'Stadtteil', streetLabel: 'Straße', heightLabel: 'Hausnummer', showStation: false },
+        GB: { stateLabel: 'Condado', cityLabel: 'Ciudad', neighborhoodLabel: 'Distrito', streetLabel: 'Calle', heightLabel: 'Número', showStation: true },
+        FR: { stateLabel: 'Région', cityLabel: 'Ville', neighborhoodLabel: 'Quartier', streetLabel: 'Rue', heightLabel: 'Numéro', showStation: true },
+        US: { stateLabel: 'Estado', cityLabel: 'Ciudad', neighborhoodLabel: 'Barrio', streetLabel: 'Calle', heightLabel: 'Número', showStation: false },
+        default: { stateLabel: 'Provincia / Estado', cityLabel: 'Ciudad / Localidad', neighborhoodLabel: 'Barrio / Comuna', streetLabel: 'Calle / Avenida', heightLabel: 'Altura / Número', showStation: false }
+      };
+
+      function adaptInterfaceToCountry(code) {
+        const config = countryConfig[code] || countryConfig.default;
+        $('label-state').innerText = config.stateLabel;
+        $('label-city').innerText = config.cityLabel;
+        $('label-neighborhood').innerText = config.neighborhoodLabel;
+        $('label-street').innerText = config.streetLabel;
+        $('label-height').innerText = config.heightLabel;
+        if (config.showStation) wrapperStation.classList.remove('hidden');
+        else wrapperStation.classList.add('hidden');
+      }
+
+      // ================================================================
+      // 5. FUNCIONES DE CARGA DE ESTADOS Y CIUDADES (vía countries-browser)
+      // ================================================================
+
+      // Cargar TODAS las provincias/estados reales del país seleccionado
+      async function loadStates(countryCode) {
+        selectState.innerHTML = '<option value="">Cargando provincias...</option>';
+        selectState.disabled = true;
+        stateError.classList.add('hidden');
+        state.statesByName = new Map();
+
+        try {
+          const rawStates = await getStatesOfCountry(countryCode) || [];
+          if (rawStates.length === 0) {
+            // País sin subdivisiones administrativas (ej. ciudades-estado
+            // como Mónaco, Singapur, Vaticano): usamos el propio país como
+            // única "provincia" para poder seguir el flujo hasta el final.
+            populateStateSelect([{ name: 'N/A (Sin provincias)', isoCode: '' }]);
+            return;
+          }
+          const states = rawStates.map(s => ({ name: s.name, isoCode: s.iso2 }));
+          states.sort((a, b) => a.name.localeCompare(b.name));
+          populateStateSelect(states);
+        } catch (err) {
+          console.warn('Error cargando provincias:', err);
+          stateError.classList.remove('hidden');
+          selectState.innerHTML = '<option value="">Error al cargar provincias</option>';
+          selectState.disabled = true;
+        }
+      }
+
+      // Cargar TODAS las ciudades reales de la provincia/estado seleccionado
+      async function loadCities(stateName, countryCode) {
+        selectCity.innerHTML = '<option value="">Cargando ciudades...</option>';
+        selectCity.disabled = true;
+        cityError.classList.add('hidden');
+
+        const stateIso = state.statesByName.get(stateName);
+
+        // Caso "N/A (Sin provincias)": no hay código de estado real
+        if (!stateIso) {
+          populateCitySelect([{ name: 'N/A (Sin ciudades registradas)' }]);
+          return;
+        }
+
+        try {
+          const rawCities = await getCitiesOfState(countryCode, stateIso) || [];
+          if (rawCities.length === 0) {
+            cityError.classList.remove('hidden');
+            selectCity.innerHTML = '<option value="">No hay ciudades disponibles</option>';
+            selectCity.disabled = true;
+            return;
+          }
+          const cities = rawCities.map(c => ({ name: c.name }));
+          cities.sort((a, b) => a.name.localeCompare(b.name));
+          populateCitySelect(cities);
+        } catch (err) {
+          console.warn('Error cargando ciudades:', err);
+          cityError.classList.remove('hidden');
+          selectCity.innerHTML = '<option value="">Error al cargar ciudades</option>';
+          selectCity.disabled = true;
+        }
+      }
+
+      function populateStateSelect(list) {
+        selectState.innerHTML = '<option value="">Seleccione una Provincia...</option>';
+        state.statesByName = new Map();
+        list.forEach(s => {
+          state.statesByName.set(s.name, s.isoCode || '');
+          const opt = document.createElement('option');
+          opt.value = s.name;
+          opt.innerText = s.name.toUpperCase();
+          selectState.appendChild(opt);
+        });
+        selectState.disabled = false;
+        stateError.classList.add('hidden');
+        // Resetear ciudad
+        selectCity.innerHTML = '<option value="">Seleccione una Provincia primero...</option>';
+        selectCity.disabled = true;
+        wrapperNeighborhood.classList.add('hidden');
+        wrapperStreet.classList.add('hidden');
+        addressPreview.classList.add('hidden');
+      }
+
+      function populateCitySelect(list) {
+        selectCity.innerHTML = '<option value="">Seleccione una Localidad...</option>';
+        list.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.name;
+          opt.innerText = c.name.toUpperCase();
+          selectCity.appendChild(opt);
+        });
+        selectCity.disabled = false;
+        cityError.classList.add('hidden');
+        wrapperNeighborhood.classList.remove('hidden');
+        wrapperStreet.classList.remove('hidden');
+      }
+
+      // ================================================================
+      // 6. SELECCIÓN DE PAÍS
+      // ================================================================
+      async function selectCountry(c) {
+        searchCountry.value = c.name;
+        inputCountry.value = c.name;
+        inputCountryCode.value = c.isoCode;
+        suggestCountry.classList.add('hidden');
+        countryError.classList.add('hidden');
+
+        adaptInterfaceToCountry(c.isoCode);
+        await loadStates(c.isoCode);
+        // Resetear ciudad
+        selectCity.innerHTML = '<option value="">Seleccione una Provincia primero...</option>';
+        selectCity.disabled = true;
+        wrapperNeighborhood.classList.add('hidden');
+        wrapperStreet.classList.add('hidden');
+        addressPreview.classList.add('hidden');
+        validateForm();
+      }
+
+      // ================================================================
+      // 7. AUTOCOMPLETADO DE PAÍS (todos los países)
+      // ================================================================
+      function renderCountrySuggestions(filter = '') {
+        suggestCountry.innerHTML = '';
+        const query = filter.trim().toLowerCase();
+        let list = state.countries;
+        if (query.length > 0) {
+          list = list.filter(c => c.name.toLowerCase().includes(query));
+        }
+        if (list.length === 0) {
+          suggestCountry.classList.add('hidden');
+          return;
+        }
+        list.forEach(c => {
+          const row = document.createElement('div');
+          row.className = "p-2.5 text-[10px] text-neutral-300 hover:bg-neutral-900 cursor-pointer uppercase font-bold transition-colors";
+          row.innerText = c.name;
+          row.addEventListener('click', () => selectCountry(c));
+          suggestCountry.appendChild(row);
+        });
+        suggestCountry.classList.remove('hidden');
+      }
+
+      searchCountry.addEventListener('focus', () => {
+        if (state.countries.length > 0) renderCountrySuggestions('');
+      });
+
+      searchCountry.addEventListener('input', () => {
+        const val = searchCountry.value.trim();
+        if (val.length === 0) {
+          suggestCountry.classList.add('hidden');
+          countryError.classList.add('hidden');
+          return;
+        }
+        renderCountrySuggestions(val);
+      });
+
+      searchCountry.addEventListener('blur', () => {
+        setTimeout(() => {
+          suggestCountry.classList.add('hidden');
+          const entered = searchCountry.value.trim();
+          const found = state.countries.some(c => c.name.toLowerCase() === entered.toLowerCase());
+          if (entered && !found) {
+            countryError.classList.remove('hidden');
+          } else {
+            countryError.classList.add('hidden');
+          }
+        }, 200);
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#search-country') && !e.target.closest('#suggest-country')) {
+          suggestCountry.classList.add('hidden');
+        }
+      });
+
+      // ================================================================
+      // 8. EVENTOS DE ESTADO Y CIUDAD
+      // ================================================================
+      selectState.addEventListener('change', async () => {
+        const stateName = selectState.value;
+        const countryCode = inputCountryCode.value;
+        if (stateName && countryCode) {
+          await loadCities(stateName, countryCode);
+          validateForm();
+        } else {
+          selectCity.innerHTML = '<option value="">Seleccione una Provincia primero...</option>';
+          selectCity.disabled = true;
+          wrapperNeighborhood.classList.add('hidden');
+          wrapperStreet.classList.add('hidden');
+          addressPreview.classList.add('hidden');
+          validateForm();
+        }
+      });
+
+      selectCity.addEventListener('change', () => {
+        if (selectCity.value) {
+          wrapperNeighborhood.classList.remove('hidden');
+          wrapperStreet.classList.remove('hidden');
+          searchNeighborhood.value = '';
+          inputNeighborhood.value = '';
+          searchStreet.value = '';
+          inputStreet.value = '';
+          inputHeight.value = '';
+          searchStation.value = '';
+        } else {
+          wrapperNeighborhood.classList.add('hidden');
+          wrapperStreet.classList.add('hidden');
+        }
+        validateForm();
+      });
+
+      // ================================================================
+      // 9. BUSCADORES DINÁMICOS (barrio, estación, calle) con Nominatim
+      // ================================================================
+      const nominatimCache = new Map();
+      const DEBOUNCE_DELAY = 300;
+
+      function createSuggestionHandler(inputEl, suggestEl, queryUrl, onSelect, filterFn = null) {
+        let debounceTimer;
+        inputEl.addEventListener('input', () => {
+          clearTimeout(debounceTimer);
+          const val = inputEl.value.trim();
+          if (val.length < 2) {
+            suggestEl.classList.add('hidden');
+            return;
+          }
+          debounceTimer = setTimeout(async () => {
+            const cacheKey = queryUrl(val);
+            if (nominatimCache.has(cacheKey)) {
+              renderSuggestions(nominatimCache.get(cacheKey), suggestEl, onSelect);
+              return;
+            }
+            try {
+              const res = await fetch(cacheKey, { headers: { 'User-Agent': 'Luxerium/6.0' } });
+              let data = await res.json();
+              if (filterFn) data = data.filter(filterFn);
+              nominatimCache.set(cacheKey, data);
+              renderSuggestions(data, suggestEl, onSelect);
+            } catch {
+              suggestEl.classList.add('hidden');
+            }
+          }, DEBOUNCE_DELAY);
+        });
+      }
+
+      function renderSuggestions(data, suggestEl, onSelect) {
+        suggestEl.innerHTML = '';
+        if (data.length === 0) {
+          suggestEl.classList.add('hidden');
+          return;
+        }
+        suggestEl.classList.remove('hidden');
+        data.slice(0, 5).forEach(item => {
+          const row = document.createElement('div');
+          row.className = "p-2.5 text-[10px] text-neutral-300 hover:bg-neutral-900 cursor-pointer uppercase font-bold transition-colors";
+          row.innerText = item.display_name;
+          row.addEventListener('click', () => {
+            onSelect(item);
+            suggestEl.classList.add('hidden');
+          });
+          suggestEl.appendChild(row);
+        });
+      }
+
+      // Barrio
+      createSuggestionHandler(
+        searchNeighborhood,
+        suggestNeighborhood,
+        (q) => `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(q + ' ' + (selectCity.value || '') + ' ' + inputCountry.value)}&accept-language=es&limit=5`,
+        (item) => {
+          const name = item.address?.suburb || item.address?.neighbourhood || item.address?.quarter || item.display_name.split(',')[0];
+          searchNeighborhood.value = name;
+          inputNeighborhood.value = name;
+          $('input-postal').value = item.address?.postcode || 'N/A';
+          $('input-latitude').value = item.lat;
+          $('input-longitude').value = item.lon;
+          updateAddressPreview();
+          validateForm();
+        },
+        (item) => !['city', 'state', 'country', 'province', 'region'].includes(item.addresstype)
+      );
+
+      // Estación
+      createSuggestionHandler(
+        searchStation,
+        suggestStation,
+        (q) => `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(q + ' station ' + (selectCity.value || '') + ' ' + inputCountry.value)}&accept-language=es&limit=5`,
+        (item) => {
+          const name = item.address?.railway || item.address?.station || item.display_name.split(',')[0];
+          searchStation.value = name;
+          inputStation.value = name;
+          updateAddressPreview();
+        },
+        (item) => item.class === 'railway' || item.type === 'station' || item.address?.railway
+      );
+
+      // Calle
+      createSuggestionHandler(
+        searchStreet,
+        suggestStreet,
+        (q) => `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(q + ' ' + (selectCity.value || '') + ' ' + (selectState.value || '') + ' ' + inputCountry.value)}&accept-language=es&limit=5`,
+        (item) => {
+          const road = item.address?.road || item.display_name.split(',')[0];
+          searchStreet.value = road;
+          inputStreet.value = road;
+          if (!inputNeighborhood.value) {
+            const hood = item.address?.suburb || item.address?.neighbourhood || 'Centro';
+            searchNeighborhood.value = hood;
+            inputNeighborhood.value = hood;
+          }
+          $('input-postal').value = item.address?.postcode || 'N/A';
+          $('input-latitude').value = item.lat;
+          $('input-longitude').value = item.lon;
+          updateAddressPreview();
+          validateForm();
+        },
+        (item) => item.addresstype === 'road' || item.addresstype === 'street'
+      );
+
+      // ================================================================
+      // 10. ALTURA, PREVISUALIZACIÓN, ESTIMADOR
+      // ================================================================
+      inputHeight.addEventListener('input', () => {
+        updateAddressPreview();
+        calculatePrediction();
+        validateForm();
+      });
+
+      function updateAddressPreview() {
+        const street = inputStreet.value;
+        const height = inputHeight.value.trim();
+        const country = inputCountry.value;
+        const stateVal = selectState.value;
+        const city = selectCity.value;
+        const neighborhood = inputNeighborhood.value || 'Centro';
+        const postal = $('input-postal').value || 'N/A';
+        const station = searchStation.value;
+        const code = inputCountryCode.value.toUpperCase();
+        const isJapan = code === 'JP';
+
+        if (isJapan) {
+          if (stateVal && city && neighborhood) {
+            document.getElementById('preview-address').innerText = `${stateVal}, ${city}, ${neighborhood}`;
+            document.getElementById('preview-details').innerText = `${street ? 'Bloque: ' + street : ''} ${height ? 'Nº: ' + height : ''} ${station ? '(Estación: ' + station + ')' : ''} | CP: ${postal} | ${country}`;
+            addressPreview.classList.remove('hidden');
+          } else {
+            addressPreview.classList.add('hidden');
+          }
+        } else {
+          if (street && height && stateVal && city) {
+            document.getElementById('preview-address').innerText = `${street} ${height}`;
+            document.getElementById('preview-details').innerText = `Barrio: ${neighborhood} | Localidad: ${city} | Provincia: ${stateVal} | CP: ${postal} | ${country}`;
+            addressPreview.classList.remove('hidden');
+          } else {
+            addressPreview.classList.add('hidden');
+          }
+        }
+      }
+
+      function calculatePrediction() {
+        const area = Number(totalArea.value) || 0;
+        const orientation = selectOrientation.value;
+        const floor = Number(inputFloor.value) || 1;
+        const hood = inputNeighborhood.value || "";
+        if (area <= 0) return;
+
+        let base = 2200;
+        if (hood.toLowerCase().includes('palermo')) base = 3100;
+        if (hood.toLowerCase().includes('recoleta')) base = 3400;
+        if (hood.toLowerCase().includes('shibuya')) base = 8500;
+        if (hood.toLowerCase().includes('shinjuku')) base = 7800;
+
+        let mult = 1.0;
+        if (orientation === 'norte') mult = 1.08;
+        if (floor > 5) mult *= 1.05;
+
+        const result = Math.round(area * base * mult);
+        document.getElementById('estimated-price').innerText = new Intl.NumberFormat('es-AR').format(result);
+        document.getElementById('estimated-m2').innerText = `~ USD ${base}/m² en ${hood || 'Zona'}`;
+      }
+
+      totalArea.addEventListener('input', calculatePrediction);
+      selectOrientation.addEventListener('change', calculatePrediction);
+      inputFloor.addEventListener('input', calculatePrediction);
+
+      // ================================================================
+      // 11. VALIDACIÓN
+      // ================================================================
+      function validateForm() {
+        const countryVal = inputCountry.value;
+        const countryOk = countryVal && state.countries.some(c => c.name.toLowerCase() === countryVal.toLowerCase());
+
+        const stateOk = selectState.value && selectState.value !== '';
+        const cityOk = selectCity.value && selectCity.value !== '';
+
+        const code = inputCountryCode.value.toUpperCase();
+        const isJapan = code === 'JP';
+        const streetOk = isJapan ? true : (inputStreet.value && inputStreet.value.trim() !== '');
+        const heightOk = isJapan ? true : (inputHeight.value && inputHeight.value.trim() !== '');
+        const neighborhoodOk = isJapan ? (inputNeighborhood.value && inputNeighborhood.value.trim() !== '') : true;
+        const addressOk = (streetOk && heightOk && neighborhoodOk) || (isJapan && neighborhoodOk);
+
+        const typeOk = selectType.value && selectType.value !== '';
+        const areaOk = Number(totalArea.value) > 0;
+
+        const status = selectStatus.value;
+        let priceOk = false;
+        if (status === 'sale') {
+          priceOk = inputPrice.value && inputPrice.value.replace(/\D/g, '').length > 0;
+        } else {
+          priceOk = inputRentalPrice.value && inputRentalPrice.value.replace(/\D/g, '').length > 0;
+        }
+
+        const ready = countryOk && stateOk && cityOk && addressOk && typeOk && areaOk && priceOk;
+
+        countryError.classList.toggle('hidden', countryOk);
+        stateError.classList.toggle('hidden', stateOk);
+        cityError.classList.toggle('hidden', cityOk);
+        $('area-error').classList.toggle('hidden', areaOk);
+        $('type-error').classList.toggle('hidden', typeOk);
+        $('price-error').classList.toggle('hidden', !(status === 'sale' && !priceOk));
+        $('rent-error').classList.toggle('hidden', !(status === 'rent' && !priceOk));
+
+        if (ready) {
+          btnSubmit.disabled = false;
+          btnSubmit.classList.replace('bg-neutral-800', 'bg-secondaryColor');
+          btnSubmit.classList.replace('text-neutral-500', 'text-white');
+          btnSubmit.classList.replace('cursor-not-allowed', 'cursor-pointer');
+          btnSubmit.classList.remove('border-neutral-700/50');
+          btnSubmit.innerText = "Guardar y Publicar Ficha de Propiedad";
+        } else {
+          btnSubmit.disabled = true;
+          btnSubmit.classList.replace('bg-secondaryColor', 'bg-neutral-800');
+          btnSubmit.classList.replace('text-white', 'text-neutral-500');
+          btnSubmit.classList.replace('cursor-pointer', 'cursor-not-allowed');
+          btnSubmit.classList.add('border-neutral-700/50');
+          btnSubmit.innerText = "Guardar y Publicar Ficha (Complete los campos obligatorios)";
+        }
+      }
+
+      document.querySelectorAll('#form-listing input, #form-listing select, #form-listing textarea').forEach(el => {
+        el.addEventListener('change', validateForm);
+        el.addEventListener('input', validateForm);
+      });
+
+      // ================================================================
+      // 12. LÓGICA DE TIPO DE OPERACIÓN Y TIPOLOGÍA
+      // ================================================================
+      selectStatus.addEventListener('change', (e) => {
+        if (e.target.value === 'sale') {
+          boxSale.classList.remove('opacity-40');
+          inputPrice.disabled = false;
+          boxRent.classList.add('opacity-40');
+          inputRentalPrice.disabled = true;
+          inputRentalPrice.value = '';
+          selectRentalCurrency.disabled = true;
+        } else {
+          boxRent.classList.remove('opacity-40');
+          inputRentalPrice.disabled = false;
+          selectRentalCurrency.disabled = false;
+          boxSale.classList.add('opacity-40');
+          inputPrice.disabled = true;
+          inputPrice.value = '';
+        }
+        validateForm();
+      });
+
+      selectType.addEventListener('change', (e) => {
+        const key = e.target.value;
+        selectSubtype.innerHTML = '<option value="">Seleccionar Subtipo...</option>';
+        if (!key) {
+          selectSubtype.disabled = true;
+          validateForm();
+          return;
+        }
+        if (key === 'house') {
+          groupBuilding.classList.add('hidden');
+          groupPrivate.classList.remove('hidden');
+          unitSpecSection.classList.add('hidden');
+          residentialSpecs.classList.remove('opacity-30', 'pointer-events-none');
+        } else if (key === 'apartment') {
+          groupBuilding.classList.remove('hidden');
+          groupPrivate.classList.remove('hidden');
+          unitSpecSection.classList.remove('hidden');
+          residentialSpecs.classList.remove('opacity-30', 'pointer-events-none');
+        } else if (key === 'land') {
+          groupBuilding.classList.add('hidden');
+          groupPrivate.classList.add('hidden');
+          unitSpecSection.classList.add('hidden');
+          residentialSpecs.classList.add('opacity-30', 'pointer-events-none');
+        } else {
+          groupBuilding.classList.remove('hidden');
+          groupPrivate.classList.remove('hidden');
+        }
+        const subTypes = realEstateTypes[key]?.types || {};
+        Object.entries(subTypes).forEach(([subKey, subType]) => {
+          if (subKey === 'studio') return;
+          const opt = document.createElement('option');
+          opt.value = subKey;
+          opt.innerText = subType.title;
+          selectSubtype.appendChild(opt);
+        });
+        selectSubtype.disabled = false;
+        validateForm();
+      });
+
+      // ================================================================
+      // 13. INICIALIZACIÓN
+      // ================================================================
+      window.addEventListener('DOMContentLoaded', async () => {
+        // Cargar TODOS los países reales (250+), no un subconjunto
+        try {
+          const rawCountries = await getCountries();
+          state.countries = rawCountries.map(c => ({ name: c.name, isoCode: c.iso2 }));
+          state.countries.sort((a, b) => a.name.localeCompare(b.name));
+          console.log(`✅ ${state.countries.length} países cargados`);
+        } catch (err) {
+          if (err instanceof NetworkError) {
+            console.error(`Falló la carga de países desde el CDN: ${err.statusCode} en ${err.url}`);
+          } else {
+            console.error('Falló la carga de países:', err);
+          }
+          countryError.classList.remove('hidden');
+          countryError.innerText = 'No se pudieron cargar los países. Revisá tu conexión y recargá la página.';
+          state.countries = [];
+        }
+
+        // Si ya había un país seleccionado (ej. edición), cargarlo
+        if (inputCountry.value) {
+          const found = state.countries.find(c => c.name.toLowerCase() === inputCountry.value.toLowerCase());
+          if (found) selectCountry(found);
+        }
+        validateForm();
+
+        // Limpiar parámetros URL
+        const url = new URL(window.location.href);
+        if (url.searchParams.has('success') || url.searchParams.has('error')) {
+          url.searchParams.delete('success');
+          url.searchParams.delete('error');
+          window.history.replaceState({}, document.title, url.pathname);
+        }
+      });
+    </script>
+  </body>
+</html>

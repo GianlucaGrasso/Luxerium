@@ -1,64 +1,319 @@
 ---
+// src/playground/playground-components/Filters.astro
+import { MarketFilters } from "../../ui/marketFilter-ui/marketFilters.js";
+
+const realEstateTypes = MarketFilters.realEstate.types;
 ---
 
-<header class="flex m-auto w-fit">
-    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-1 sm:gap-2 md:gap-4 lg:gap-10 p-2 flex-row justify-between uppercase">
-      <!-- Property Type -->
-      <select
-        id="filterType"
-        class="bg-primaryColor text-terciaryColor font-secondaryFont p-2 rounded-2xl w-full appearance-none cursor-pointer uppercase flex"
-        > 
-        <option value="">All Types ▼</option> 
-        <option value="Apartment">Apartment</option>
-        <option value="House">House</option>
-        <option value="Condo">Condo</option>
+<header 
+  class="w-full bg-neutral-900 border-b border-primaryColor p-3 z-40 relative"
+  id="filters-header"
+  data-types={JSON.stringify(realEstateTypes)}
+>
+  <div class="max-w-7xl mx-auto flex flex-col gap-3">
+    
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2.5 items-end uppercase font-secondaryFont text-[10px] font-bold">
+      
+      <div class="flex flex-col gap-1">
+        <label class="text-primaryColor/50 tracking-wider">Tipo</label>
+        <select
+          id="filterType"
+          class="bg-neutral-950 border border-neutral-800 text-primaryColor p-2 rounded-xl w-full cursor-pointer focus:border-secondaryColor transition-colors uppercase"
+        >
+          <option value="">Todos los Tipos</option>
+          {Object.entries(realEstateTypes).map(([key, val]) => (
+            <option value={key}>{val.title}</option>
+          ))}
+        </select>
+      </div>
 
-      </select>
-  
-      <!-- Bedrooms -->
-      <select
-        id="filterBeds"
-        class="bg-primaryColor text-terciaryColor font-secondaryFont p-2 rounded-2xl w-full appearance-none cursor-pointer uppercase"
-      >
-        <option value="">Any Beds</option>
-        <option value="1">1+</option>
-        <option value="2">2+</option>
-        <option value="3">3+</option>
-        <option value="4">4+</option>
-      </select>
-  
-      <!-- Price Range -->
-      <select
-        id="filterPrice"
-        class="bg-primaryColor text-terciaryColor font-secondaryFont p-2 rounded-2xl w-full appearance-none cursor-pointer uppercase"
-      >
-        <option value="">Any Price</option>
-        <option value="250000">≤ $250K</option>
-        <option value="500000">≤ $500K</option>
-        <option value="1000000">≤ $1M</option>
-        <option value="15000000">≤ $1.5M</option>
-        <option value="2000000">≤ $2M</option>
-      </select>
+      <div class="flex flex-col gap-1">
+        <label class="text-primaryColor/50 tracking-wider">Subtipo</label>
+        <select
+          id="filterSubtype"
+          disabled
+          class="bg-neutral-950 border border-neutral-800 text-primaryColor p-2 rounded-xl w-full cursor-pointer focus:border-secondaryColor transition-colors uppercase disabled:opacity-40"
+        >
+          <option value="">Seleccionar Tipo...</option>
+        </select>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-primaryColor/50 tracking-wider">Dormitorios</label>
+        <select
+          id="filterBeds"
+          class="bg-neutral-950 border border-neutral-800 text-primaryColor p-2 rounded-xl w-full cursor-pointer focus:border-secondaryColor transition-colors uppercase"
+        >
+          <option value="">Cualquiera</option>
+          <option value="1">1+</option>
+          <option value="2">2+</option>
+          <option value="3">3+</option>
+          <option value="4">4+</option>
+        </select>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-primaryColor/50 tracking-wider">Baños</label>
+        <select
+          id="filterBaths"
+          class="bg-neutral-950 border border-neutral-800 text-primaryColor p-2 rounded-xl w-full cursor-pointer focus:border-secondaryColor transition-colors uppercase"
+        >
+          <option value="">Cualquiera</option>
+          <option value="1">1+</option>
+          <option value="2">2+</option>
+          <option value="3">3+</option>
+        </select>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-primaryColor/50 tracking-wider">Estado</label>
+        <select
+          id="filterStatus"
+          class="bg-neutral-950 border border-neutral-800 text-primaryColor p-2 rounded-xl w-full cursor-pointer focus:border-secondaryColor transition-colors uppercase"
+        >
+          <option value="">Todos</option>
+          <option value="rent">Rent</option>
+          <option value="sale">Sale</option>
+        </select>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-primaryColor/50 tracking-wider">Precio</label>
+        <button
+          id="btnTogglePriceDropdown"
+          type="button"
+          class="bg-neutral-950 border border-neutral-800 text-primaryColor p-2 rounded-xl w-full text-left flex justify-between items-center transition-colors hover:border-neutral-700"
+        >
+          <span id="priceLabel" class="truncate">Cualquier precio</span>
+          <span class="text-[8px] text-primaryColor/40">▼</span>
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-primaryColor/50 tracking-wider">Ver Mapa</label>
+        <button
+          id="btnToggleMapGlobal"
+          type="button"
+          class="w-full bg-secondaryColor hover:bg-secondaryColor/90 text-white p-2 rounded-xl flex items-center justify-center gap-1.5 transition-all font-bold tracking-wider"
+        >
+          <svg id="icon-map-hide" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+          </svg>
+          <svg id="icon-map-show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5 hidden">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.446 6-1.9c.614-.194 1-.725 1-1.368V4.735c0-.643-.386-1.174-1-1.368l-6 1.9c-.3.095-.7.095-1 0L9.503 3.367a1.498 1.498 0 0 0-1 0l-6 1.9A1.498 1.498 0 0 0 1.5 6.633v12.898c0 .643.386 1.174 1 1.368l6-1.9c.3-.095.7-.095 1 0Z" />
+          </svg>
+          <span id="textMapToggle" class="truncate">Ocultar</span>
+        </button>
+      </div>
+
     </div>
-  </header>
+
+    <div id="priceDropdown" class="hidden absolute left-4 right-4 top-full mt-1 bg-neutral-950 border border-neutral-800 p-4 rounded-2xl z-50 shadow-2xl">
+      <div class="flex justify-between items-center mb-3">
+        <h4 class="text-[10px] font-bold text-primaryColor uppercase tracking-wider">Distribución de Precios (USD)</h4>
+        <button id="btnClosePriceDropdown" class="text-primaryColor/50 hover:text-primaryColor text-[9px] font-bold uppercase">Listo</button>
+      </div>
+      
+      <div class="flex items-end gap-[2px] h-16 w-full bg-neutral-900/40 rounded-lg p-1.5 border border-neutral-800/40 relative overflow-hidden mb-3" id="priceHistogram">
+        <div class="absolute inset-0 flex items-center justify-center text-[9px] uppercase font-bold tracking-widest text-primaryColor/30" id="histogramLoader">
+          Cargando distribución...
+        </div>
+      </div>
+
+      <div>
+        <input 
+          type="range" 
+          id="priceSlider" 
+          min="0" 
+          max="5000000" 
+          step="25000" 
+          value="5000000" 
+          class="w-full accent-secondaryColor cursor-pointer bg-neutral-800 rounded-lg h-1.5 appearance-none"
+        />
+        <div class="flex justify-between items-center mt-2 text-[9px] font-bold text-primaryColor/40 uppercase">
+          <span>Min: $0</span>
+          <span class="text-secondaryColor font-bold text-[10px]" id="sliderCurrentVal">Max: Cualquier precio</span>
+          <span>Max: $5M+</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</header>
+
+<script>
+  import { supabase } from '../../infrastructure/supabase';
+
+  const header = document.getElementById("filters-header");
+  const realEstateTypes = header && header.getAttribute("data-types") 
+    ? JSON.parse(header.getAttribute("data-types")!) 
+    : {};
+
+  const typeSelect = document.getElementById("filterType") as HTMLSelectElement | null;
+  const subtypeSelect = document.getElementById("filterSubtype") as HTMLSelectElement | null;
+  const bedsSelect = document.getElementById("filterBeds") as HTMLSelectElement | null;
+  const bathsSelect = document.getElementById("filterBaths") as HTMLSelectElement | null;
+  const statusSelect = document.getElementById("filterStatus") as HTMLSelectElement | null;
   
-  <script>
-    const typeSelect = document.getElementById("filterType") as HTMLSelectElement;
-    const bedsSelect = document.getElementById("filterBeds") as HTMLSelectElement;
-    const priceSelect = document.getElementById("filterPrice") as HTMLSelectElement;
-  
-    function updateFilters() {
-      const params = new URLSearchParams(window.location.search);
-      params.set("type", typeSelect.value);
-      params.set("beds", bedsSelect.value);
-      params.set("maxPrice", priceSelect.value);
-      history.replaceState(null, "", `?${params.toString()}`);
-  
-      // Disparar evento global para que Proplist lo escuche
-      window.dispatchEvent(new Event("filterUpdated"));
+  const btnTogglePriceDropdown = document.getElementById("btnTogglePriceDropdown");
+  const priceDropdown = document.getElementById("priceDropdown");
+  const btnClosePriceDropdown = document.getElementById("btnClosePriceDropdown");
+  const priceSlider = document.getElementById("priceSlider") as HTMLInputElement | null;
+  const priceLabel = document.getElementById("priceLabel");
+  const sliderCurrentVal = document.getElementById("sliderCurrentVal");
+  const priceHistogram = document.getElementById("priceHistogram");
+  const histogramLoader = document.getElementById("histogramLoader");
+
+  const btnToggleMapGlobal = document.getElementById("btnToggleMapGlobal");
+  const iconMapHide = document.getElementById("icon-map-hide");
+  const iconMapShow = document.getElementById("icon-map-show");
+  const textMapToggle = document.getElementById("textMapToggle");
+
+  let mapOpen = true;
+
+  // 1. Lógica de Apertura del Dropdown de Precio
+  btnTogglePriceDropdown?.addEventListener("click", () => {
+    priceDropdown?.classList.toggle("hidden");
+  });
+
+  btnClosePriceDropdown?.addEventListener("click", () => {
+    priceDropdown?.classList.add("hidden");
+  });
+
+  // Cerrar si hacen click afuera
+  document.addEventListener("click", (e) => {
+    if (priceDropdown && btnTogglePriceDropdown) {
+      const target = e.target as HTMLElement;
+      if (!priceDropdown.contains(target) && !btnTogglePriceDropdown.contains(target)) {
+        priceDropdown.classList.add("hidden");
+      }
     }
-  
-    typeSelect.addEventListener("change", updateFilters);
-    bedsSelect.addEventListener("change", updateFilters);
-    priceSelect.addEventListener("change", updateFilters);
-  </script>
+  });
+
+  // 2. Control del Slider
+  priceSlider?.addEventListener("input", (e) => {
+    const val = Number((e.target as HTMLInputElement).value);
+    if (val >= 5000000) {
+      if (priceLabel) priceLabel.innerText = "Cualquier precio";
+      if (sliderCurrentVal) sliderCurrentVal.innerText = "Max: Cualquier precio";
+    } else {
+      const formatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
+      if (priceLabel) priceLabel.innerText = `≤ ${formatted}`;
+      if (sliderCurrentVal) sliderCurrentVal.innerText = `Max: ${formatted}`;
+    }
+    updateFilters();
+  });
+
+  // 3. Selección dinámica de Subtipos
+  typeSelect?.addEventListener("change", () => {
+    const selectedTypeKey = typeSelect.value;
+    
+    if (subtypeSelect) {
+      subtypeSelect.innerHTML = '<option value="">Todos los Subtipos</option>';
+
+      if (!selectedTypeKey || !realEstateTypes[selectedTypeKey]) {
+        subtypeSelect.disabled = true;
+        updateFilters();
+        return;
+      }
+
+      const subTypesObj = realEstateTypes[selectedTypeKey].types;
+      Object.entries(subTypesObj).forEach(([subKey, subVal]: [string, any]) => {
+        const opt = document.createElement("option");
+        opt.value = subKey;
+        opt.innerText = subVal.title;
+        subtypeSelect.appendChild(opt);
+      });
+
+      subtypeSelect.disabled = false;
+    }
+    updateFilters();
+  });
+
+  // 4. Carga e Histograma de Precios de Supabase
+  async function fetchAndBuildHistogram() {
+    try {
+      const { data, error } = await supabase.from('listingsRealEstate').select('price');
+      if (error) throw error;
+      if (histogramLoader) histogramLoader.remove();
+
+      const prices = data?.map(p => p.price).filter(p => p != null && p > 0) || [];
+      if (prices.length === 0 || !priceHistogram) return;
+
+      const binCount = 20;
+      const maxLimit = 5000000;
+      const binWidth = maxLimit / binCount;
+      const bins = Array(binCount).fill(0);
+
+      prices.forEach(price => {
+        const binIndex = Math.floor(price / binWidth);
+        if (binIndex >= 0 && binIndex < binCount) bins[binIndex]++;
+        else if (price >= maxLimit) bins[binCount - 1]++;
+      });
+
+      const maxFrequency = Math.max(...bins);
+      priceHistogram.innerHTML = '';
+
+      bins.forEach((freq) => {
+        const bar = document.createElement('div');
+        const heightPercent = maxFrequency > 0 ? (freq / maxFrequency) * 100 : 0;
+        bar.className = "flex-1 bg-neutral-800 rounded-t-[2px] transition-all duration-300 relative group";
+        bar.style.height = `${Math.max(heightPercent, 5)}%`;
+        priceHistogram.appendChild(bar);
+      });
+    } catch (err) {
+      console.error("Error al cargar histograma:", err);
+    }
+  }
+
+  // 5. Visibilidad Global del Mapa
+  btnToggleMapGlobal?.addEventListener("click", () => {
+    mapOpen = !mapOpen;
+    window.dispatchEvent(new CustomEvent('map:visibilityChanged', {
+      detail: { visible: mapOpen }
+    }));
+  });
+
+  window.addEventListener('map:visibilityChanged', (e: any) => {
+    mapOpen = e.detail.visible;
+    if (mapOpen) {
+      iconMapHide?.classList.remove("hidden");
+      iconMapShow?.classList.add("hidden");
+      if (textMapToggle) textMapToggle.innerText = "Ocultar";
+    } else {
+      iconMapHide?.classList.add("hidden");
+      iconMapShow?.classList.remove("hidden");
+      if (textMapToggle) textMapToggle.innerText = "Ver Mapa";
+    }
+  });
+
+  // 6. Actualizar Parámetros URL y Notificar
+  function updateFilters() {
+    const params = new URLSearchParams(window.location.search);
+    
+    if (typeSelect?.value) params.set("type", typeSelect.value); else params.delete("type");
+    if (subtypeSelect?.value) params.set("subtype", subtypeSelect.value); else params.delete("subtype");
+    if (bedsSelect?.value) params.set("beds", bedsSelect.value); else params.delete("beds");
+    if (bathsSelect?.value) params.set("baths", bathsSelect.value); else params.delete("baths");
+    if (statusSelect?.value) params.set("status", statusSelect.value); else params.delete("status");
+
+    const sliderVal = Number(priceSlider?.value);
+    if (sliderVal && sliderVal < 5000000) {
+      params.set("maxPrice", sliderVal.toString());
+    } else {
+      params.delete("maxPrice");
+    }
+
+    history.replaceState(null, "", `?${params.toString()}`);
+    window.dispatchEvent(new Event("filterUpdated"));
+  }
+
+  // Listeners de actualización
+  subtypeSelect?.addEventListener("change", updateFilters);
+  bedsSelect?.addEventListener("change", updateFilters);
+  bathsSelect?.addEventListener("change", updateFilters);
+  statusSelect?.addEventListener("change", updateFilters);
+
+  // Inicializar Histograma
+  fetchAndBuildHistogram();
+</script>

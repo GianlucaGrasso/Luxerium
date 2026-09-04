@@ -4,19 +4,29 @@ import Navbar from '../ui/navbar/Navbar.astro';
 import SecondaryNavbar from '../ui/navbar/SecondaryNavbar.astro';
 import Feature from '../ui/indexComponents/Feature.astro';
 import Markets from  '../ui/indexComponents/Markets.astro';
-import Test2 from '../playground/test2.astro';
-import Footer from '../ui/Footer.astro';
+
 ---
 
-<Layout title="Luxerium">
-    <Navbar />
-    <SecondaryNavbar/>
-    <Feature />
-    <div class="flex flex-col">
-        <div class="w-full">
-            <Markets client:load />
+<Layout title="LUXERIUM - HOME">
+    <div class="relative w-full h-[65vh]">
+        <Feature />
+        <Navbar />
+        <SecondaryNavbar />
+      </div>
+
+      <article class="flex flex-col items-center justify-center w-full h-fit py-2 bg-terciaryColor text-primaryColor font-secondaryFont uppercase">
+        <h2 class="text-2xl font-bold">Discover the World of Marketplace</h2>
+        <p class="text-md text-center text-secondaryColor/80 max-w-2xl border-t border-primaryColor/20 mt-1 pt-1 w-full"> $1B+ CLOSED DEALS <span class="text-primaryColor/50 text-xl mx-4">|</span> 50000+ ACTIVE LISTINGS <span class="text-primaryColor/50 text-xl mx-4">|</span> 300+ CERTIFIED AGENTS  </p>
+<!--         <p class="text-md text-center text-secondaryColor/80 max-w-2xl border-t border-primaryColor/20 mt-1 w-full">OUR PARTNERS</p>
+        <div>
+          THIS IS WHERE THE LOGOS OF THE PARTNERS SHOULD BE 
+        </div> -->
+      </article>
+      <div class="flex flex-col">
+        <div class="w-full border-t border-primaryColor/20">
+          <Markets />
         </div>
-    </div>
+      </div>
 </Layout>
 
     

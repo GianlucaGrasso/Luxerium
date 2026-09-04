@@ -14,9 +14,9 @@ export default {
 			  },
 			  
 			  colors: {
-				'primaryColor': '#F6F6F6',
+				'primaryColor': '#F6F6F6', /* e0e1dd A FUTURO PARA WHITE-MODE f6f6f6 */
 				'secondaryColor': '#F99929',
-				'terciaryColor': '#252525',
+				'terciaryColor': '#0A0A0A',
 				'Red': '#874545',
 				'Green': '#45874C',
 				'lightGreyFade': 'rgba(9, 9, 9, 0.71)',

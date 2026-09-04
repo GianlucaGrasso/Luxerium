@@ -12,3 +12,22 @@
   font-weight: normal;
   font-display: swap;
 }
+
+*::-webkit-scrollbar {
+  width: none;
+}
+*::-webkit-scrollbar-track {
+  background: transparent; /* Fondo transparente para que se vea el layout */
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2); /* Barra semi-blanca */
+  border-radius: 20px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+/* Firefox */
+* {
+  scrollbar-width: none;
+  scrollbar-color: rgb(249, 153, 41, 0.75) transparent;
+}

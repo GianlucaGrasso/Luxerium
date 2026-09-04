@@ -1,52 +1,350 @@
 ---
 import Searchbar from '../Searchbar.astro';
 
-var currency = {
+// 10 propiedades de ejemplo con campos extra
+const properties = [
+  {
+    image: '/Featured.webp',
+    title: 'MANSION IN LOMAS DE ZAMORA',
+    location: 'GBA SUR, AR',
+    price: 420000000,
+    currencyIndex: 4, // JPY ¥
+    beds: 5,
+    baths: 4,
+    parking: 3,
+    area: 650,
+    link: '/property/1'
+  },
+  {
+    image: 'https://images.pexels.com/photos/7614590/pexels-photo-7614590.jpeg',
+    title: 'MODERN VILLA IN BARCELONA',
+    location: 'Catalunya, ES',
+    price: 1850000,
+    currencyIndex: 1, // EUR €
+    beds: 4,
+    baths: 3,
+    parking: 2,
+    area: 420,
+    link: '/property/2'
+  },
+  {
+    image: 'https://images.pexels.com/photos/5847362/pexels-photo-5847362.jpeg',
+    title: 'PENTHOUSE WITH PANORAMIC VIEW',
+    location: 'New York, US',
+    price: 3200000,
+    currencyIndex: 0, // USD $
+    beds: 3,
+    baths: 2,
+    parking: 1,
+    area: 180,
+    link: '/property/3'
+  },
+  {
+    image: 'https://images.pexels.com/photos/27277237/pexels-photo-27277237.jpeg',
+    title: 'BEACHFRONT VILLA IN',
+    location: 'MALIBU, California, US',
+    price: 5900000,
+    currencyIndex: 0,
+    beds: 6,
+    baths: 5,
+    parking: 4,
+    area: 850,
+    link: '/property/4'
+  },
+  {
+    image: 'https://images.pexels.com/photos/3639507/pexels-photo-3639507.jpeg',
+    title: 'DUPLEX IN LONDON',
+    location: 'Kensington, UK',
+    price: 2750000,
+    currencyIndex: 2, // GBP £
+    beds: 4,
+    baths: 3,
+    parking: 2,
+    area: 320,
+    link: '/property/5'
+  },
+  {
+    image: 'https://images.pexels.com/photos/2614818/pexels-photo-2614818.jpeg',
+    title: 'LUXURY APARTMENT IN TOKYO',
+    location: 'Shibuya, JP',
+    price: 430000000,
+    currencyIndex: 4, // JPY ¥
+    beds: 3,
+    baths: 2,
+    parking: 1,
+    area: 145,
+    link: '/property/6'
+  },
+  {
+    image: 'https://images.pexels.com/photos/32599888/pexels-photo-32599888.jpeg',
+    title: 'COUNTRY ESTATE IN TUSCANY',
+    location: 'Florence, IT',
+    price: 2300000,
+    currencyIndex: 1,
+    beds: 5,
+    baths: 4,
+    parking: 3,
+    area: 550,
+    link: '/property/7'
+  },
+  {
+    image: 'https://media.architecturaldigest.com/photos/564e5b6610e801045c55ff45/16:9/w_2560%2Cc_limit/slide%25204.jpg',
+    title: 'SKYSCRAPER PENTHOUSE',
+    location: 'Dubai, UAE',
+    price: 8700000,
+    currencyIndex: 0,
+    beds: 4,
+    baths: 4,
+    parking: 3,
+    area: 500,
+    link: '/property/8'
+  },
+  {
+    image: 'https://www.gddevelopers.com/images/modulo/936.jpg?v=1779115078',
+    title: 'STUDIO IN BARRACAS',
+    location: 'BUENOS AIRES, AR',
+    price: 1500000,
+    currencyIndex: 0,
+    beds: 6,
+    baths: 5,
+    parking: 4,
+    area: 720,
+    link: '/property/9'
+  },
+  {
+    image: 'https://images.pexels.com/photos/16396624/pexels-photo-16396624.jpeg',
+    title: 'CHALET IN THE SWISS ALPS',
+    location: 'Zermatt, CH',
+    price: 6200000,
+    currencyIndex: 1,
+    beds: 5,
+    baths: 4,
+    parking: 3,
+    area: 480,
+    link: '/property/10'
+  }
+];
+
+// Mapeo de monedas
+const currencySymbols = {
   0: 'USD $',
   1: 'EUR €',
-  2: 'GBP €',
+  2: 'GBP £',
   3: 'ARS $',
   4: 'JPY ¥',
   5: 'CNY ¥',
   6: 'AUD $',
-} ; // Define the currency variable
+};
 
+// Formateador de números
+const formatter = new Intl.NumberFormat('en-US', {
+  maximumFractionDigits: 0,
+});
 
+// Obtener el color secondary de las variables de Tailwind (para los dots)
+const SECONDARY_COLOR = '#eab308'; // Cambia por tu color secondary
+
+// PROPS: permiten controlar el Searchbar y la altura del contenedor
+export interface Props {
+  showSearchbar?: boolean;
+  heightClass?: string;
+}
+
+const { showSearchbar = true, heightClass = 'h-[65vh]' } = Astro.props;
 ---
 
-<div class="relative w-full h-[50vh]">
-  <Searchbar />
+<div class={`absolute w-full ${heightClass}`}>
   
-  <!-- Image with gradient overlay -->
-  <a href="/agency">
-    <div class="relative w-full h-full">
-      <img 
-        src="Featured.webp" 
-        alt="Mansion in Lomas de Zamora" 
-        class="w-full h-full object-cover hover:object-top" 
-        loading="eager"
-      />
-      
-      <!-- Gradient overlay -->
-      <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+  <!-- SEARCHBAR CONDICIONAL -->
+  {showSearchbar && (
+    <div class="relative z-30 w-full">
+      <Searchbar />
     </div>
-  </a>
+  )}
 
-  <!-- Text content with better visibility due to gradient -->
-  <div class="absolute bottom-0 left-8 mb-8 font-semibold text-primaryColor">
-    <h1 class="text-2xl font-secondaryFont">
-      MANSION IN LOMAS DE ZAMORA
-      <span class="md:inline hidden">, GBA SUR</span>
-      <span class="lg:inline hidden">, AR</span>
-    </h1>
-    <p class="mb-[.5em] text-lg font-secondaryFont">
-     <span class="text-secondaryColor font-extrabold">{currency[4]}</span> 420,000,000
-    </p>
-    <div class="flex space-x-4">
-      <button class="transition-all duration-300 backdrop-blur-sm hover:bg-secondaryColor w-72 h-10 text-center border-secondaryColor border rounded-br-3xl rounded-tr-md">
-        CONTACT AGENT
-      </button>
+  <!-- SLIDER CON FONDO NEGRO -->
+  <div id="feature-slider" class="absolute inset-0 w-full h-full bg-black">
+    
+    <!-- Slides -->
+    <div id="slides-wrapper" class="relative w-full h-full">
+      {properties.map((prop, index) => (
+        <a 
+          href={prop.link} 
+          class="slide absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out"
+          style={{ opacity: index === 0 ? 1 : 0, zIndex: index === 0 ? 10 : 1 }}
+          data-index={index}
+        >
+          <div class="relative w-full h-full">
+            <img 
+              src={prop.image} 
+              alt={prop.title} 
+              class="w-full h-full object-cover hover:object-top" 
+              loading={index === 0 ? 'eager' : 'lazy'}
+            />
+            <!-- Gradiente inferior -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+            <!-- Viñeta -->
+            <div 
+              class="absolute inset-0" 
+              style="background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.65) 85%);"
+            ></div>
+          </div>
+          
+          <!-- Texto, precio y características -->
+          <div class="absolute bottom-0 left-8 mb-10 font-semibold text-primaryColor">
+            <h1 class="text-2xl font-secondaryFont">
+              {prop.title}
+              <span class="md:inline hidden uppercase">{prop.location}</span>
+            </h1>
+            <p class="mb-1 text-lg font-secondaryFont">
+              <span class="text-secondaryColor font-extrabold">{currencySymbols[prop.currencyIndex]}</span> {formatter.format(prop.price)}
+            </p>
+            
+            <!-- Características: ambientes, baños, parking, área -->
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-primaryColor/75 text-sm font-secondaryFont mt-1">
+              <span class="flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                {prop.beds} amb
+              </span>
+              <span class="text-secondaryColor/50">|</span>
+              <span class="flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" /></svg>
+                {prop.baths} baños
+              </span>
+              <span class="text-secondaryColor/50">|</span>
+              <span class="flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                {prop.parking} slots
+              </span>
+              <span class="text-secondaryColor/50">|</span>
+              <span class="flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                {prop.area} m²
+              </span>
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <!-- Flechas de navegación (sin círculo ni anillo naranja) -->
+    <button id="prev-btn" class="absolute left-4 top-1/2 -translate-y-1/2 z-20 text-white/60 hover:text-white transition-colors duration-200 focus:outline-none p-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+    </button>
+    <button id="next-btn" class="absolute right-4 top-1/2 -translate-y-1/2 z-20 text-white/60 hover:text-white transition-colors duration-200 focus:outline-none p-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+      </svg>
+    </button>
+
+    <!-- Indicadores (rectángulos redondeados) -->
+    <div id="dots-container" class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+      {properties.map((_, index) => (
+        <button 
+          class="dot h-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-secondaryColor"
+          style={{
+            width: index === 0 ? '3rem' : '2rem',
+            backgroundColor: index === 0 ? SECONDARY_COLOR : 'rgba(255,255,255,0.4)',
+          }}
+          data-index={index}
+          aria-label={`Ir a diapositiva ${index + 1}`}
+        ></button>
+      ))}
     </div>
   </div>
 </div>
 
+<script>
+  (function() {
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const totalSlides = slides.length;
+    let currentIndex = 0;
+    let autoPlayInterval = null;
+
+    // Color secondary (debe coincidir con el definido arriba)
+    const SECONDARY_COLOR = '#eab308'; // Cambiar según tu tema
+
+    function goToSlide(index) {
+      if (index < 0) index = totalSlides - 1;
+      if (index >= totalSlides) index = 0;
+      
+      slides.forEach((slide, i) => {
+        slide.style.opacity = i === index ? '1' : '0';
+        slide.style.zIndex = i === index ? '10' : '1';
+      });
+      
+      dots.forEach((dot, i) => {
+        const isActive = i === index;
+        dot.style.backgroundColor = isActive ? SECONDARY_COLOR : 'rgba(255,255,255,0.4)';
+        dot.style.width = isActive ? '3rem' : '2rem';
+      });
+      
+      currentIndex = index;
+      resetAutoPlay();
+    }
+
+    function nextSlide() {
+      goToSlide(currentIndex + 1);
+    }
+
+    function prevSlide() {
+      goToSlide(currentIndex - 1);
+    }
+
+    function startAutoPlay() {
+      if (autoPlayInterval) clearInterval(autoPlayInterval);
+      autoPlayInterval = setInterval(nextSlide, 3500);
+    }
+
+    function resetAutoPlay() {
+      if (autoPlayInterval) {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = null;
+      }
+      startAutoPlay();
+    }
+
+    // Eventos
+    nextBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      nextSlide();
+    });
+    
+    prevBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      prevSlide();
+    });
+
+    dots.forEach((dot) => {
+      dot.addEventListener('click', () => {
+        const index = parseInt(dot.getAttribute('data-index'), 10);
+        if (!isNaN(index)) goToSlide(index);
+      });
+    });
+
+    const slider = document.getElementById('feature-slider');
+    slider.addEventListener('mouseenter', () => {
+      if (autoPlayInterval) {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = null;
+      }
+    });
+    slider.addEventListener('mouseleave', () => {
+      startAutoPlay();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') prevSlide();
+      if (e.key === 'ArrowRight') nextSlide();
+    });
+
+    // Inicializar
+    goToSlide(0);
+    startAutoPlay();
+  })();
+</script>

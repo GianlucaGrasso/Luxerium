@@ -1,51 +1,58 @@
 ---
-//REALESTATE SEARCH PAGE
+// src/pages/realestateSearch.astro
 import Layout from "../../layouts/Layout.astro"
 import Navbar from "../../ui/navbar/Navbar.astro"
 import SecondaryNavbar from "../../ui/navbar/SecondaryNavbar.astro"
 import MapView from "../../ui/map/MapView"
 import Proplist from "../../ui/real-estate/Proplist"
-import Filters from "../../playground/playground-components/Filters.astro" //*ESTO ES UN FILTRO DE PRUEBA*//
-
-
-
+import Filters from "../../playground/playground-components/Filters.astro"
 ---
 
 <Layout title="Real Estate">
+  <div class="flex flex-col h-screen overflow-hidden bg-terciaryColor">
     <Navbar />
     <SecondaryNavbar />
-    <Filters/>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-0 h-[82.5dvh] static">
+    <Filters />
+    
+    <div 
+      id="realestate-grid-container" 
+      class="grid grid-cols-1 md:grid-cols-2 gap-0 flex-1 min-h-0 relative"
+    >
+      <div id="map-view-wrapper" class="w-full h-full min-h-0 block overflow-hidden">
         <MapView client:only="react" />
+      </div>
+      
+      <div class="w-full h-full min-h-0 overflow-hidden">
         <Proplist client:only="react" />
+      </div>
     </div>
+  </div>
 </Layout>
 
+<script>
+  const container = document.getElementById('realestate-grid-container');
+  const mapWrapper = document.getElementById('map-view-wrapper');
 
+  if (container && mapWrapper) {
+    window.addEventListener('map:visibilityChanged', (e: any) => {
+      const isVisible = e.detail.visible;
 
-<!-- 
----
-import Layout from "../../layouts/Layout.astro"
-import Navbar from "../../ui/navbar/Navbar.astro"
-import SecondaryNavbar from "../../ui/navbar/SecondaryNavbar.astro"
-import RealEstatePage from "../../ui/real-estate/RealEstatePage.jsx"
----
-
-<Layout title="Real Estate">
-  <Navbar />
-  <SecondaryNavbar />
-  <RealEstatePage client:only="react" />
-</Layout>
-
--->
-
-
-<!-- 
-    <Layout title="RealEstate">
-        <Navbar/>
-        <div class="grid grid-cols-2 p-0 m-0 gap-0">
-            <Map/>
-            <Proplist/>
-        </div>
-    </Layout>
- -->
+      if (isVisible) {
+        container.classList.remove('md:grid-cols-1');
+        container.classList.add('md:grid-cols-2');
+        mapWrapper.classList.remove('hidden');
+        mapWrapper.classList.add('block');
+        
+        // Disparar resize para recalcular dimensiones de Leaflet/Google Maps
+        setTimeout(() => {
+          window.dispatchEvent(new Event('resize'));
+        }, 150);
+      } else {
+        container.classList.remove('md:grid-cols-2');
+        container.classList.add('md:grid-cols-1');
+        mapWrapper.classList.remove('block');
+        mapWrapper.classList.add('hidden');
+      }
+    });
+  }
+</script>
